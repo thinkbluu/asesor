@@ -65,14 +65,11 @@ export function HeroSection() {
         className="absolute inset-0 w-full h-full"
         colors={["#000000", "#10b981", "#059669", "#064e3b", "#ffffff"]}
         speed={0.3}
-        backgroundColor="#000000"
       />
       <MeshGradient
         className="absolute inset-0 w-full h-full opacity-40"
         colors={["#000000", "#ffffff", "#10b981", "#059669"]}
         speed={0.2}
-        wireframe="true"
-        backgroundColor="transparent"
       />
 
       <main className="relative z-20 flex items-end justify-start min-h-screen px-8 pb-32 sm:px-12 lg:px-16">
@@ -152,20 +149,16 @@ export function HeroSection() {
         <div className="relative w-20 h-20 flex items-center justify-center">
           <PulsingBorder
             colors={["#10b981", "#059669", "#ffffff", "#34d399", "#6ee7b7"]}
-            colorBack="#00000000"
             speed={1.5}
             roundness={1}
             thickness={0.1}
             softness={0.2}
             intensity={5}
-            spotsPerColor={5}
             spotSize={0.1}
             pulse={0.1}
             smoke={0.5}
             smokeSize={4}
             scale={0.65}
-            rotation={0}
-            frame={9161408.251009725}
             style={{
               width: "60px",
               height: "60px",
