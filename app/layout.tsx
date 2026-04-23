@@ -38,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             signUpUrl="/register"
             signInFallbackRedirectUrl="/app"
             signUpFallbackRedirectUrl="/app/onboarding"
+            appearance={{ cssLayerName: "clerk" }}
           >
             {children}
           </ClerkProvider>

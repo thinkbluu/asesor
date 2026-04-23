@@ -36,7 +36,6 @@ export default function LoginPage() {
             <span className="text-xl font-semibold text-[#0A0A0A] tracking-tight">ASESOR</span>
           </div>
           <SignIn
-            routing="hash"
             appearance={{
               elements: {
                 rootBox: "w-full max-w-md",
