@@ -6,7 +6,6 @@ import { SignUp } from "@clerk/nextjs"
 export default function RegisterPage() {
   return (
     <div className="flex min-h-screen">
-      {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0A0A0A] p-12">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2D8C3C]">
@@ -31,7 +30,6 @@ export default function RegisterPage() {
         <p className="text-white/30 text-sm">© 2025 ASESOR. Toate drepturile rezervate.</p>
       </div>
 
-      {/* Right panel */}
       <div className="flex flex-1 items-center justify-center bg-[#F7F5F2] px-6 py-12">
         <div className="flex flex-col items-center gap-6 w-full">
           <div className="flex lg:hidden items-center gap-2 mb-2">
@@ -47,17 +45,13 @@ export default function RegisterPage() {
                 card: "shadow-sm border border-black/10 rounded-2xl bg-white p-8",
                 headerTitle: "text-2xl font-bold text-[#0A0A0A]",
                 headerSubtitle: "text-sm text-[#0A0A0A]/50",
-                formButtonPrimary:
-                  "bg-[#2D8C3C] hover:bg-[#256b30] text-white font-semibold rounded-xl h-11 w-full",
-                formFieldInput:
-                  "h-11 border border-black/15 bg-white rounded-xl px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2D8C3C] focus:border-transparent w-full",
+                formButtonPrimary: "bg-[#2D8C3C] hover:bg-[#256b30] text-white font-semibold rounded-xl h-11 w-full",
+                formFieldInput: "h-11 border border-black/15 bg-white rounded-xl px-3 text-sm w-full",
                 formFieldLabel: "text-sm font-medium text-[#0A0A0A] mb-1",
                 footerActionLink: "text-[#2D8C3C] hover:text-[#256b30] font-semibold",
                 dividerLine: "bg-black/10",
                 dividerText: "text-[#0A0A0A]/40 text-xs",
-                socialButtonsBlockButton:
-                  "border border-black/15 bg-white hover:bg-black/5 text-[#0A0A0A] font-medium h-11 rounded-xl w-full",
-                socialButtonsBlockButtonText: "font-medium text-[#0A0A0A] text-sm",
+                socialButtonsBlockButton: "border border-black/15 bg-white hover:bg-black/5 text-[#0A0A0A] font-medium h-11 rounded-xl w-full",
                 alertText: "text-red-600 text-sm",
                 formFieldErrorText: "text-red-500 text-xs mt-1",
               },
