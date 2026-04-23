@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 const isProtectedRoute = createRouteMatcher(['/app(.*)'])
-const isAuthRoute = createRouteMatcher(['/login', '/register', '/forgot-password', '/sso-callback'])
+const isAuthRoute = createRouteMatcher(['/login', '/register', '/sso-callback'])
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth()
