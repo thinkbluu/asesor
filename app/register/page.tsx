@@ -13,7 +13,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 interface Errors { [key: string]: string }
 
 export default function RegisterPage() {
-  const { signUp, isLoaded } = useSignUp()
+  const { signUp, isLoaded, setActive } = useSignUp()
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -69,7 +69,8 @@ export default function RegisterPage() {
     try {
       const result = await signUp.attemptEmailAddressVerification({ code })
       if (result.status === "complete") {
-        router.push("/app")
+        await setActive({ session: result.createdSessionId })
+        router.push("/app/onboarding")
       }
     } catch (err: unknown) {
       const clerkError = err as { errors?: { message: string }[] }

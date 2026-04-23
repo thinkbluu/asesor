@@ -12,7 +12,7 @@ import { ArrowLeft, Loader2, Mail } from "lucide-react"
 type Step = "email" | "code"
 
 export default function ForgotPasswordPage() {
-  const { signIn, isLoaded } = useSignIn()
+  const { signIn, isLoaded, setActive } = useSignIn()
   const router = useRouter()
   const [step, setStep] = useState<Step>("email")
   const [email, setEmail] = useState("")
@@ -49,6 +49,7 @@ export default function ForgotPasswordPage() {
         password: newPassword,
       })
       if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId })
         router.push("/app")
       }
     } catch (err: unknown) {

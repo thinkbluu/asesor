@@ -12,7 +12,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function LoginPage() {
-  const { signIn, isLoaded } = useSignIn()
+  const { signIn, isLoaded, setActive } = useSignIn()
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -29,6 +29,7 @@ export default function LoginPage() {
     try {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId })
         router.push("/app")
       }
     } catch (err: unknown) {
