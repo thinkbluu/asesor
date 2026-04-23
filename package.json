@@ -64,8 +64,6 @@
     "canvas-confetti": "1.9.4",
     "@number-flow/react": "0.5.11",
     "@paper-design/shaders-react": "0.0.71",
-    "@supabase/ssr": "0.8.0",
-    "@supabase/supabase-js": "2.99.2",
     "@clerk/nextjs": "7.2.5"
   },
   "devDependencies": {
