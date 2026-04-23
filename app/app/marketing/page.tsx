@@ -424,7 +424,7 @@ function PromotionModal({ open, onClose }: { open: boolean; onClose: () => void 
           <DialogDescription>Creează un discount pentru clienți.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div className="space-y-1">
               <Label>Cod</Label>
               <Input placeholder="ex: PROMO20" className="font-mono uppercase" />
@@ -497,13 +497,13 @@ export default function MarketingPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Marketing</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">Marketing</h1>
           <p className="text-muted-foreground text-sm">Campanii, automatizări, promoții</p>
         </div>
-        <Button className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => setWizardOpen(true)}>
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full sm:w-auto" onClick={() => setWizardOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Campanie nouă
         </Button>
       </div>
@@ -543,16 +543,18 @@ export default function MarketingPage() {
       </div>
 
       <Tabs defaultValue="campanii" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="campanii">Campanii</TabsTrigger>
-          <TabsTrigger value="automatizari">Automatizări</TabsTrigger>
-          <TabsTrigger value="promotii">Promoții</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="w-max sm:w-auto">
+            <TabsTrigger value="campanii">Campanii</TabsTrigger>
+            <TabsTrigger value="automatizari">Automatizări</TabsTrigger>
+            <TabsTrigger value="promotii">Promoții</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ── CAMPANII ── */}
         <TabsContent value="campanii" className="space-y-3">
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border overflow-x-auto">
+            <table className="w-full text-sm min-w-[420px]">
               <thead>
                 <tr className="border-b bg-muted/40">
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">Campanie</th>
@@ -678,14 +680,14 @@ export default function MarketingPage() {
 
         {/* ── PROMOȚII ── */}
         <TabsContent value="promotii" className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">{PROMOTIONS.filter(p => p.active).length} coduri active</p>
-            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => setPromoOpen(true)}>
+            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0" onClick={() => setPromoOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />Cod nou
             </Button>
           </div>
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
               <thead>
                 <tr className="border-b bg-muted/40">
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">Cod</th>

@@ -582,7 +582,7 @@ function ListView({
                   key={apt.id}
                   type="button"
                   onClick={() => onSelectApt(apt)}
-                  className="w-full flex items-center gap-4 p-3 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors text-left"
+                  className="w-full flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 p-3 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors text-left"
                 >
                   <div className="text-center shrink-0 w-12">
                     <p className="text-sm font-bold text-foreground">{apt.startTime}</p>
@@ -1015,10 +1015,10 @@ export default function ProgramariPage() {
     <div className="flex flex-col h-screen overflow-hidden pt-16 lg:pt-0">
       {/* ── Header ── */}
       <div className="shrink-0 border-b border-border bg-background px-4 py-3 lg:px-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
           {/* Left: title + nav */}
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-foreground">Programări</h1>
+            <h1 className="text-xl font-bold text-foreground text-balance">Programări</h1>
             <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
               <button type="button" onClick={navigatePrev} className="p-1.5 rounded hover:bg-muted">
                 <ChevronLeft className="h-4 w-4" />
@@ -1080,8 +1080,9 @@ export default function ProgramariPage() {
               onClick={() => { setPrefillStaff(undefined); setPrefillTime(undefined); setNewAptOpen(true) }}
               className="bg-emerald-600 hover:bg-emerald-700 text-white"
             >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Programare nouă
+              <Plus className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Programare nouă</span>
+              <span className="sr-only sm:hidden">Programare nouă</span>
             </Button>
           </div>
         </div>
@@ -1145,7 +1146,7 @@ export default function ProgramariPage() {
 
         {/* Detail panel */}
         {selectedApt && (
-          <div className="w-80 shrink-0 flex flex-col bg-background overflow-hidden">
+          <div className="fixed inset-0 z-40 lg:static lg:inset-auto w-full lg:w-80 shrink-0 flex flex-col bg-background overflow-hidden">
             <AppointmentDetail
               apt={selectedApt}
               onClose={() => setSelectedApt(null)}

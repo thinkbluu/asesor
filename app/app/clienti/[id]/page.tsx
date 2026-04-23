@@ -134,7 +134,7 @@ export default function ClientProfilePage() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="text-xl font-bold">{client.prenume} {client.nume}</h1>
+                <h1 className="text-xl font-bold text-balance break-words">{client.prenume} {client.nume}</h1>
                 {client.tags.map(tag => (
                   <span key={tag} className={cn("text-xs font-medium px-2 py-0.5 rounded-full border", TAG_COLORS[tag])}>
                     {tag}
@@ -181,7 +181,7 @@ export default function ClientProfilePage() {
           )}
 
           {/* Summary cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-5">
             {[
               { label: "Total vizite", value: client.totalVisits, icon: Calendar },
               { label: "Total cheltuit", value: `${client.totalSpent.toLocaleString("ro-RO")} Lei`, icon: Wallet },
@@ -194,7 +194,7 @@ export default function ClientProfilePage() {
                   <s.icon className={cn("h-3.5 w-3.5", s.highlight ? "text-red-500" : "text-accent")} />
                   <span className="text-xs text-muted-foreground">{s.label}</span>
                 </div>
-                <p className={cn("font-semibold text-sm leading-tight", s.highlight && "text-red-500")}>
+                <p className={cn("font-semibold text-sm leading-tight break-words", s.highlight && "text-red-500")}>
                   {s.value}
                 </p>
               </div>
@@ -204,14 +204,14 @@ export default function ClientProfilePage() {
       </Card>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-border">
+      <div className="flex gap-1 border-b border-border overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
         {TABS.map(t => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
             className={cn(
-              "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
+              "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors shrink-0 whitespace-nowrap",
               tab === t.id
                 ? "border-accent text-accent"
                 : "border-transparent text-muted-foreground hover:text-foreground"

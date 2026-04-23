@@ -94,7 +94,7 @@ const uid = () => Math.random().toString(36).slice(2, 9)
 
 function ProgressBar({ current }: { current: number }) {
   return (
-    <div className="flex items-center gap-2 mb-10">
+    <div className="flex items-center gap-2 mb-6 sm:mb-10">
       {STEPS.map((step, i) => {
         const done = current > step.number
         const active = current === step.number
@@ -233,8 +233,8 @@ function Step2({
       </div>
 
       <div className="space-y-3">
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_100px_90px_32px] gap-2 px-1">
+        {/* Header — visible only on sm+ */}
+        <div className="hidden sm:grid grid-cols-[1fr_100px_90px_32px] gap-2 px-1">
           <span className="text-xs font-medium text-[#0A0A0A]/40">Serviciu</span>
           <span className="text-xs font-medium text-[#0A0A0A]/40">Durată</span>
           <span className="text-xs font-medium text-[#0A0A0A]/40">Preț (RON)</span>
@@ -242,43 +242,73 @@ function Step2({
         </div>
 
         {services.map((service) => (
-          <div key={service.id} className="grid grid-cols-[1fr_100px_90px_32px] gap-2 items-center">
-            <Input
-              placeholder="Numele serviciului"
-              value={service.name}
-              onChange={(e) => updateService(service.id, "name", e.target.value)}
-              className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
-            />
-            <Select
-              value={service.duration}
-              onValueChange={(v) => updateService(service.id, "duration", v)}
-            >
-              <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#2D8C3C]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {["15", "30", "45", "60", "90", "120"].map((d) => (
-                  <SelectItem key={d} value={d}>
-                    {d} min
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              placeholder="0"
-              type="number"
-              value={service.price}
-              onChange={(e) => updateService(service.id, "price", e.target.value)}
-              className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => removeService(service.id)}
-              disabled={services.length <= 1}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-[#0A0A0A]/30 hover:text-red-500 hover:bg-red-50 disabled:opacity-20 transition-colors"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+          <div
+            key={service.id}
+            className="rounded-xl border border-[#0A0A0A]/10 bg-white p-3 sm:border-0 sm:bg-transparent sm:p-0 sm:rounded-none sm:grid sm:grid-cols-[1fr_100px_90px_32px] sm:gap-2 sm:items-center"
+          >
+            <div className="flex items-center gap-2 sm:contents">
+              <Input
+                placeholder="Numele serviciului"
+                value={service.name}
+                onChange={(e) => updateService(service.id, "name", e.target.value)}
+                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm flex-1 sm:flex-none"
+              />
+              <Select
+                value={service.duration}
+                onValueChange={(v) => updateService(service.id, "duration", v)}
+              >
+                <SelectTrigger className="hidden sm:flex h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#2D8C3C]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["15", "30", "45", "60", "90", "120"].map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d} min
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Preț"
+                type="number"
+                value={service.price}
+                onChange={(e) => updateService(service.id, "price", e.target.value)}
+                className="hidden sm:block h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => removeService(service.id)}
+                disabled={services.length <= 1}
+                className="flex h-10 w-8 items-center justify-center rounded-md text-[#0A0A0A]/30 hover:text-red-500 hover:bg-red-50 disabled:opacity-20 transition-colors sm:h-8"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            {/* Mobile-only: duration + price row */}
+            <div className="grid grid-cols-2 gap-2 mt-2 sm:hidden">
+              <Select
+                value={service.duration}
+                onValueChange={(v) => updateService(service.id, "duration", v)}
+              >
+                <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#2D8C3C]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["15", "30", "45", "60", "90", "120"].map((d) => (
+                    <SelectItem key={d} value={d}>
+                      {d} min
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Preț RON"
+                type="number"
+                value={service.price}
+                onChange={(e) => updateService(service.id, "price", e.target.value)}
+                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -321,11 +351,11 @@ function Step3({
             <div
               key={key}
               className={cn(
-                "flex items-center gap-4 rounded-xl border p-3 transition-colors",
+                "flex items-center flex-wrap gap-x-4 gap-y-2 rounded-xl border p-3 transition-colors sm:flex-nowrap",
                 day.open ? "border-[#0A0A0A]/10 bg-white" : "border-[#0A0A0A]/5 bg-[#0A0A0A]/2",
               )}
             >
-              <div className="flex items-center gap-3 w-28">
+              <div className="flex items-center gap-3 w-28 shrink-0">
                 <button
                   type="button"
                   onClick={() => toggle(key, "open", !day.open)}
@@ -352,19 +382,19 @@ function Step3({
               </div>
 
               {day.open ? (
-                <div className="flex items-center gap-2 flex-1">
+                <div className="flex items-center gap-2 flex-1 w-full sm:w-auto">
                   <Input
                     type="time"
                     value={day.start}
                     onChange={(e) => toggle(key, "start", e.target.value)}
-                    className="h-9 w-28 border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
+                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
                   />
                   <span className="text-[#0A0A0A]/30 text-sm">—</span>
                   <Input
                     type="time"
                     value={day.end}
                     onChange={(e) => toggle(key, "end", e.target.value)}
-                    className="h-9 w-28 border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
+                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
                   />
                 </div>
               ) : (
@@ -434,7 +464,7 @@ function Step4({
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-[#0A0A0A]/60">Nume *</Label>
                 <Input
@@ -648,7 +678,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F5F2] flex items-start justify-center px-4 py-10">
+    <div className="min-h-screen bg-[#F7F5F2] flex items-start justify-center px-4 py-6 sm:py-10">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -665,7 +695,7 @@ export default function OnboardingPage() {
 
         <ProgressBar current={step} />
 
-        <div className="rounded-2xl border border-[#0A0A0A]/8 bg-white p-8 shadow-sm">
+        <div className="rounded-2xl border border-[#0A0A0A]/8 bg-white p-5 shadow-sm sm:p-8">
           {step === 1 && (
             <Step1
               data={salon}

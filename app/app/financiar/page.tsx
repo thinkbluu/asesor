@@ -160,11 +160,11 @@ export default function FinanciarPage() {
   const cashVariance = cashDiff !== null && Math.abs(cashDiff) > 10
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 pt-16 sm:p-6 lg:p-8 lg:pt-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Financiar</h1>
+          <h1 className="text-2xl font-semibold text-balance">Financiar</h1>
           <p className="text-sm text-muted-foreground">Venituri, cheltuieli și rapoarte financiare</p>
         </div>
         <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ export default function FinanciarPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         {[
           { label: "Venituri totale", value: totalRevenue, prev: totalRevenue * 0.91, icon: TrendingUp, green: true },
           { label: "Cheltuieli totale", value: totalExpenses, prev: totalExpenses * 1.04, icon: TrendingDown, green: false },
@@ -225,7 +225,7 @@ export default function FinanciarPage() {
 
       {/* Main Tabs */}
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="h-9">
+        <TabsList className="h-9 w-full justify-start overflow-x-auto flex-nowrap">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="tranzactii">Tranzacții</TabsTrigger>
           <TabsTrigger value="cheltuieli">Cheltuieli</TabsTrigger>
@@ -338,12 +338,12 @@ export default function FinanciarPage() {
         <TabsContent value="tranzactii" className="space-y-4 mt-4">
           {/* Filters */}
           <div className="flex flex-wrap gap-2">
-            <div className="relative flex-1 min-w-48">
+            <div className="relative flex-1 min-w-0 sm:min-w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Caută client…" className="pl-9 h-9" value={txSearch} onChange={e => setTxSearch(e.target.value)} />
             </div>
             <Select value={txMethod} onValueChange={setTxMethod}>
-              <SelectTrigger className="w-36 h-9"><SelectValue placeholder="Metodă" /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-36 h-9"><SelectValue placeholder="Metodă" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="toate">Toate metodele</SelectItem>
                 <SelectItem value="numerar">Numerar</SelectItem>
@@ -352,14 +352,14 @@ export default function FinanciarPage() {
               </SelectContent>
             </Select>
             <Select value={txStaff} onValueChange={setTxStaff}>
-              <SelectTrigger className="w-40 h-9"><SelectValue placeholder="Angajat" /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-40 h-9"><SelectValue placeholder="Angajat" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="toate">Toți angajații</SelectItem>
                 {STAFF_DATA.map(s => <SelectItem key={s.id} value={s.id}>{s.firstName} {s.lastName}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={txStatus} onValueChange={setTxStatus}>
-              <SelectTrigger className="w-36 h-9"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectTrigger className="w-full sm:w-36 h-9"><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="toate">Toate</SelectItem>
                 <SelectItem value="incasat">Încasat</SelectItem>
@@ -398,7 +398,7 @@ export default function FinanciarPage() {
                     <TableRow key={tx.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setSelectedTx(tx)}>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{new Date(tx.date).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })} {tx.time}</TableCell>
                       <TableCell className="font-medium text-sm">{tx.clientName}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground max-w-xs truncate">{tx.services.join(", ")}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground max-w-[140px] sm:max-w-xs truncate">{tx.services.join(", ")}</TableCell>
                       <TableCell className="text-sm">{tx.staffName.split(" ")[0]}</TableCell>
                       <TableCell><PaymentBadge method={tx.paymentMethod} /></TableCell>
                       <TableCell className="text-right text-xs text-muted-foreground">

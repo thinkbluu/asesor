@@ -93,7 +93,7 @@ export default function StaffProfilePage({ params }: { params: Promise<{ id: str
               {getInitials(member)}
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{getFullName(member)}</h1>
+              <h1 className="text-2xl font-bold text-balance break-words">{getFullName(member)}</h1>
               <p className="text-muted-foreground">{member.role}</p>
               <div className="mt-1 flex items-center gap-2 flex-wrap">
                 <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", STATUS_STYLES[member.status])}>
@@ -115,13 +115,13 @@ export default function StaffProfilePage({ params }: { params: Promise<{ id: str
       </div>
 
       {/* Tab nav */}
-      <div className="mb-6 flex gap-1 border-b">
+      <div className="mb-6 flex gap-1 border-b overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id)}
             className={cn(
-              "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
+              "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px shrink-0 whitespace-nowrap",
               activeTab === t.id
                 ? "border-accent text-accent"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -144,26 +144,26 @@ export default function StaffProfilePage({ params }: { params: Promise<{ id: str
               {DAYS.map((day) => {
                 const d = schedule[day] ?? { active: false, start: "09:00", end: "18:00" }
                 return (
-                  <div key={day} className="flex items-center gap-4">
-                    <div className="w-24 text-sm font-medium">{day}</div>
+                  <div key={day} className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-4 gap-y-2">
+                    <div className="w-20 sm:w-24 text-sm font-medium">{day}</div>
                     <Switch
                       checked={d.active}
                       onCheckedChange={(v) => setSchedule((s) => ({ ...s, [day]: { ...d, active: v } }))}
                     />
                     {d.active ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
                         <Input
                           type="time"
                           value={d.start}
                           onChange={(e) => setSchedule((s) => ({ ...s, [day]: { ...d, start: e.target.value } }))}
-                          className="h-8 w-28 text-sm"
+                          className="h-8 w-24 sm:w-28 text-sm"
                         />
                         <span className="text-muted-foreground text-sm">—</span>
                         <Input
                           type="time"
                           value={d.end}
                           onChange={(e) => setSchedule((s) => ({ ...s, [day]: { ...d, end: e.target.value } }))}
-                          className="h-8 w-28 text-sm"
+                          className="h-8 w-24 sm:w-28 text-sm"
                         />
                       </div>
                     ) : (
@@ -318,7 +318,7 @@ export default function StaffProfilePage({ params }: { params: Promise<{ id: str
                   const override = priceOverrides[svc] ?? ""
                   return (
                     <div key={svc} className={cn(
-                      "flex items-center gap-4 rounded-lg border p-3 transition-colors",
+                      "flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 gap-y-2 rounded-lg border p-3 transition-colors",
                       enabled ? "border-accent/30 bg-accent/5" : "opacity-60"
                     )}>
                       <Checkbox

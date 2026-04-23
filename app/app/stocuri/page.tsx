@@ -152,7 +152,7 @@ const emptyProduct = (): Product => ({
   linkedServices: [], notes: "", active: true,
 })
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Main Component ─────────────────���──────────────────────────────────────────
 export default function StocuriPage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS)
   const [movements, setMovements] = useState<Movement[]>(INITIAL_MOVEMENTS)
@@ -306,11 +306,11 @@ export default function StocuriPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="p-4 pt-16 sm:p-6 lg:p-8 lg:pt-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Stocuri</h1>
+          <h1 className="text-2xl font-semibold text-balance">Stocuri</h1>
           <p className="text-sm text-muted-foreground">Inventar și mișcări de produse</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -422,13 +422,13 @@ export default function StocuriPage() {
         <Card>
           <CardContent className="p-0">
             {/* Filters */}
-            <div className="flex flex-wrap gap-3 border-b border-border p-4">
-              <div className="relative min-w-[220px] flex-1">
+            <div className="flex flex-wrap gap-2 sm:gap-3 border-b border-border p-3 sm:p-4">
+              <div className="relative w-full sm:min-w-[220px] sm:flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input placeholder="Caută după nume, brand, SKU..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
               </div>
               <Select value={filterCat} onValueChange={setFilterCat}>
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-full sm:w-44">
                   <Filter className="mr-2 h-3.5 w-3.5" />
                   <SelectValue />
                 </SelectTrigger>
@@ -438,7 +438,7 @@ export default function StocuriPage() {
                 </SelectContent>
               </Select>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -449,7 +449,7 @@ export default function StocuriPage() {
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={v => setSortBy(v as typeof sortBy)}>
-                <SelectTrigger className="w-36">
+                <SelectTrigger className="w-full sm:w-36">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -505,8 +505,8 @@ export default function StocuriPage() {
                         <input type="checkbox" className="accent-accent" checked={bulkSelected.has(p.id)} onChange={() => toggleBulk(p.id)} />
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium">{p.name}</div>
-                        {p.sku && <div className="font-mono text-xs text-muted-foreground">{p.sku}</div>}
+                        <div className="font-medium break-words min-w-0">{p.name}</div>
+                        {p.sku && <div className="font-mono text-xs text-muted-foreground break-all">{p.sku}</div>}
                       </TableCell>
                       <TableCell className="text-sm">{p.brand}</TableCell>
                       <TableCell><Badge variant="outline" className="text-xs">{p.category}</Badge></TableCell>
@@ -565,13 +565,13 @@ export default function StocuriPage() {
       {activeTab === "miscari" && (
         <Card>
           <CardContent className="p-0">
-            <div className="flex flex-wrap gap-3 border-b border-border p-4">
-              <div className="relative min-w-[220px] flex-1">
+            <div className="flex flex-wrap gap-2 sm:gap-3 border-b border-border p-3 sm:p-4">
+              <div className="relative w-full sm:min-w-[220px] sm:flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input placeholder="Caută produs sau notă..." className="pl-9" value={movSearch} onChange={e => setMovSearch(e.target.value)} />
               </div>
               <Select value={movType} onValueChange={setMovType}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -759,9 +759,9 @@ export default function StocuriPage() {
             <div className="space-y-2">
               <Label>Produse recepționate</Label>
               {receptionLines.map((line, i) => (
-                <div key={i} className="flex gap-2">
+                <div key={i} className="flex flex-wrap sm:flex-nowrap gap-2">
                   <Select value={line.productId} onValueChange={v => setReceptionLines(prev => prev.map((l, idx) => idx === i ? { ...l, productId: v } : l))}>
-                    <SelectTrigger className="flex-1 text-sm">
+                    <SelectTrigger className="w-full sm:flex-1 text-sm">
                       <SelectValue placeholder="Selectează produs..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -775,7 +775,7 @@ export default function StocuriPage() {
                   />
                   <Input
                     value={line.note} placeholder="Notă"
-                    className="flex-1 text-sm"
+                    className="w-full sm:flex-1 text-sm"
                     onChange={e => setReceptionLines(prev => prev.map((l, idx) => idx === i ? { ...l, note: e.target.value } : l))}
                   />
                   {receptionLines.length > 1 && (

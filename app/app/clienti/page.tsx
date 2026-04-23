@@ -142,7 +142,7 @@ export default function ClientiPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Clienți</h1>
+          <h1 className="text-2xl font-bold text-balance">Clienți</h1>
           <p className="text-muted-foreground text-sm mt-0.5">Gestionează relațiile cu clienții tăi</p>
         </div>
         <Button
@@ -158,7 +158,7 @@ export default function ClientiPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map(s => (
           <Card key={s.label}>
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
                   <s.icon className="h-4 w-4 text-accent" />
@@ -174,7 +174,7 @@ export default function ClientiPage() {
 
       {/* Filters & search */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Caută după nume, telefon, email..."
@@ -184,7 +184,7 @@ export default function ClientiPage() {
           />
         </div>
         <Select value={filterTag} onValueChange={v => setFilterTag(v as ClientTag | "all")}>
-          <SelectTrigger className="w-[140px]">
+          <SelectTrigger className="w-full sm:w-[140px]">
             <Tag className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
             <SelectValue placeholder="Tag" />
           </SelectTrigger>
@@ -194,7 +194,7 @@ export default function ClientiPage() {
           </SelectContent>
         </Select>
         <Select value={filterStaff} onValueChange={setFilterStaff}>
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue placeholder="Stilist" />
           </SelectTrigger>
           <SelectContent>
@@ -203,7 +203,7 @@ export default function ClientiPage() {
           </SelectContent>
         </Select>
         <Select value={filterLastVisit} onValueChange={setFilterLastVisit}>
-          <SelectTrigger className="w-[170px]">
+          <SelectTrigger className="w-full sm:w-[170px]">
             <SelectValue placeholder="Ultima vizită" />
           </SelectTrigger>
           <SelectContent>
@@ -227,7 +227,7 @@ export default function ClientiPage() {
 
       {/* Bulk actions bar */}
       {selected.size > 0 && (
-        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 px-4 py-2.5 text-sm">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 rounded-lg border border-accent/30 bg-accent/5 px-3 sm:px-4 py-2.5 text-sm">
           <span className="font-medium">{selected.size} selectat{selected.size > 1 ? "i" : ""}</span>
           <div className="flex-1" />
           <Button size="sm" variant="outline" className="h-7 gap-1.5 bg-transparent" onClick={() => setBulkTagOpen(true)}>
@@ -305,12 +305,12 @@ export default function ClientiPage() {
                     <p className="font-medium text-sm truncate group-hover:text-accent transition-colors">
                       {client.prenume} {client.nume}
                     </p>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Phone className="h-3 w-3" />{client.phone}
+                    <div className="flex items-center gap-3 mt-0.5 min-w-0">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1 min-w-0">
+                        <Phone className="h-3 w-3 shrink-0" /><span className="truncate">{client.phone}</span>
                       </span>
-                      <span className="text-xs text-muted-foreground hidden sm:flex items-center gap-1 truncate">
-                        <Mail className="h-3 w-3" />{client.email}
+                      <span className="text-xs text-muted-foreground hidden sm:flex items-center gap-1 min-w-0 truncate">
+                        <Mail className="h-3 w-3 shrink-0" /><span className="truncate">{client.email}</span>
                       </span>
                     </div>
                   </div>
