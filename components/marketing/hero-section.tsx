@@ -62,12 +62,12 @@ export function HeroSection() {
       </svg>
 
       <MeshGradient
-        className="absolute inset-0 w-full h-full"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
         colors={["#000000", "#10b981", "#059669", "#064e3b", "#ffffff"]}
         speed={0.3}
       />
       <MeshGradient
-        className="absolute inset-0 w-full h-full opacity-40"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.4 }}
         colors={["#000000", "#ffffff", "#10b981", "#059669"]}
         speed={0.2}
       />
@@ -159,11 +159,7 @@ export function HeroSection() {
             smoke={0.5}
             smokeSize={4}
             scale={0.65}
-            style={{
-              width: "60px",
-              height: "60px",
-              borderRadius: "50%",
-            }}
+            style={{ width: "60px", height: "60px", borderRadius: "50%", position: "absolute", inset: 0, margin: "auto" }}
           />
 
           <motion.svg
