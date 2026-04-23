@@ -30,7 +30,7 @@ export function HeroSection() {
   }, [])
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-black relative overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-slate-950 relative overflow-hidden">
       <svg className="absolute inset-0 w-0 h-0">
         <defs>
           <filter id="glass-effect" x="-50%" y="-50%" width="200%" height="200%">
@@ -63,12 +63,12 @@ export function HeroSection() {
 
       <MeshGradient
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        colors={["#000000", "#10b981", "#059669", "#064e3b", "#ffffff"]}
+        colors={["#0f172a", "#10b981", "#34d399", "#065f46", "#1e293b"]}
         speed={0.3}
       />
       <MeshGradient
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.4 }}
-        colors={["#000000", "#ffffff", "#10b981", "#059669"]}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.25 }}
+        colors={["#0f172a", "#6ee7b7", "#10b981", "#059669"]}
         speed={0.2}
       />
 
