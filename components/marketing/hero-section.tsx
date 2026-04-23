@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { MeshGradient, PulsingBorder } from "@paper-design/shaders-react"
+import { Warp, PulsingBorder } from "@paper-design/shaders-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { ArrowUpRight, Sparkles } from "lucide-react"
@@ -50,16 +50,20 @@ export function HeroSection() {
         </defs>
       </svg>
 
-      {/* Background shaders */}
-      <MeshGradient
+      {/* Background shader */}
+      <Warp
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        colors={["#0f172a", "#10b981", "#34d399", "#065f46", "#1e293b"]}
-        speed={0.3}
-      />
-      <MeshGradient
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.25 }}
-        colors={["#0f172a", "#6ee7b7", "#10b981", "#059669"]}
-        speed={0.2}
+        proportion={0.45}
+        softness={1}
+        distortion={0.25}
+        swirl={0.8}
+        swirlIterations={10}
+        shape="checks"
+        shapeScale={0.1}
+        scale={1}
+        rotation={0}
+        speed={0.6}
+        colors={["#0f172a", "#065f46", "#10b981", "#1e293b"]}
       />
 
       {/* Main content — bottom-left layout */}
