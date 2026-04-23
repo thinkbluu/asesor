@@ -21,7 +21,7 @@ export function SocialProofSection() {
           className="flex flex-col items-center gap-6 md:flex-row md:justify-between"
         >
           <p className="text-sm font-medium text-muted-foreground tracking-wide">
-            Peste <span className="text-foreground font-semibold">200+</span> saloane folosesc ASESOR
+            Construit în <span className="text-foreground font-semibold">România</span>. Pentru saloane din <span className="text-foreground font-semibold">România</span>.
           </p>
 
           <div className="flex items-center gap-6">
