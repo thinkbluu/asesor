@@ -1,37 +1,22 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { MeshGradient, PulsingBorder } from "@paper-design/shaders-react"
+import { useEffect, useRef } from "react"
+import { Warp, PulsingBorder } from "@paper-design/shaders-react"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowUpRight, Sparkles } from "lucide-react"
 
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [isActive, setIsActive] = useState(false)
-
-  useEffect(() => {
-    const handleMouseEnter = () => setIsActive(true)
-    const handleMouseLeave = () => setIsActive(false)
-
-    const container = containerRef.current
-    if (container) {
-      container.addEventListener("mouseenter", handleMouseEnter)
-      container.addEventListener("mouseleave", handleMouseLeave)
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("mouseenter", handleMouseEnter)
-        container.removeEventListener("mouseleave", handleMouseLeave)
-      }
-    }
-  }, [])
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-black relative overflow-hidden">
-      <svg className="absolute inset-0 w-0 h-0">
+    <div
+      ref={containerRef}
+      className="bg-slate-950 relative overflow-hidden"
+      style={{ minHeight: "calc(100vh - 56px)" }}
+    >
+      {/* SVG Filters */}
+      <svg className="absolute inset-0 w-0 h-0" aria-hidden="true">
         <defs>
           <filter id="glass-effect" x="-50%" y="-50%" width="200%" height="200%">
             <feTurbulence baseFrequency="0.005" numOctaves="1" result="noise" />
@@ -42,15 +27,18 @@ export function HeroSection() {
                       0 1 0 0 0.02
                       0 0 1 0 0.05
                       0 0 0 0.9 0"
-              result="tint"
             />
           </filter>
-          <linearGradient id="hero-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" />
-            <stop offset="30%" stopColor="#10b981" />
-            <stop offset="70%" stopColor="#059669" />
-            <stop offset="100%" stopColor="#ffffff" />
-          </linearGradient>
+          <filter id="gooey-filter" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+              result="gooey"
+            />
+            <feComposite in="SourceGraphic" in2="gooey" operator="atop" />
+          </filter>
           <filter id="text-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="2" result="coloredBlur" />
             <feMerge>
@@ -58,33 +46,72 @@ export function HeroSection() {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <path id="text-circle" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
         </defs>
       </svg>
 
-      <MeshGradient
+      {/* Background shader */}
+      <Warp
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        colors={["#000000", "#10b981", "#059669", "#064e3b", "#ffffff"]}
-        speed={0.3}
-      />
-      <MeshGradient
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.4 }}
-        colors={["#000000", "#ffffff", "#10b981", "#059669"]}
-        speed={0.2}
+        proportion={0.45}
+        softness={1}
+        distortion={0.25}
+        swirl={0.8}
+        swirlIterations={10}
+        shape="checks"
+        shapeScale={0.1}
+        scale={1}
+        rotation={0}
+        speed={0.6}
+        colors={["#0f172a", "#065f46", "#10b981", "#1e293b"]}
       />
 
-      <main className="relative z-20 flex items-end justify-start min-h-screen px-8 pb-32 sm:px-12 lg:px-16">
+      {/* Main content — bottom-left layout */}
+      <main
+        className="relative z-20 flex items-end justify-start px-8 pb-16 sm:px-12 lg:px-16"
+        style={{ minHeight: "calc(100vh - 56px)" }}
+      >
         <div className="max-w-2xl">
+
+          {/* Badge pill */}
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm mb-8 relative border border-white/10"
+            style={{ filter: "url(#glass-effect)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="absolute top-0 left-1 right-1 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent rounded-full" />
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-white/90 text-xs font-medium tracking-wide">
+              Gestionare salon — simplu, elegant, complet
+            </span>
+          </motion.div>
+
+          {/* Headline */}
           <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight tracking-tight"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-none tracking-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <motion.span
-              className="block font-light text-white text-2xl md:text-3xl lg:text-4xl mb-2 tracking-wide drop-shadow-lg"
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              className="block font-light text-3xl md:text-4xl lg:text-5xl mb-2 tracking-wide"
+              style={{
+                background: "linear-gradient(135deg, #ffffff 0%, #10b981 35%, #34d399 65%, #ffffff 100%)",
+                backgroundSize: "200% 200%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                filter: "url(#text-glow)",
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0, backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] } as any}
+              transition={{
+                opacity: { duration: 0.6, delay: 0.5 },
+                y: { duration: 0.6, delay: 0.5 },
+                backgroundPosition: { duration: 8, repeat: Infinity, ease: "linear" },
+              }}
             >
               Salonul tău.
             </motion.span>
@@ -93,58 +120,67 @@ export function HeroSection() {
             </span>
           </motion.h1>
 
+          {/* Subtext */}
           <motion.p
-            className="text-base md:text-lg font-light text-white/70 mb-8 leading-relaxed max-w-lg"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="text-base md:text-lg font-light text-white/65 mb-10 leading-relaxed max-w-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            Programări, clienți, echipă, stocuri, venituri — totul centralizat. Fără haos. Fără surprize.
+            Programări, clienți, echipă, stocuri, venituri — totul centralizat.
+            Fără haos. Fără surprize.
           </motion.p>
 
+          {/* CTAs */}
           <motion.div
-            className="flex items-center justify-start gap-4 flex-wrap mb-6"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-4 flex-wrap"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.0 }}
           >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                asChild
-                size="lg"
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-8 py-6 text-base rounded-full shadow-lg hover:shadow-xl"
+            {/* Gooey login button */}
+            <div
+              className="relative flex items-center group"
+              style={{ filter: "url(#gooey-filter)" }}
+            >
+              <Link
+                href="/login"
+                className="absolute right-0 rounded-full bg-white text-black cursor-pointer h-10 w-10 flex items-center justify-center -translate-x-10 group-hover:-translate-x-[4.5rem] z-0 transition-transform duration-300"
               >
-                <Link href="/register">
-                  Începe gratuit
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-2 border-white/30 text-white font-medium px-8 py-6 text-base rounded-full bg-transparent hover:bg-white/10 hover:border-emerald-400/50 backdrop-blur-sm"
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/login"
+                className="px-7 rounded-full bg-white text-black font-medium text-sm cursor-pointer h-10 flex items-center z-10 hover:bg-white/90 transition-colors whitespace-nowrap"
               >
-                <Link href="#features">
-                  Vezi funcționalitățile
-                </Link>
-              </Button>
+                Autentificare
+              </Link>
+            </div>
+
+            {/* Primary CTA */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/register"
+                className="px-8 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all duration-300 cursor-pointer shadow-lg hover:shadow-emerald-500/25 hover:shadow-xl h-10 flex items-center whitespace-nowrap"
+              >
+                Începe gratuit
+              </Link>
             </motion.div>
           </motion.div>
 
-          <motion.div
-            className="text-white/50 text-xs tracking-wide"
+          {/* Trust line */}
+          <motion.p
+            className="mt-6 text-white/35 text-xs tracking-wide"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
+            transition={{ duration: 0.6, delay: 1.3 }}
           >
             14 zile gratuit · Fără card · Anulare instant
-          </motion.div>
+          </motion.p>
         </div>
       </main>
 
+      {/* Pulsing border + rotating text — bottom right */}
       <div className="absolute bottom-8 right-8 z-30 hidden md:block">
         <div className="relative w-20 h-20 flex items-center justify-center">
           <PulsingBorder
@@ -161,24 +197,17 @@ export function HeroSection() {
             scale={0.65}
             style={{ width: "60px", height: "60px", borderRadius: "50%", position: "absolute", inset: 0, margin: "auto" }}
           />
-
           <motion.svg
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 100 100"
             animate={{ rotate: 360 }}
-            transition={{
-              duration: 20,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             style={{ transform: "scale(1.6)" }}
+            aria-hidden="true"
           >
-            <defs>
-              <path id="circle" d="M 50, 50 m -38, 0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
-            </defs>
-            <text className="text-[10px] fill-white/60 font-medium tracking-wider">
-              <textPath href="#circle" startOffset="0%">
-                ASESOR • BEAUTY SALON • MANAGEMENT • ASESOR • 
+            <text fill="rgba(255,255,255,0.6)" fontSize="10" fontWeight="500">
+              <textPath href="#text-circle" startOffset="0%">
+                ASESOR • BEAUTY SALON • MANAGEMENT •{" "}
               </textPath>
             </text>
           </motion.svg>

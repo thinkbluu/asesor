@@ -1,7 +1,12 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -13,6 +18,8 @@ import {
 import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react"
 
 export default function ContactPage() {
+  const [gdprChecked, setGdprChecked] = useState(false)
+
   return (
     <MarketingLayout>
       <main className="flex-1">
@@ -92,8 +99,32 @@ export default function ContactPage() {
                         required
                       />
                     </div>
+
+                    <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3">
+                      <Checkbox
+                        id="gdpr"
+                        checked={gdprChecked}
+                        onCheckedChange={(checked) => setGdprChecked(checked === true)}
+                        className="mt-0.5"
+                      />
+                      <Label
+                        htmlFor="gdpr"
+                        className="text-sm font-normal leading-relaxed text-muted-foreground"
+                      >
+                        Sunt de acord cu prelucrarea datelor personale conform{" "}
+                        <Link
+                          href="/privacy"
+                          className="font-medium text-foreground underline underline-offset-4 hover:text-accent"
+                        >
+                          Politicii de confidențialitate
+                        </Link>{" "}
+                        în scopul de a primi răspuns la solicitarea mea.
+                      </Label>
+                    </div>
+
                     <Button
                       type="submit"
+                      disabled={!gdprChecked}
                       className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                     >
                       Trimite mesajul

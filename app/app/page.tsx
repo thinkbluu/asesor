@@ -121,9 +121,14 @@ function useAlerts() {
     const noShows = APPOINTMENTS_DATA.filter(a => a.date === yesterdayStr && a.status === "no_show")
     const pendingConfirmations = APPOINTMENTS_DATA.filter(a => a.date >= todayStr && a.status === "in_asteptare")
     const staffTimeOff = STAFF_DATA.flatMap(s =>
-      s.schedule
-        .filter(d => d.timeOff && d.timeOff.length > 0)
-        .flatMap(d => d.timeOff!.map(t => ({ staffName: s.firstName, ...t })))
+      s.timeOffRequests
+        .filter(req => req.status === "approved")
+        .map(req => ({
+          staffName: s.firstName,
+          reason: req.reason,
+          startDate: req.startDate,
+          endDate: req.endDate,
+        }))
     ).slice(0, 3)
 
     return { lowStockProducts, noShows, pendingConfirmations, staffTimeOff }
@@ -155,7 +160,7 @@ function useStaffUtilization() {
   }, [])
 }
 
-// ── Today's timeline ──────────────────────────────────────────────────────────
+// ── Today's timeline ─────��────────────────────────────────────────────────────
 function TodayTimeline({ onSelect }: { onSelect: (id: string) => void }) {
   const appts = useMemo(() =>
     APPOINTMENTS_DATA.filter(a => a.date === todayStr)
