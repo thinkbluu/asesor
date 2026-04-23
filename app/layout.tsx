@@ -27,22 +27,22 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ro" suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          storageKey="asesor-theme"
+        <ClerkProvider
+          signInUrl="/login"
+          signUpUrl="/register"
+          signInFallbackRedirectUrl="/app"
+          signUpFallbackRedirectUrl="/app/onboarding"
+          appearance={{ cssLayerName: "clerk" }}
         >
-          <ClerkProvider
-            signInUrl="/login"
-            signUpUrl="/register"
-            signInFallbackRedirectUrl="/app"
-            signUpFallbackRedirectUrl="/app/onboarding"
-            appearance={{ cssLayerName: "clerk" }}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            storageKey="asesor-theme"
           >
             {children}
-          </ClerkProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </ClerkProvider>
         <Analytics />
       </body>
     </html>

@@ -7,12 +7,10 @@ const isAuthRoute = createRouteMatcher(['/login', '/register', '/sso-callback'])
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth()
 
-  // Redirect unauthenticated users away from protected routes
   if (isProtectedRoute(req) && !userId) {
     return redirectToSignIn({ returnBackUrl: req.url })
   }
 
-  // Redirect authenticated users away from auth pages → straight to dashboard
   if (isAuthRoute(req) && userId) {
     return NextResponse.redirect(new URL('/app', req.url))
   }
@@ -20,6 +18,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
   ],
 }
