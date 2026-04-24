@@ -55,14 +55,16 @@ import {
   type ComunicarePreferinta,
 } from "@/lib/clienti-data"
 import { cn } from "@/lib/utils"
+import { ClientLoyaltyCard } from "@/components/app/client-loyalty-card"
 
-type TabId = "istoric" | "preferinte" | "galerie" | "financiar"
+type TabId = "istoric" | "preferinte" | "galerie" | "financiar" | "loialitate"
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "istoric", label: "Istoric" },
   { id: "preferinte", label: "Preferințe" },
   { id: "galerie", label: "Galerie" },
   { id: "financiar", label: "Financiar" },
+  { id: "loialitate", label: "Loialitate" },
 ]
 
 const ALL_STAFF = ["Ana Ionescu", "Cristina Popa", "Mara Stancu", "Diana Florea"]
@@ -495,7 +497,13 @@ export default function ClientProfilePage() {
                   <span className="text-sm text-muted-foreground">Puncte loialitate</span>
                 </div>
                 <p className="text-2xl font-bold">{client.puncteLoyalty}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Modul loialitate — în curând</p>
+                <button
+                  type="button"
+                  onClick={() => setTab("loialitate")}
+                  className="text-xs text-emerald-600 hover:underline mt-0.5"
+                >
+                  Vezi istoricul →
+                </button>
               </CardContent>
             </Card>
           </div>
@@ -522,6 +530,10 @@ export default function ClientProfilePage() {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {tab === "loialitate" && (
+        <ClientLoyaltyCard clientId={client.id} balance={client.puncteLoyalty} />
       )}
 
       {/* Add Note Dialog */}

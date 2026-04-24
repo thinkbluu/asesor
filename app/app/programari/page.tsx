@@ -33,6 +33,7 @@ import {
 } from "@/lib/programari-data"
 import { CLIENTS_DATA, getClientById } from "@/lib/clienti-data"
 import { AppointmentWhatsApp } from "@/components/app/appointment-whatsapp"
+import { AppointmentLoyalty } from "@/components/app/appointment-loyalty"
 
 type ViewMode = "day" | "week" | "month" | "list"
 
@@ -223,6 +224,22 @@ function AppointmentDetail({
             serviceNames={apt.services.map((s) => s.name)}
           />
         </div>
+
+        {/* Loyalty */}
+        {(() => {
+          const client = getClientById(apt.clientId)
+          return (
+            <AppointmentLoyalty
+              clientId={apt.clientId}
+              clientBalance={client?.puncteLoyalty ?? 0}
+              clientBirthday={client?.dataNasterii}
+              isFirstVisit={client ? client.totalVisits <= 1 : false}
+              totalPrice={apt.totalPrice}
+              visitDate={apt.date}
+              isCompleted={apt.status === "finalizat"}
+            />
+          )
+        })()}
       </div>
 
       {/* Actions */}

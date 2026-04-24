@@ -33,10 +33,14 @@ import {
   ChevronRight,
   Download,
   Scissors,
+  Award,
+  Star,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SettingsServicii } from "@/components/app/settings-servicii"
 import { SettingsWhatsApp } from "@/components/app/settings-whatsapp"
+import { SettingsLoialitate } from "@/components/app/settings-loialitate"
+import { SettingsReviews } from "@/components/app/settings-reviews"
 
 // --- Types ---
 interface DaySchedule {
@@ -102,6 +106,8 @@ const TABS = [
   { id: "servicii", label: "Servicii", icon: Scissors },
   { id: "politici", label: "Politici", icon: FileText },
   { id: "notificari", label: "Notificări", icon: Bell },
+  { id: "loialitate", label: "Loialitate", icon: Award },
+  { id: "recenzii", label: "Recenzii Google", icon: Star },
   { id: "abonament", label: "Abonament", icon: CreditCard },
   { id: "permisiuni", label: "Permisiuni", icon: Shield },
 ]
@@ -738,6 +744,16 @@ export default function SettingsPage() {
               {/* WhatsApp Business */}
               <SettingsWhatsApp onDirty={markDirty} />
             </div>
+          )}
+
+          {/* ── LOIALITATE ── */}
+          {activeTab === "loialitate" && (
+            <SettingsLoialitate onDirty={markDirty} />
+          )}
+
+          {/* ── RECENZII GOOGLE ── */}
+          {activeTab === "recenzii" && (
+            <SettingsReviews onDirty={markDirty} />
           )}
 
           {/* ── ABONAMENT ── */}

@@ -23,6 +23,7 @@ import {
   CAMPAIGNS, AUTOMATIONS, PROMOTIONS, AUDIENCE_SEGMENTS, EMAIL_TEMPLATES,
   type Campaign, type Automation, type Promotion,
 } from "@/lib/marketing-data"
+import { ReviewsWidget } from "@/components/app/reviews-widget"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -209,7 +210,7 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
               {type === "SMS" ? (
                 <>
                   <div className="flex gap-1 flex-wrap">
-                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}"].map(v => (
+                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
                         className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                         {v}
@@ -231,7 +232,11 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
                     <div className="rounded-xl border bg-muted/30 p-4">
                       <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Preview</p>
                       <div className="rounded-2xl bg-background border p-3 text-sm max-w-xs">
-                        {body.replace("{{nume_client}}", "Maria").replace("{{salon}}", "Salon ASESOR").replace("{{link_programare}}", "asesor.ro/booking")}
+                        {body
+                          .replace(/\{\{nume_client\}\}/g, "Maria")
+                          .replace(/\{\{salon\}\}/g, "Salon ASESOR")
+                          .replace(/\{\{link_programare\}\}/g, "asesor.ro/booking")
+                          .replace(/\{\{puncte_loialitate\}\}/g, "450")}
                       </div>
                     </div>
                   )}
@@ -256,7 +261,7 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
                     <Input placeholder="ex: O ofertă specială pentru tine!" value={subject} onChange={e => setSubject(e.target.value)} />
                   </div>
                   <div className="flex gap-1 flex-wrap">
-                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{data}}", "{{serviciu}}"].map(v => (
+                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{data}}", "{{serviciu}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
                         className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                         {v}
@@ -375,7 +380,7 @@ function AutomationModal({
           <div className="space-y-2">
             <Label>Template mesaj</Label>
             <div className="flex gap-1 flex-wrap mb-2">
-              {["{{nume_client}}", "{{salon}}", "{{data}}", "{{ora}}", "{{serviciu}}", "{{link_programare}}", "{{link_review}}"].map(v => (
+              {["{{nume_client}}", "{{salon}}", "{{data}}", "{{ora}}", "{{serviciu}}", "{{link_programare}}", "{{link_review}}", "{{puncte_loialitate}}"].map(v => (
                 <button key={v} onClick={() => setTemplate(t => t + v)}
                   className="rounded border bg-muted px-2 py-0.5 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                   {v}
@@ -541,6 +546,9 @@ export default function MarketingPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Google Reviews widget */}
+      <ReviewsWidget />
 
       <Tabs defaultValue="campanii" className="space-y-4">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
