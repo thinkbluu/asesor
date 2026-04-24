@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -977,7 +978,15 @@ function NewAppointmentModal({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ProgramariPage() {
-  const [view, setView] = useState<ViewMode>("day")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const view = (searchParams.get("tab") as ViewMode) ?? "day"
+  const setView = (value: ViewMode) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", value)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
   const [currentDate, setCurrentDate] = useState(new Date())
   const [allAppointments, setAllAppointments] = useState<Appointment[]>(APPOINTMENTS_DATA)
   const [selectedApt, setSelectedApt] = useState<Appointment | null>(null)

@@ -8,9 +8,11 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0A0A0A] p-12">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2D8C3C]">
-            <span className="text-sm font-bold text-white">A</span>
-          </div>
+          <img
+            src="/asesor-logo.png"
+            alt="ASESOR"
+            className="h-9 w-9 rounded-full bg-white object-cover ring-1 ring-white/20 shrink-0"
+          />
           <span className="text-xl font-semibold text-white tracking-tight">ASESOR</span>
         </Link>
         <div className="space-y-6">
@@ -28,9 +30,11 @@ export default function LoginPage() {
       <div className="flex flex-1 items-center justify-center bg-[#F7F5F2] px-6 py-12">
         <div className="flex flex-col items-center gap-6 w-full">
           <div className="flex lg:hidden items-center gap-2 mb-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0A0A0A]">
-              <span className="text-sm font-bold text-white">A</span>
-            </div>
+            <img
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              className="h-9 w-9 rounded-full bg-[#0A0A0A] object-contain p-1 ring-1 ring-black/10 shrink-0"
+            />
             <span className="text-xl font-semibold text-[#0A0A0A] tracking-tight">ASESOR</span>
           </div>
           <SignIn

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -152,11 +153,19 @@ const emptyProduct = (): Product => ({
   linkedServices: [], notes: "", active: true,
 })
 
-// ── Main Component ─────────────────���──────────────────────────────────────────
+// ── Main Component ─────────────────�����──────────────────────────────────────────
 export default function StocuriPage() {
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS)
   const [movements, setMovements] = useState<Movement[]>(INITIAL_MOVEMENTS)
-  const [activeTab, setActiveTab] = useState<"produse" | "miscari">("produse")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const activeTab = (searchParams.get("tab") as "produse" | "miscari") ?? "produse"
+  const setActiveTab = (value: "produse" | "miscari") => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", value)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
 
   // Filters
   const [search, setSearch] = useState("")

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   Calendar,
@@ -13,35 +13,113 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+  ChevronDown,
   Menu,
   Moon,
+  Share2,
+  type LucideIcon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import {
+  Collapsible,
+  CollapsibleContent,
+} from "@/components/ui/collapsible"
 import { useState, useEffect } from "react"
 import { useClerk, useUser } from "@clerk/nextjs"
-import { useRouter } from "next/navigation"
 
-const navigation = [
+type NavItem = {
+  name: string
+  href: string
+  icon: LucideIcon
+  subItems?: { name: string; tab: string }[]
+}
+
+const navigation: NavItem[] = [
   { name: "Dashboard", href: "/app", icon: LayoutDashboard },
-  { name: "Programări", href: "/app/programari", icon: Calendar },
+  {
+    name: "Programări",
+    href: "/app/programari",
+    icon: Calendar,
+    subItems: [
+      { name: "Zi", tab: "day" },
+      { name: "Săptămână", tab: "week" },
+      { name: "Lună", tab: "month" },
+      { name: "Listă", tab: "list" },
+    ],
+  },
   { name: "Clienți", href: "/app/clienti", icon: Users },
   { name: "Echipă", href: "/app/echipa", icon: UserCog },
-  { name: "Stocuri", href: "/app/stocuri", icon: Package },
-  { name: "Financiar", href: "/app/financiar", icon: PieChart },
-  { name: "Marketing", href: "/app/marketing", icon: Megaphone },
+  {
+    name: "Stocuri",
+    href: "/app/stocuri",
+    icon: Package,
+    subItems: [
+      { name: "Produse", tab: "produse" },
+      { name: "Mișcări stoc", tab: "miscari" },
+    ],
+  },
+  {
+    name: "Financiar",
+    href: "/app/financiar",
+    icon: PieChart,
+    subItems: [
+      { name: "Dashboard", tab: "dashboard" },
+      { name: "Tranzacții", tab: "tranzactii" },
+      { name: "Cheltuieli", tab: "cheltuieli" },
+      { name: "Rapoarte", tab: "rapoarte" },
+      { name: "Închidere zi", tab: "inchidere" },
+    ],
+  },
+  {
+    name: "Marketing",
+    href: "/app/marketing",
+    icon: Megaphone,
+    subItems: [
+      { name: "Campanii", tab: "campanii" },
+      { name: "Automatizări", tab: "automatizari" },
+      { name: "Promoții", tab: "promotii" },
+    ],
+  },
+  {
+    name: "Pagina publică",
+    href: "/app/booking",
+    icon: Share2,
+    subItems: [
+      { name: "Vizualizare", tab: "overview" },
+      { name: "Personalizare", tab: "branding" },
+      { name: "Previzualizare", tab: "preview" },
+    ],
+  },
 ]
 
-const bottomNavigation = [
-  { name: "Setări", href: "/app/setari", icon: Settings },
+const bottomNavigation: NavItem[] = [
+  {
+    name: "Setări",
+    href: "/app/setari",
+    icon: Settings,
+    subItems: [
+      { name: "Profil salon", tab: "profil" },
+      { name: "Program de lucru", tab: "program" },
+      { name: "Servicii", tab: "servicii" },
+      { name: "Politici", tab: "politici" },
+      { name: "Notificări", tab: "notificari" },
+      { name: "Abonament", tab: "abonament" },
+      { name: "Permisiuni", tab: "permisiuni" },
+    ],
+  },
 ]
+
+const STORAGE_KEY = "asesor-sidebar-expanded"
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({})
   const { resolvedTheme, setTheme } = useTheme()
   const { signOut } = useClerk()
   const { user } = useUser()
@@ -49,11 +127,35 @@ export function AppSidebar() {
 
   useEffect(() => {
     setMounted(true)
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === "object") setExpandedMap(parsed)
+      }
+    } catch {
+      /* ignore */
+    }
   }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(expandedMap))
+    } catch {
+      /* ignore */
+    }
+  }, [expandedMap, mounted])
 
   const handleLogout = async () => {
     await signOut()
     router.push("/login")
+  }
+
+  const toggleExpanded = (href: string, isInSection: boolean) => {
+    // Active section is always open per spec — chevron click is a no-op.
+    if (isInSection) return
+    setExpandedMap((prev) => (prev[href] ? {} : { [href]: true }))
   }
 
   const firstName = user?.firstName ?? ""
@@ -64,6 +166,97 @@ export function AppSidebar() {
   const initials = firstName && lastName
     ? `${firstName[0]}${lastName[0]}`.toUpperCase()
     : (email[0] ?? "?").toUpperCase()
+
+  const activeTabParam = searchParams.get("tab")
+
+  const renderNavItem = (item: NavItem) => {
+    const hasSub = !!item.subItems?.length
+    const isExactActive = pathname === item.href
+    // "In section" = pathname starts with href, but Dashboard ("/app") must not match everything.
+    const isInSection =
+      item.href === "/app"
+        ? pathname === "/app"
+        : pathname === item.href || pathname.startsWith(item.href + "/")
+    const isOpen = !collapsed && hasSub && (expandedMap[item.href] === true || isInSection)
+
+    return (
+      <Collapsible key={item.name} open={isOpen}>
+        <div
+          className={cn(
+            "flex items-center rounded-lg transition-colors",
+            isExactActive
+              ? "bg-sidebar-primary text-sidebar-primary-foreground"
+              : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          )}
+        >
+          <Link
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 text-sm font-medium py-2.5",
+              collapsed ? "w-full justify-center px-0" : hasSub ? "flex-1 pl-3" : "flex-1 px-3",
+            )}
+            title={collapsed ? item.name : undefined}
+            onClick={() => setMobileOpen(false)}
+          >
+            <item.icon className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="truncate">{item.name}</span>}
+          </Link>
+          {hasSub && !collapsed && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                toggleExpanded(item.href, isInSection)
+              }}
+              className={cn(
+                "flex items-center justify-center px-2 py-2 mr-1 rounded-md transition-colors",
+                isInSection
+                  ? "cursor-default opacity-70"
+                  : "hover:bg-sidebar-accent/50",
+              )}
+              aria-label={isOpen ? `Colapsează ${item.name}` : `Extinde ${item.name}`}
+              aria-expanded={isOpen}
+              disabled={isInSection}
+            >
+              <ChevronDown
+                className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")}
+              />
+            </button>
+          )}
+        </div>
+        {hasSub && !collapsed && (
+          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-none">
+            <div className="mt-1 space-y-0.5">
+              {item.subItems!.map((sub, idx) => {
+                const isFirst = idx === 0
+                // Highlight exact tab match, OR the default (first) sub-item when no ?tab is set
+                // and we're inside this section.
+                const subActive =
+                  isInSection &&
+                  (activeTabParam === sub.tab || (!activeTabParam && isFirst))
+                return (
+                  <Link
+                    key={sub.tab}
+                    href={`${item.href}?tab=${sub.tab}`}
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "block text-sm py-1.5 pl-10 pr-3 rounded-lg transition-colors",
+                      subActive
+                        ? "bg-sidebar-primary/20 text-sidebar-primary-foreground font-medium"
+                        : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    )}
+                  >
+                    {sub.name}
+                  </Link>
+                )
+              })}
+            </div>
+          </CollapsibleContent>
+        )}
+      </Collapsible>
+    )
+  }
 
   return (
     <>
@@ -102,16 +295,20 @@ export function AppSidebar() {
         >
           {!collapsed && (
             <Link href="/app" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary">
-                <span className="text-sm font-semibold text-sidebar-primary-foreground">A</span>
-              </div>
+              <img
+                src="/asesor-logo.png"
+                alt="ASESOR"
+                className="h-8 w-8 rounded-full bg-white object-cover ring-1 ring-white/20 shrink-0"
+              />
               <span className="text-lg font-semibold">ASESOR</span>
             </Link>
           )}
           {collapsed && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary">
-              <span className="text-sm font-semibold text-sidebar-primary-foreground">A</span>
-            </div>
+            <img
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              className="h-8 w-8 rounded-full bg-white object-cover ring-1 ring-white/20 shrink-0"
+            />
           )}
           <button
             type="button"
@@ -129,50 +326,12 @@ export function AppSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  collapsed && "justify-center"
-                )}
-                title={collapsed ? item.name : undefined}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            )
-          })}
+          {navigation.map(renderNavItem)}
         </nav>
 
         {/* Bottom navigation */}
         <div className="border-t border-sidebar-border px-2 py-4">
-          {bottomNavigation.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  collapsed && "justify-center"
-                )}
-                title={collapsed ? item.name : undefined}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            )
-          })}
+          {bottomNavigation.map(renderNavItem)}
 
           <div className="mt-4 border-t border-sidebar-border pt-4">
             <div

@@ -27,9 +27,11 @@ export function TopBar() {
     <div className="fixed top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
-            <span className="text-sm font-semibold text-primary-foreground">A</span>
-          </div>
+          <img
+            src="/asesor-logo.png"
+            alt="ASESOR"
+            className="h-8 w-8 rounded-full bg-white object-cover ring-1 ring-black/10 shrink-0"
+          />
           <span className="text-lg font-semibold tracking-tight">ASESOR</span>
         </Link>
 

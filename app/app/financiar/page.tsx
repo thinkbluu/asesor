@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -90,7 +91,15 @@ function StatusBadge({ status }: { status: Transaction["status"] }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 export default function FinanciarPage() {
   const [period, setPeriod] = useState<Period>("luna")
-  const [tab, setTab] = useState("dashboard")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const tab = searchParams.get("tab") ?? "dashboard"
+  const setTab = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", value)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
 
   // Transaction filters
   const [txSearch, setTxSearch] = useState("")

@@ -63,9 +63,11 @@ export function SiteFooter() {
       <div className="grid w-full gap-8 xl:grid-cols-3 xl:gap-8">
         <AnimatedContainer className="space-y-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent">
-              <span className="text-accent-foreground font-bold text-xl">A</span>
-            </div>
+            <img
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              className="h-10 w-10 rounded-lg bg-white object-cover ring-1 ring-black/10 shrink-0"
+            />
             <span className="text-2xl font-bold">ASESOR</span>
           </Link>
           <p className="text-muted-foreground text-sm max-w-xs">
