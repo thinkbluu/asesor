@@ -83,7 +83,7 @@ export default function EchipaPage() {
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Echipa</h1>
+          <h1 className="text-2xl font-bold text-balance">Echipa</h1>
           <p className="text-muted-foreground">Gestionează membrii echipei și performanța</p>
         </div>
         <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
@@ -214,19 +214,19 @@ export default function EchipaPage() {
       {/* Filters */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-center gap-3 flex-wrap">
-          <div className="relative min-w-[200px] flex-1 max-w-xs">
+          <div className="relative w-full min-w-0 sm:min-w-[200px] flex-1 sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-9" placeholder="Caută după nume..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <Select value={filterRole} onValueChange={setFilterRole}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Toate rolurile" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Toate rolurile" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toate rolurile</SelectItem>
               {ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Toate statusurile" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Toate statusurile" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toate statusurile</SelectItem>
               <SelectItem value="activ">Activ</SelectItem>
@@ -281,7 +281,7 @@ export default function EchipaPage() {
                   </DropdownMenu>
                 </div>
 
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                   <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", STATUS_STYLES[member.status])}>
                     {STATUS_LABELS[member.status]}
                   </span>

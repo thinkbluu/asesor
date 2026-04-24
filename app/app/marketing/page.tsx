@@ -23,6 +23,7 @@ import {
   CAMPAIGNS, AUTOMATIONS, PROMOTIONS, AUDIENCE_SEGMENTS, EMAIL_TEMPLATES,
   type Campaign, type Automation, type Promotion,
 } from "@/lib/marketing-data"
+import { ReviewsWidget } from "@/components/app/reviews-widget"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
@@ -209,7 +210,7 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
               {type === "SMS" ? (
                 <>
                   <div className="flex gap-1 flex-wrap">
-                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}"].map(v => (
+                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
                         className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                         {v}
@@ -231,7 +232,11 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
                     <div className="rounded-xl border bg-muted/30 p-4">
                       <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Preview</p>
                       <div className="rounded-2xl bg-background border p-3 text-sm max-w-xs">
-                        {body.replace("{{nume_client}}", "Maria").replace("{{salon}}", "Salon ASESOR").replace("{{link_programare}}", "asesor.ro/booking")}
+                        {body
+                          .replace(/\{\{nume_client\}\}/g, "Maria")
+                          .replace(/\{\{salon\}\}/g, "Salon ASESOR")
+                          .replace(/\{\{link_programare\}\}/g, "asesor.ro/booking")
+                          .replace(/\{\{puncte_loialitate\}\}/g, "450")}
                       </div>
                     </div>
                   )}
@@ -256,7 +261,7 @@ function CampaignWizard({ open, onClose }: { open: boolean; onClose: () => void 
                     <Input placeholder="ex: O ofertă specială pentru tine!" value={subject} onChange={e => setSubject(e.target.value)} />
                   </div>
                   <div className="flex gap-1 flex-wrap">
-                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{data}}", "{{serviciu}}"].map(v => (
+                    {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{data}}", "{{serviciu}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
                         className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                         {v}
@@ -375,7 +380,7 @@ function AutomationModal({
           <div className="space-y-2">
             <Label>Template mesaj</Label>
             <div className="flex gap-1 flex-wrap mb-2">
-              {["{{nume_client}}", "{{salon}}", "{{data}}", "{{ora}}", "{{serviciu}}", "{{link_programare}}", "{{link_review}}"].map(v => (
+              {["{{nume_client}}", "{{salon}}", "{{data}}", "{{ora}}", "{{serviciu}}", "{{link_programare}}", "{{link_review}}", "{{puncte_loialitate}}"].map(v => (
                 <button key={v} onClick={() => setTemplate(t => t + v)}
                   className="rounded border bg-muted px-2 py-0.5 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
                   {v}
@@ -424,7 +429,7 @@ function PromotionModal({ open, onClose }: { open: boolean; onClose: () => void 
           <DialogDescription>Creează un discount pentru clienți.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
             <div className="space-y-1">
               <Label>Cod</Label>
               <Input placeholder="ex: PROMO20" className="font-mono uppercase" />
@@ -497,13 +502,13 @@ export default function MarketingPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Marketing</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">Marketing</h1>
           <p className="text-muted-foreground text-sm">Campanii, automatizări, promoții</p>
         </div>
-        <Button className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => setWizardOpen(true)}>
+        <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full sm:w-auto" onClick={() => setWizardOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Campanie nouă
         </Button>
       </div>
@@ -542,17 +547,22 @@ export default function MarketingPage() {
         </Card>
       </div>
 
+      {/* Google Reviews widget */}
+      <ReviewsWidget />
+
       <Tabs defaultValue="campanii" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="campanii">Campanii</TabsTrigger>
-          <TabsTrigger value="automatizari">Automatizări</TabsTrigger>
-          <TabsTrigger value="promotii">Promoții</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="w-max sm:w-auto">
+            <TabsTrigger value="campanii">Campanii</TabsTrigger>
+            <TabsTrigger value="automatizari">Automatizări</TabsTrigger>
+            <TabsTrigger value="promotii">Promoții</TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ── CAMPANII ── */}
         <TabsContent value="campanii" className="space-y-3">
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border overflow-x-auto">
+            <table className="w-full text-sm min-w-[420px]">
               <thead>
                 <tr className="border-b bg-muted/40">
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">Campanie</th>
@@ -678,14 +688,14 @@ export default function MarketingPage() {
 
         {/* ── PROMOȚII ── */}
         <TabsContent value="promotii" className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">{PROMOTIONS.filter(p => p.active).length} coduri active</p>
-            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => setPromoOpen(true)}>
+            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0" onClick={() => setPromoOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />Cod nou
             </Button>
           </div>
-          <div className="rounded-lg border overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="rounded-lg border overflow-x-auto">
+            <table className="w-full text-sm min-w-[480px]">
               <thead>
                 <tr className="border-b bg-muted/40">
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">Cod</th>

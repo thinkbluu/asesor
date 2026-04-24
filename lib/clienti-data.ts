@@ -29,6 +29,8 @@ export interface Client {
   prenume: string
   nume: string
   phone: string
+  /** Optional separate WhatsApp number. Falls back to `phone` if not set. */
+  whatsappNumber?: string
   email: string
   dataNasterii?: string
   sex: Sex
@@ -58,6 +60,7 @@ export const CLIENTS_DATA: Client[] = [
     prenume: "Maria",
     nume: "Popescu",
     phone: "0722 123 456",
+    whatsappNumber: "0722 987 654",
     email: "maria.popescu@email.com",
     dataNasterii: "1985-04-12",
     sex: "F",

@@ -270,7 +270,7 @@ function AppointmentPanel({ id, onClose }: { id: string; onClose: () => void }) 
         </div>
         <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-lg leading-none">&times;</button>
       </div>
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex flex-wrap items-center gap-2 gap-y-1 text-sm">
         <Clock className="h-3.5 w-3.5 text-muted-foreground" />
         <span>{appt.startTime} – {appt.endTime} ({appt.duration} min)</span>
         <span className={cn("ml-auto text-xs rounded-full px-2 py-0.5 font-medium", cfg.bg, cfg.color)}>{cfg.label}</span>
@@ -362,10 +362,10 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-foreground text-balance">Dashboard</h1>
           <p className="text-muted-foreground capitalize text-sm">{today}</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex w-full sm:w-auto gap-2 flex-wrap">
           <Button variant="outline" size="sm" asChild>
             <Link href="/app/clienti"><UserPlus className="mr-1.5 h-3.5 w-3.5" />Client nou</Link>
           </Button>
@@ -402,7 +402,7 @@ export default function DashboardPage() {
                       : null}
                   </div>
                 </div>
-                <p className="text-xl font-bold text-foreground tabular-nums">{card.format(card.value)}</p>
+                <p className="text-xl font-bold text-foreground tabular-nums break-words">{card.format(card.value)}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{card.label}</p>
               </CardContent>
             </Card>
@@ -564,7 +564,7 @@ export default function DashboardPage() {
             <CardContent className="space-y-3">
               {staffUtil.map(s => (
                 <div key={s.id}>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex flex-wrap items-center justify-between gap-y-1 mb-1">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground">{s.name}</span>
                       <span className="text-[11px] text-muted-foreground">{s.role}</span>
