@@ -31,7 +31,8 @@ import {
   getWeekDates, getMonthDates, getAppointmentsForDate, getDayRevenue,
   CATALOG_SERVICES,
 } from "@/lib/programari-data"
-import { CLIENTS_DATA } from "@/lib/clienti-data"
+import { CLIENTS_DATA, getClientById } from "@/lib/clienti-data"
+import { AppointmentWhatsApp } from "@/components/app/appointment-whatsapp"
 
 type ViewMode = "day" | "week" | "month" | "list"
 
@@ -204,6 +205,23 @@ function AppointmentDetail({
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <MessageSquare className="h-3.5 w-3.5" />
           <span>Sursă: <span className="capitalize">{apt.source}</span></span>
+        </div>
+
+        {/* WhatsApp */}
+        <div className="rounded-xl border border-border bg-card p-3">
+          <AppointmentWhatsApp
+            appointmentId={apt.id}
+            clientId={apt.clientId}
+            clientName={apt.clientName}
+            clientPhone={apt.clientPhone}
+            clientWhatsApp={getClientById(apt.clientId)?.whatsappNumber}
+            salonName="Beauty Studio"
+            salonPhone="0722 123 456"
+            date={apt.date}
+            startTime={apt.startTime}
+            staffName={apt.staffName}
+            serviceNames={apt.services.map((s) => s.name)}
+          />
         </div>
       </div>
 

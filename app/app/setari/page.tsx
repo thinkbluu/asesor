@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SettingsServicii } from "@/components/app/settings-servicii"
+import { SettingsWhatsApp } from "@/components/app/settings-whatsapp"
 
 // --- Types ---
 interface DaySchedule {
@@ -734,25 +735,8 @@ export default function SettingsPage() {
                 </CardContent>
               </Card>
 
-              {/* WhatsApp placeholder */}
-              <Card className="border-dashed opacity-70">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <MessageSquare className="h-4 w-4" />
-                    WhatsApp Business
-                    <Badge variant="outline" className="text-xs">În curând</Badge>
-                  </CardTitle>
-                  <CardDescription>
-                    {/* TODO: Integrate WhatsApp Business API */}
-                    Conectează numărul tău de WhatsApp Business pentru a trimite confirmări și remindere direct pe WhatsApp.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" disabled className="gap-2 opacity-50">
-                    <Plus className="h-4 w-4" /> Conectează WhatsApp
-                  </Button>
-                </CardContent>
-              </Card>
+              {/* WhatsApp Business */}
+              <SettingsWhatsApp onDirty={markDirty} />
             </div>
           )}
 

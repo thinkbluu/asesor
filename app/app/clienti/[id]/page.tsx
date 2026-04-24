@@ -43,6 +43,7 @@ import {
   Gift,
   Edit,
   Check,
+  MessageCircle,
 } from "lucide-react"
 import {
   CLIENTS_DATA,
@@ -81,6 +82,7 @@ export default function ClientProfilePage() {
   const [prefNotes, setPrefNotes] = useState(client?.notes ?? "")
   const [prefStaff, setPrefStaff] = useState(client?.preferredStaff ?? "")
   const [prefComunicare, setPrefComunicare] = useState<ComunicarePreferinta>(client?.comunicarePreferinta ?? "SMS")
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(client?.whatsappNumber ?? "")
 
   if (!client) {
     return (
@@ -368,6 +370,33 @@ export default function ClientProfilePage() {
                 </Select>
               ) : (
                 <span className="inline-flex items-center text-sm font-medium px-3 py-1 rounded-full bg-muted border border-border">{prefComunicare}</span>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1.5">
+                <MessageCircle className="h-3.5 w-3.5 text-[#25D366]" />
+                Număr WhatsApp
+                <span className="text-xs font-normal text-muted-foreground">(opțional)</span>
+              </Label>
+              {editingPrefs ? (
+                <>
+                  <Input
+                    value={whatsappNumber}
+                    onChange={e => setWhatsappNumber(e.target.value)}
+                    placeholder={client.phone}
+                    className="max-w-xs"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Completează doar dacă diferă de numărul principal. Altfel se folosește {client.phone}.
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm">
+                  {whatsappNumber
+                    ? <span className="font-medium">{whatsappNumber}</span>
+                    : <span className="text-muted-foreground italic">Folosește numărul principal ({client.phone})</span>}
+                </p>
               )}
             </div>
 
