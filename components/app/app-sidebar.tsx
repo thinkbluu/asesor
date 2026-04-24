@@ -295,16 +295,20 @@ export function AppSidebar() {
         >
           {!collapsed && (
             <Link href="/app" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary">
-                <span className="text-sm font-semibold text-sidebar-primary-foreground">A</span>
-              </div>
+              <img
+                src="/asesor-logo.png"
+                alt="ASESOR"
+                className="h-8 w-8 rounded-full bg-white object-cover ring-1 ring-white/20 shrink-0"
+              />
               <span className="text-lg font-semibold">ASESOR</span>
             </Link>
           )}
           {collapsed && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-primary">
-              <span className="text-sm font-semibold text-sidebar-primary-foreground">A</span>
-            </div>
+            <img
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              className="h-8 w-8 rounded-full bg-white object-cover ring-1 ring-white/20 shrink-0"
+            />
           )}
           <button
             type="button"

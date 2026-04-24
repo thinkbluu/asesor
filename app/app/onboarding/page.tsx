@@ -683,9 +683,11 @@ export default function OnboardingPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0A0A0A]">
-              <span className="text-xs font-bold text-white">A</span>
-            </div>
+            <img
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              className="h-8 w-8 rounded-full bg-[#0A0A0A] object-contain p-1 ring-1 ring-black/10 shrink-0"
+            />
             <span className="text-base font-semibold text-[#0A0A0A] tracking-tight">ASESOR</span>
           </div>
           <span className="text-xs text-[#0A0A0A]/40 font-medium">

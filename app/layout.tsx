@@ -15,12 +15,9 @@ export const metadata: Metadata = {
   description: 'Simplificăm activitatea zilnică a saloanelor. Creștem controlul și profitabilitatea. Programări, clienți, echipă, stocuri și rapoarte într-un singur loc.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
+    icon: '/asesor-logo.png',
+    apple: '/asesor-logo.png',
+    shortcut: '/asesor-logo.png',
   },
 }
 
