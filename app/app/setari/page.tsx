@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -113,7 +114,15 @@ const TABS = [
 ]
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("profil")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const activeTab = searchParams.get("tab") ?? "profil"
+  const setActiveTab = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", value)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
   const [unsaved, setUnsaved] = useState(false)
   const [saved, setSaved] = useState(false)
 

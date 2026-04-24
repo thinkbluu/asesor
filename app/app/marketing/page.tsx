@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import {
   Megaphone, Mail, MessageSquare, Gift, Star, Users, TrendingUp,
   Send, Plus, Calendar, CheckCircle2, AlertCircle, Eye, MousePointer,
@@ -492,6 +493,15 @@ export default function MarketingPage() {
   const [automations, setAutomations] = useState(AUTOMATIONS)
   const [editingAutomation, setEditingAutomation] = useState<typeof AUTOMATIONS[0] | null>(null)
   const [promoOpen, setPromoOpen] = useState(false)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const tab = searchParams.get("tab") ?? "campanii"
+  const setTab = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", value)
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }
 
   const sentThisMonth = CAMPAIGNS.filter(c => c.sentDate?.startsWith("2025-01")).reduce((s, c) => s + c.sent, 0)
   const avgOpenRate = CAMPAIGNS.filter(c => c.sent > 0).reduce((s, c) => s + c.openRate, 0) / CAMPAIGNS.filter(c => c.sent > 0).length
@@ -550,7 +560,7 @@ export default function MarketingPage() {
       {/* Google Reviews widget */}
       <ReviewsWidget />
 
-      <Tabs defaultValue="campanii" className="space-y-4">
+      <Tabs value={tab} onValueChange={setTab} className="space-y-4">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <TabsList className="w-max sm:w-auto">
             <TabsTrigger value="campanii">Campanii</TabsTrigger>
