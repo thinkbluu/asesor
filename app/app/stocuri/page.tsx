@@ -105,12 +105,8 @@ function MovementBadge({ type }: { type: MovementType }) {
   return <span className={cn("rounded-full border px-2 py-0.5 text-xs font-medium", styles[type])}>{type}</span>
 }
 
-// ── Sample data ──────────────────────────────────────────────────────────────
-const INITIAL_PRODUCTS: Product[] = [
-]
-
-const INITIAL_MOVEMENTS: Movement[] = [
-]
+const INITIAL_PRODUCTS: Product[] = []
+const INITIAL_MOVEMENTS: Movement[] = []
 
 // ── Empty states ─────────────────────────────────────────────��────────────────
 const emptyProduct = (): Product => ({

@@ -94,14 +94,10 @@ const COLOR_OPTIONS = [
 
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120, 180]
 
-const STAFF_LIST = ["Ana Popescu", "Maria Ionescu", "Elena Dumitrescu", "Ioana Constantin"]
+const STAFF_LIST: string[] = []
 
-// ── Initial Data ──────────────────────────────────────────────────────
-const initialCategories: Category[] = [
-]
-
-const initialServices: Service[] = [
-]
+const initialCategories: Category[] = []
+const initialServices: Service[] = []
 
 // ── Empty modal state ─────────────────────────────────────────────────
 const emptyService = (): Service => ({

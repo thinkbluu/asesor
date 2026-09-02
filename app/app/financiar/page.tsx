@@ -857,7 +857,7 @@ export default function FinanciarPage() {
           {selectedTx && (
             <div className="space-y-3 text-sm font-mono">
               <div className="text-center border-b pb-3">
-                <p className="font-bold text-base">Salon Demo ASESOR</p>
+                <p className="font-bold text-base">Salonul meu</p>
                 <p className="text-xs text-muted-foreground">{new Date(selectedTx.date).toLocaleDateString("ro-RO", { day: "numeric", month: "long", year: "numeric" })} {selectedTx.time}</p>
               </div>
               <div className="space-y-1">
