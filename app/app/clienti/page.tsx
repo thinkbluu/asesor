@@ -48,7 +48,6 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import {
-  CLIENTS_DATA,
   TAG_COLORS,
   getInitials,
   formatDate,
@@ -57,9 +56,11 @@ import {
   type Sursa,
   type Sex,
   type ComunicarePreferinta,
+  type Client,
 } from "@/lib/clienti-data"
 import { cn } from "@/lib/utils"
 
+const CLIENTS_DATA: Client[] = []
 const ALL_TAGS: ClientTag[] = ["VIP", "Nou", "Inactiv", "Frecvent", "Sensibil", "Fidel"]
 const ALL_STAFF = ["Ana Ionescu", "Cristina Popa", "Mara Stancu", "Diana Florea"]
 

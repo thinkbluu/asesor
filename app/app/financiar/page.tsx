@@ -27,14 +27,15 @@ import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 import {
   formatRON, formatRONShort,
-  TRANSACTIONS, EXPENSES, DAY_CLOSES,
   PAYMENT_LABELS, EXPENSE_CATEGORY_LABELS, EXPENSE_CATEGORY_COLORS,
-  getRevenueByDay, getRevenueByCategory, getRevenueByStaff,
-  getPaymentMethodSplit, getMonthlyComparison, getServiceRanking,
-  getTopClients, getTodaySummary,
-  type Transaction, type Expense, type PaymentMethod, type ExpenseCategory, type ExpenseFrequency,
+  type Transaction, type Expense, type DayClose, type PaymentMethod, type ExpenseCategory, type ExpenseFrequency,
 } from "@/lib/financiar-data"
-import { STAFF_DATA } from "@/lib/echipa-data"
+import type { StaffMember } from "@/lib/echipa-data"
+
+const TRANSACTIONS: Transaction[] = []
+const EXPENSES: Expense[] = []
+const DAY_CLOSES: DayClose[] = []
+const STAFF_DATA: StaffMember[] = []
 
 // ─── Period selector ────────────────────────────────────────────────────────
 type Period = "azi" | "saptamana" | "luna" | "luna_trecuta" | "custom"
@@ -123,15 +124,23 @@ export default function FinanciarPage() {
   const [dayNotes, setDayNotes] = useState("")
   const [dayClosed, setDayClosed] = useState(false)
 
-  // Chart data (memoised)
-  const revenueByDay = useMemo(() => getRevenueByDay(14), [])
-  const byCategory   = useMemo(() => getRevenueByCategory(), [])
-  const byStaff      = useMemo(() => getRevenueByStaff(), [])
-  const byMethod     = useMemo(() => getPaymentMethodSplit(), [])
-  const monthly      = useMemo(() => getMonthlyComparison(), [])
-  const serviceRank  = useMemo(() => getServiceRanking(), [])
-  const topClients   = useMemo(() => getTopClients(), [])
-  const todaySummary = useMemo(() => getTodaySummary(), [])
+  // Chart data
+  const revenueByDay: { date: string; venituri: number; prevVenituri: number }[] = []
+  const byCategory: { name: string; value: number; color: string }[] = []
+  const byStaff: { name: string; venituri: number; comision: number }[] = []
+  const byMethod: { name: string; value: number; color: string }[] = []
+  const monthly: { month: string; venituri: number; cheltuieli: number; profit: number }[] = []
+  const serviceRank: { name: string; revenue: number; count: number; avgPrice: number }[] = []
+  const topClients: { name: string; totalSpent: number; visits: number; avgSpend: number; lastVisit: string }[] = []
+  const todaySummary = {
+    numarIncasat: 0,
+    cardIncasat: 0,
+    transferIncasat: 0,
+    tips: 0,
+    discounts: 0,
+    totalRevenue: 0,
+    transactionCount: 0,
+  }
 
   // KPI computations
   const activeTx = TRANSACTIONS.filter(t => t.status === "incasat")

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Star, ExternalLink, MessageSquare } from "lucide-react"
-import { MOCK_GOOGLE_REVIEWS, getReviewsStats } from "@/lib/reviews"
+import { getReviewsStats, type GoogleReview } from "@/lib/reviews"
 import { cn } from "@/lib/utils"
 
 function formatDate(iso: string) {
@@ -28,7 +28,7 @@ function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) 
 }
 
 export function ReviewsWidget() {
-  const reviews = MOCK_GOOGLE_REVIEWS
+  const reviews: GoogleReview[] = []
   const stats = getReviewsStats(reviews)
   const recent = [...reviews].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3)
 

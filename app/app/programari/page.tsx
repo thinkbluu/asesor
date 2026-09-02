@@ -26,13 +26,22 @@ import {
 import { cn } from "@/lib/utils"
 import {
   type Appointment, type AppointmentStatus, type AppointmentService,
-  APPOINTMENTS_DATA, CALENDAR_STAFF, STATUS_CONFIG, SALON_HOURS,
+  STATUS_CONFIG, SALON_HOURS,
   generateTimeSlots, timeToMinutes, minutesToTime, addMinutes,
   formatDateRO, formatDateShortRO, getDayName, toDateString,
-  getWeekDates, getMonthDates, getAppointmentsForDate, getDayRevenue,
-  CATALOG_SERVICES,
+  getWeekDates, getMonthDates,
 } from "@/lib/programari-data"
-import { CLIENTS_DATA, getClientById } from "@/lib/clienti-data"
+import type { Client } from "@/lib/clienti-data"
+
+const APPOINTMENTS_DATA: Appointment[] = []
+const CALENDAR_STAFF: { id: string; name: string; color: string; initials: string }[] = []
+const CATALOG_SERVICES: AppointmentService[] = []
+const CLIENTS_DATA: Client[] = []
+const getClientById = (id: string) => CLIENTS_DATA.find((client) => client.id === id)
+const getAppointmentsForDate = (date: string) => APPOINTMENTS_DATA.filter((appointment) => appointment.date === date)
+const getDayRevenue = (date: string) => getAppointmentsForDate(date)
+  .filter((appointment) => appointment.status === "finalizat")
+  .reduce((total, appointment) => total + appointment.totalPrice, 0)
 import { AppointmentWhatsApp } from "@/components/app/appointment-whatsapp"
 import { AppointmentLoyalty } from "@/components/app/appointment-loyalty"
 

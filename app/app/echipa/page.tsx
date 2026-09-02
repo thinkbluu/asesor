@@ -26,11 +26,13 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
-  STAFF_DATA, ALL_SERVICES, ROLES, STATUS_STYLES, STATUS_LABELS,
+  ROLES, STATUS_STYLES, STATUS_LABELS,
   getInitials, getFullName,
   type StaffMember, type StaffStatus, type RoleType, type CommissionType,
 } from "@/lib/echipa-data"
 
+const STAFF_DATA: StaffMember[] = []
+const ALL_SERVICES: string[] = []
 const DAYS = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"]
 
 const DEFAULT_SCHEDULE = Object.fromEntries(

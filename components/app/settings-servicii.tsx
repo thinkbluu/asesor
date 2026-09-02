@@ -98,49 +98,16 @@ const STAFF_LIST = ["Ana Popescu", "Maria Ionescu", "Elena Dumitrescu", "Ioana C
 
 // ── Initial Data ──────────────────────────────────────────────────────
 const initialCategories: Category[] = [
-  { id: "coafor", name: "Coafor", icon: "Scissors", color: "#10b981" },
-  { id: "coloristica", name: "Coloristică", icon: "Sparkles", color: "#f59e0b" },
-  { id: "manichiura", name: "Manichiură", icon: "Hand", color: "#ec4899" },
-  { id: "pedichiura", name: "Pedichiură", icon: "Flower", color: "#8b5cf6" },
-  { id: "cosmetica", name: "Cosmetică", icon: "Star", color: "#3b82f6" },
-  { id: "gene", name: "Gene & Sprâncene", icon: "Eye", color: "#06b6d4" },
-  { id: "masaj", name: "Masaj", icon: "Waves", color: "#f97316" },
-  { id: "altele", name: "Altele", icon: "MoreHorizontal", color: "#6b7280" },
 ]
 
 const initialServices: Service[] = [
-  // Coafor
-  { id: "s1", name: "Tuns dame", categoryId: "coafor", duration: 60, price: 80, description: "", products: [], staff: [], color: "#10b981", onlineBooking: true, active: true },
-  { id: "s2", name: "Tuns bărbați", categoryId: "coafor", duration: 30, price: 50, description: "", products: [], staff: [], color: "#10b981", onlineBooking: true, active: true },
-  { id: "s3", name: "Coafat", categoryId: "coafor", duration: 45, price: 100, description: "", products: [], staff: [], color: "#10b981", onlineBooking: true, active: true },
-  { id: "s4", name: "Spălat + uscat", categoryId: "coafor", duration: 30, price: 40, description: "", products: [], staff: [], color: "#10b981", onlineBooking: true, active: true },
-  // Coloristică
-  { id: "s5", name: "Vopsit rădăcini", categoryId: "coloristica", duration: 90, price: 150, description: "", products: [], staff: [], color: "#f59e0b", onlineBooking: true, active: true },
-  { id: "s6", name: "Vopsit integral", categoryId: "coloristica", duration: 120, price: 250, description: "", products: [], staff: [], color: "#f59e0b", onlineBooking: true, active: true },
-  { id: "s7", name: "Balayage", categoryId: "coloristica", duration: 180, price: 400, description: "", products: [], staff: [], color: "#f59e0b", onlineBooking: true, active: true },
-  { id: "s8", name: "Șuvițe", categoryId: "coloristica", duration: 150, price: 300, description: "", products: [], staff: [], color: "#f59e0b", onlineBooking: true, active: true },
-  // Manichiură
-  { id: "s9", name: "Manichiură gel", categoryId: "manichiura", duration: 60, price: 120, description: "", products: [], staff: [], color: "#ec4899", onlineBooking: true, active: true },
-  { id: "s10", name: "Manichiură semipermanentă", categoryId: "manichiura", duration: 45, price: 90, description: "", products: [], staff: [], color: "#ec4899", onlineBooking: true, active: true },
-  { id: "s11", name: "Manichiură clasică", categoryId: "manichiura", duration: 30, price: 60, description: "", products: [], staff: [], color: "#ec4899", onlineBooking: true, active: true },
-  // Cosmetică
-  { id: "s12", name: "Tratament facial", categoryId: "cosmetica", duration: 60, price: 150, description: "", products: [], staff: [], color: "#3b82f6", onlineBooking: true, active: true },
-  { id: "s13", name: "Curățare ten", categoryId: "cosmetica", duration: 75, price: 180, description: "", products: [], staff: [], color: "#3b82f6", onlineBooking: true, active: true },
-  { id: "s14", name: "Microdermabraziunie", categoryId: "cosmetica", duration: 45, price: 200, description: "", products: [], staff: [], color: "#3b82f6", onlineBooking: true, active: true },
-  // Gene
-  { id: "s15", name: "Extensii gene 3D", categoryId: "gene", duration: 120, price: 250, description: "", products: [], staff: [], color: "#06b6d4", onlineBooking: true, active: true },
-  { id: "s16", name: "Laminare gene", categoryId: "gene", duration: 60, price: 150, description: "", products: [], staff: [], color: "#06b6d4", onlineBooking: true, active: true },
-  { id: "s17", name: "Design sprâncene", categoryId: "gene", duration: 30, price: 80, description: "", products: [], staff: [], color: "#06b6d4", onlineBooking: true, active: true },
-  // Masaj
-  { id: "s18", name: "Masaj relaxare", categoryId: "masaj", duration: 60, price: 180, description: "", products: [], staff: [], color: "#f97316", onlineBooking: true, active: true },
-  { id: "s19", name: "Masaj terapeutic", categoryId: "masaj", duration: 90, price: 250, description: "", products: [], staff: [], color: "#f97316", onlineBooking: true, active: true },
 ]
 
 // ── Empty modal state ─────────────────────────────────────────────────
 const emptyService = (): Service => ({
   id: "",
   name: "",
-  categoryId: initialCategories[0].id,
+  categoryId: "",
   duration: 60,
   price: 0,
   description: "",

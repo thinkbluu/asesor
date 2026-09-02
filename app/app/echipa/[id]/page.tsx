@@ -4,8 +4,8 @@ import { use, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  getStaffById, getInitials, getFullName, getStaffById as unused,
-  STATUS_STYLES, STATUS_LABELS, ALL_SERVICES, ROLES,
+  getInitials, getFullName,
+  STATUS_STYLES, STATUS_LABELS, ROLES,
   type StaffMember, type RoleType, type CommissionType,
 } from "@/lib/echipa-data"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +33,8 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+const STAFF_DATA: StaffMember[] = []
+const ALL_SERVICES: string[] = []
 const DAYS = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"]
 
 type Tab = "program" | "servicii" | "performanta" | "comisioane"
@@ -40,7 +42,7 @@ type Tab = "program" | "servicii" | "performanta" | "comisioane"
 export default function StaffProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
-  const member = getStaffById(id)
+  const member = STAFF_DATA.find((item) => item.id === id)
 
   const [activeTab, setActiveTab] = useState<Tab>("program")
   const [schedule, setSchedule] = useState(member?.schedule ?? {})

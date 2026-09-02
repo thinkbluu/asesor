@@ -55,7 +55,6 @@ export function SettingsWhatsApp({ onDirty }: Props) {
   // Connection state
   const [phoneNumber, setPhoneNumber] = useState("")
   const [phoneNumberId, setPhoneNumberId] = useState("")
-  const [apiKey, setApiKey] = useState("")
   const [wabaId, setWabaId] = useState("")
   const [status, setStatus] = useState<WhatsAppChannelStatus>("disconnected")
   const [verifying, setVerifying] = useState(false)
@@ -79,7 +78,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
     setVerifying(true)
     setVerifyError(null)
     setStatus("pending")
-    const result = await verifyWhatsAppConnection({ apiKey, phoneNumberId })
+    const result = await verifyWhatsAppConnection({ phoneNumberId })
     if (result.ok) {
       setStatus("connected")
     } else {
@@ -92,7 +91,6 @@ export function SettingsWhatsApp({ onDirty }: Props) {
 
   function handleDisconnect() {
     setStatus("disconnected")
-    setApiKey("")
     setPhoneNumberId("")
     setWabaId("")
     setVerifyError(null)
@@ -172,27 +170,13 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label>WhatsApp Business Account ID</Label>
-              <Input
-                placeholder="987654321"
-                value={wabaId}
-                onChange={(e) => { setWabaId(e.target.value); markDirty() }}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Cheie API (Access Token)</Label>
-              <Input
-                type="password"
-                placeholder="EAAG..."
-                value={apiKey}
-                onChange={(e) => { setApiKey(e.target.value); markDirty() }}
-              />
-              <p className="text-xs text-muted-foreground">
-                Token permanent. Se stochează criptat pe server.
-              </p>
-            </div>
+          <div className="space-y-1.5">
+            <Label>WhatsApp Business Account ID</Label>
+            <Input
+              placeholder="987654321"
+              value={wabaId}
+              onChange={(e) => { setWabaId(e.target.value); markDirty() }}
+            />
           </div>
 
           {verifyError && (
@@ -206,7 +190,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             {status !== "connected" ? (
               <Button
                 onClick={handleVerify}
-                disabled={verifying || !apiKey || !phoneNumberId}
+                disabled={verifying || !phoneNumberId}
                 className="bg-[#25D366] text-white hover:bg-[#1fb355]"
               >
                 {verifying ? (

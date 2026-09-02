@@ -9,8 +9,6 @@ import {
   DEFAULT_LOYALTY_CONFIG,
   formatPoints,
   getLevelForLifetimePoints,
-  getLifetimePoints,
-  getLoyaltyHistory,
   getNextLevel,
   type LoyaltyTransaction,
 } from "@/lib/loyalty"
@@ -28,9 +26,11 @@ const TYPE_BADGES: Record<LoyaltyTransaction["type"], { label: string; className
   adjustment: { label: "Ajustare", className: "bg-muted text-muted-foreground border-border", icon: TrendingUp },
 }
 
-export function ClientLoyaltyCard({ clientId, balance }: { clientId: string; balance: number }) {
-  const history = getLoyaltyHistory(clientId)
-  const lifetime = getLifetimePoints(clientId)
+export function ClientLoyaltyCard({ clientId: _clientId, balance }: { clientId: string; balance: number }) {
+  const history: LoyaltyTransaction[] = []
+  const lifetime = history
+    .filter((transaction) => transaction.type === "earned" || transaction.type === "bonus")
+    .reduce((total, transaction) => total + transaction.points, 0)
   const currentLevel = getLevelForLifetimePoints(lifetime)
   const nextLevel = getNextLevel(currentLevel)
   const progressPct = nextLevel
