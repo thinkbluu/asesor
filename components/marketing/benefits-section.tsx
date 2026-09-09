@@ -5,25 +5,25 @@ const benefits = [
     icon: Clock,
     title: "Fără programări pe WhatsApp",
     description:
-      "Clienții tăi își fac singuri programarea online. Tu primești confirmare automată. Gata cu mesajele și apelurile.",
+      "Clienții își rezervă singuri serviciile, iar confirmările se trimit automat. Mai puține apeluri, mai puține mesaje și mai puține programări uitate.",
   },
   {
     icon: Eye,
-    title: "Nu mai ghicești. Vezi totul.",
+    title: "Vezi ce se întâmplă în salon",
     description:
-      "Câți clienți ai, cât ai încasat, ce produse s-au consumat. Pe zi, săptămână, lună.",
+      "Programări, încasări, consum de produse și activitatea echipei, fără prea multe filtre.",
   },
   {
     icon: Users,
-    title: "Echipa știe ce are de făcut",
+    title: "Echipa are claritate",
     description:
-      "Program individual, servicii alocate, performanță măsurabilă. Fără întrebări inutile.",
+      "Fiecare membru vede programul, serviciile și clienții alocați. Mai multă organizare, scris puțin mai oferit.",
   },
   {
     icon: TrendingUp,
-    title: "Controlul real al salonului",
+    title: "Control asupra afacerii tale",
     description:
-      "Rapoarte clare, stocuri monitorizate, venituri pe fiecare serviciu și angajat.",
+      "Rapoarte clare, stocuri actualizate și performanța fiecărui serviciu sau angajat, într-un singur dashboard.",
   },
 ]
 
@@ -36,7 +36,7 @@ export function BenefitsSection() {
             De ce ASESOR?
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Simplu. Rapid. Eficient. Exact ce îți trebuie pentru a conduce salonul mai bine.
+            Pentru că a fost creat dintr-o nevoie reală, studiată și observată.
           </p>
         </div>
 
