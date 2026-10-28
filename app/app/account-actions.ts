@@ -3,7 +3,7 @@
 // Close-account flow: the owner requests salon deletion (soft, reversible for
 // 30 days). The booking page goes dark immediately — the public RPCs in
 // scripts/015 filter deleted_at. Hard deletion happens in purge_deleted_salons()
-// (scripts/003), driven by the P12 cron through /api/cron/purge-deleted.
+// (scripts/003), driven by the P12 daily cron (/api/cron/daily).
 
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { requireRole } from "@/lib/auth/session"

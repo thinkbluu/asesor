@@ -58,7 +58,7 @@ export async function purgeSalonStorage(salonId: string): Promise<void> {
 
 /**
  * Full purge pass: storage objects first, then the SQL hard delete. Returns
- * the number of salons purged. Called by /api/cron/purge-deleted (P12 cron).
+ * the number of salons purged. Called by the P12 daily cron (/api/cron/daily).
  */
 export async function purgeDeletedSalons(): Promise<{ ok: boolean; purged: number; error?: string }> {
   if (!isSupabaseAdminConfigured()) {
