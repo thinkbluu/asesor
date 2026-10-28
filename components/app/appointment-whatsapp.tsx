@@ -123,13 +123,13 @@ export function AppointmentWhatsApp({
 
   return (
     <div className="space-y-3">
-      {/* Send button */}
+      {/* Send button — WhatsApp sending is not wired yet (P8+) */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             size="sm"
             className="w-full gap-2 bg-[#25D366] text-white hover:bg-[#1fb355]"
-            disabled={!e164}
+            disabled
           >
             <MessageCircle className="h-3.5 w-3.5" />
             Trimite pe WhatsApp
@@ -154,6 +154,11 @@ export function AppointmentWhatsApp({
           Număr WhatsApp invalid — verifică profilul clientului
         </p>
       )}
+
+      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <AlertCircle className="h-3.5 w-3.5" />
+        Trimiterea WhatsApp — În curând
+      </p>
 
       {/* Message history preview */}
       <div>

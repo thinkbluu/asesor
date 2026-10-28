@@ -1361,12 +1361,49 @@ export type Database = {
         Args: { p_first: string; p_last: string; p_phone: string }
         Returns: string
       }
+      create_appointment_rpc: {
+        Args: {
+          p_salon_id: string
+          p_client_id: string
+          p_staff_id: string
+          p_starts_at: string
+          p_ends_at: string
+          p_status: Database['public']['Enums']['appointment_status']
+          p_notes: string | null
+          p_total_price: number
+          p_discount: number
+          p_discount_type: string
+          p_services: Json
+          p_recurrence?: string
+          p_override?: boolean
+        }
+        Returns: Json
+      }
       create_salon_for_current_user: {
         Args: { p_name: string; p_city: string }
         Returns: string
       }
       current_staff_id: { Args: { p_salon: string }; Returns: string }
       dashboard_summary: { Args: { p_salon: string; p_day: string }; Returns: Json }
+      update_appointment_rpc: {
+        Args: {
+          p_appointment_id: string
+          p_salon_id: string
+          p_client_id: string
+          p_staff_id: string
+          p_starts_at: string
+          p_ends_at: string
+          p_status: Database['public']['Enums']['appointment_status']
+          p_notes: string | null
+          p_total_price: number
+          p_discount: number
+          p_discount_type: string
+          p_services: Json
+          p_override?: boolean
+          p_scope?: string
+        }
+        Returns: Json
+      }
       expire_loyalty_points: { Args: Record<string, never>; Returns: undefined }
       handle_new_user: { Args: Record<string, never>; Returns: undefined }
       has_salon_role: {

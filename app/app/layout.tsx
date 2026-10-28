@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth/session"
 import { AppSidebar } from "@/components/app/app-sidebar"
+import { Toaster } from "@/components/ui/sonner"
 
 // Server shell for the authenticated app. Resolves the session once and feeds
 // the sidebar; users without a salon membership are sent to onboarding.
@@ -27,6 +28,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="lg:pl-64 transition-all duration-300">
         <main className="min-h-screen">{children}</main>
       </div>
+      <Toaster position="bottom-right" richColors />
     </div>
   )
 }
