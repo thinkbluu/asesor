@@ -500,7 +500,8 @@ export async function uploadPhoto(
     return { ok: false, error: "Fișierul depășește 8 MB." }
   }
 
-  const path = `${salonId}/${clientId}/${randomUUID()}.webp`
+  const ext = file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1]
+  const path = `${salonId}/${clientId}/${randomUUID()}.${ext}`
   const body = await file.arrayBuffer()
   const { error: uploadError } = await supabase.storage
     .from("client-photos")

@@ -1425,6 +1425,10 @@ export type Database = {
     Functions: {
       accept_invite: { Args: { p_token: string }; Returns: string }
       apply_stock_movement: { Args: Record<string, never>; Returns: undefined }
+      register_contact_attempt_rpc: {
+        Args: { p_ip_hash: string }
+        Returns: Json
+      }
       client_search_text: {
         Args: { p_first: string; p_last: string; p_phone: string }
         Returns: string
