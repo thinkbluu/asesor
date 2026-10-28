@@ -254,10 +254,10 @@ function CampaignWizard({
                   </div>
                 </div>
               )}
-              {audienceObj && audienceObj.count !== null && (
+              {audienceObj && segmentCount(audienceObj.id) !== null && (
                 <div className="flex items-center gap-2 rounded-lg bg-accent/10 px-4 py-2 text-sm">
                   <Users className="h-4 w-4 text-accent" />
-                  <span className="font-medium text-accent">Audiență estimată: {audienceObj.count} clienți</span>
+                  <span className="font-medium text-accent">Audiență estimată: {segmentCount(audienceObj.id)} clienți</span>
                 </div>
               )}
             </div>
@@ -550,7 +550,7 @@ function PromotionModal({ open, onClose }: { open: boolean; onClose: () => void 
   )
 }
 
-// ── Main Page ───────────────────────────────────────────────────────────────────
+// ── Main Page ───────────────────���───────────────────────────────────────────────
 
 export default function MarketingView({
   segments,

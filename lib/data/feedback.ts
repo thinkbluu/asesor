@@ -84,7 +84,7 @@ export async function getFeedbackByToken(
 }
 
 export async function getReviewsStatsForSalon(salonId: string): Promise<ReviewsStats> {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from("feedback_requests")
     .select("rating, comment, answered_at, created_at")

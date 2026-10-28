@@ -10,7 +10,7 @@ import type { SegmentCounts } from "@/lib/marketing"
 //   inactive60 — no visit in the last 60 days (or never visited and created
 //                more than 60 days ago)
 export async function getSegmentCounts(salonId: string): Promise<SegmentCounts | null> {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const [clientsRes, statsRes] = await Promise.all([
     supabase

@@ -1,6 +1,5 @@
-// Display helpers shared by the clienti UI. Kept separate from the legacy
-// mock data module (lib/clienti-data.ts) so the real Supabase-backed pages
-// under /app/clienti do not depend on it.
+// Display helpers shared by the clienti UI. Pure functions only — the real
+// Supabase-backed pages under /app/clienti do not depend on any mock module.
 
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("ro-RO", {
