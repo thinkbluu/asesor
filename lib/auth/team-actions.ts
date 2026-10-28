@@ -11,10 +11,14 @@ import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { writeAudit } from "@/lib/audit"
+import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { getSession, MANAGEMENT_ROLES } from "./session"
 import type { AppRole } from "./session"
 
-export type ActionResult = { ok: true } | { ok: false; error: string }
+export type ActionResult =
+  | { ok: true }
+  | { ok: false; error: string }
+  | MfaRequired
 
 const ROLES: AppRole[] = ["owner", "manager", "staff", "receptionist"]
 
@@ -123,6 +127,7 @@ export async function changeMemberRole(memberId: string, role: string): Promise<
   if (!isRole(role)) return { ok: false, error: "Rolul selectat nu este valid." }
 
   const supabase = await createSupabaseServerClient()
+  if (await aal2Required(supabase)) return MFA_REQUIRED
   const salonId = guard.session.salon!.id
 
   const { data: member } = await supabase
@@ -166,6 +171,7 @@ export async function removeMember(memberId: string): Promise<ActionResult> {
   if (!guard.session) return { ok: false, error: guard.error }
 
   const supabase = await createSupabaseServerClient()
+  if (await aal2Required(supabase)) return MFA_REQUIRED
   const salonId = guard.session.salon!.id
 
   const { data: member } = await supabase

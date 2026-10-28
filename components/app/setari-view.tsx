@@ -38,6 +38,7 @@ import {
   Award,
   Star,
   Users,
+  KeyRound,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SettingsServicii } from "@/components/app/settings-servicii"
@@ -45,6 +46,7 @@ import { SettingsWhatsApp } from "@/components/app/settings-whatsapp"
 import { SettingsLoialitate } from "@/components/app/settings-loialitate"
 import { SettingsReviews } from "@/components/app/settings-reviews"
 import { SettingsEchipa } from "@/components/app/settings-echipa"
+import { SettingsSecurity } from "@/components/app/settings-security"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
 import type { LoyaltyConfig } from "@/lib/loyalty"
 import type { ReviewsConfig, ReviewsStats } from "@/lib/reviews"
@@ -119,6 +121,7 @@ const TABS = [
   { id: "recenzii", label: "Recenzii Google", icon: Star },
   { id: "abonament", label: "Abonament", icon: CreditCard },
   { id: "echipa", label: "Echipă și acces", icon: Users },
+  { id: "securitate", label: "Securitate", icon: KeyRound },
   { id: "permisiuni", label: "Permisiuni", icon: Shield },
 ]
 
@@ -954,6 +957,9 @@ export function SetariView({
               </Card>
             </div>
           )}
+
+          {/* ── SECURITATE ── */}
+          {activeTab === "securitate" && <SettingsSecurity />}
 
           {/* ── PERMISIUNI ── */}
           {activeTab === "permisiuni" && (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, useMemo, useEffect } from "react"
+import { useState, useTransition, useMemo, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,6 +18,7 @@ import {
 } from "recharts"
 import { Download, Plus, Undo2, Lock, LockOpen, FileText, Trash2, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Aal2Dialog } from "@/components/app/aal2-dialog"
 import type { FinanciarState } from "@/lib/data/financiar-state"
 import {
   PAYMENT_LABELS,
@@ -664,6 +665,8 @@ function DayCloseTab(props: {
   const [counted, setCounted] = useState("")
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
+  const [aal2Open, setAal2Open] = useState(false)
+  const reopenRef = useRef<() => void>(() => {})
 
   const load = (d: string) => {
     setLoading(true)
@@ -739,6 +742,16 @@ function DayCloseTab(props: {
                       void (async () => {
                         const res = await reopenDayAction({ day })
                         if (res.ok) { toast.success("Ziua a fost redeschisă."); setClosed(false); onClosed() }
+                        else if ("needsMfa" in res) {
+                          reopenRef.current = () => {
+                            void (async () => {
+                              const retry = await reopenDayAction({ day })
+                              if (retry.ok) { toast.success("Ziua a fost redeschisă."); setClosed(false); onClosed() }
+                              else if (!("needsMfa" in retry)) toast.error(retry.error)
+                            })()
+                          }
+                          setAal2Open(true)
+                        }
                         else toast.error(res.error)
                       })()
                     }}>
@@ -784,6 +797,12 @@ function DayCloseTab(props: {
           ))}
         </CardContent>
       </Card>
+
+      <Aal2Dialog
+        open={aal2Open}
+        onOpenChange={setAal2Open}
+        onVerified={() => reopenRef.current()}
+      />
     </div>
   )
 }

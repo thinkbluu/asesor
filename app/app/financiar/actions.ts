@@ -12,6 +12,7 @@ import {
 } from "@/lib/validation/financiar"
 import { writeAudit } from "@/lib/audit"
 import { internalActionError } from "@/lib/action-errors"
+import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import * as db from "@/lib/data/financiar"
 import type { PaymentMethod, TransactionView, ExpenseView, DayCloseView, FinReport } from "@/lib/mappers/financiar"
@@ -202,10 +203,13 @@ export async function closeDayAction(input: unknown): Promise<ActionResult> {
   return { ok: true }
 }
 
-export async function reopenDayAction(input: unknown): Promise<ActionResult> {
+export async function reopenDayAction(input: unknown): Promise<ActionResult | MfaRequired> {
   // Reopen is owner-only.
   const session = await requireRole(["owner"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
+
+  const supabase = await createSupabaseServerClient()
+  if (await aal2Required(supabase)) return MFA_REQUIRED
 
   const parsed = dayReopenSchema.safeParse(input)
   if (!parsed.success) return { ok: false, ...zodToActionError(parsed.error) }

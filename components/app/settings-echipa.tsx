@@ -4,7 +4,7 @@
 // role changes and member removal. Reads through RLS with the browser client;
 // mutations go through server actions that re-verify the caller's role.
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,6 +21,7 @@ import { UserPlus, Copy, Check, Trash2, Loader2 } from "lucide-react"
 import { createSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client"
 import { SALON_COOKIE } from "@/lib/auth/constants"
 import { inviteMember, changeMemberRole, removeMember } from "@/lib/auth/team-actions"
+import { Aal2Dialog } from "@/components/app/aal2-dialog"
 
 type Member = {
   id: string
@@ -152,10 +153,20 @@ export function SettingsEchipa() {
     }
   }
 
+  // AAL2 step-up: when a guarded action returns needsMfa, remember the retry
+  // and prompt for the 6-digit code.
+  const retryRef = useRef<(() => Promise<void>) | null>(null)
+  const [aal2Open, setAal2Open] = useState(false)
+
   const handleRoleChange = async (memberId: string, role: string) => {
     setActionError(null)
     const result = await changeMemberRole(memberId, role)
     if (!result.ok) {
+      if ("needsMfa" in result) {
+        retryRef.current = () => handleRoleChange(memberId, role)
+        setAal2Open(true)
+        return
+      }
       setActionError(result.error)
       return
     }
@@ -166,6 +177,11 @@ export function SettingsEchipa() {
     setActionError(null)
     const result = await removeMember(memberId)
     if (!result.ok) {
+      if ("needsMfa" in result) {
+        retryRef.current = () => handleRemove(memberId)
+        setAal2Open(true)
+        return
+      }
       setActionError(result.error)
       return
     }
@@ -337,6 +353,12 @@ export function SettingsEchipa() {
           )}
         </CardContent>
       </Card>
+
+      <Aal2Dialog
+        open={aal2Open}
+        onOpenChange={setAal2Open}
+        onVerified={() => void retryRef.current?.()}
+      />
     </div>
   )
 }

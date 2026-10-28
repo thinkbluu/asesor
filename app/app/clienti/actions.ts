@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache"
 import { requireRole } from "@/lib/auth/session"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { zodToActionError, type ActionResult } from "@/lib/validation/onboarding"
 import * as db from "@/lib/data/clienti"
 import {
@@ -187,9 +189,12 @@ export async function exportClientAction(clientId: string) {
   return { ok: true as const, data: result.data }
 }
 
-export async function deleteClientAction(input: unknown): Promise<ActionResult> {
+export async function deleteClientAction(input: unknown): Promise<ActionResult | MfaRequired> {
   const session = await requireRole([...GDPR_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
+
+  const supabase = await createSupabaseServerClient()
+  if (await aal2Required(supabase)) return MFA_REQUIRED
 
   const parsed = clientDeleteSchema.safeParse(input)
   if (!parsed.success) return { ok: false, ...zodToActionError(parsed.error) }

@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Aal2Dialog } from "@/components/app/aal2-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   AlertTriangle,
@@ -391,7 +392,7 @@ function HistoryTab({ history }: { history: ClientHistoryItem[] }) {
   )
 }
 
-// ─── Date protejate ──────────────────────────────────────────────────────────
+// ─── Date protejate ───────────────���──────────────────────────────────────────
 
 function SensitiveTab({
   clientId,
@@ -548,6 +549,8 @@ function GdprTab({ client }: { client: ClientDetail }) {
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [showDelete, setShowDelete] = useState(false)
+  const [aal2Open, setAal2Open] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<{ confirmName: string } | null>(null)
   const router = useRouter()
 
   function handleExport() {
@@ -624,6 +627,11 @@ function GdprTab({ client }: { client: ClientDetail }) {
                     confirmName: fd.get("confirmName"),
                   })
                   if (!result.ok) {
+                    if ("needsMfa" in result) {
+                      setPendingDelete({ confirmName: String(fd.get("confirmName") ?? "") })
+                      setAal2Open(true)
+                      return
+                    }
                     setError(result.error)
                     return
                   }
@@ -644,6 +652,25 @@ function GdprTab({ client }: { client: ClientDetail }) {
             </form>
           </DialogContent>
         </Dialog>
+
+        <Aal2Dialog
+          open={aal2Open}
+          onOpenChange={setAal2Open}
+          onVerified={() => {
+            if (!pendingDelete) return
+            startTransition(async () => {
+              const result = await deleteClientAction({
+                clientId: client.id,
+                confirmName: pendingDelete.confirmName,
+              })
+              if (!result.ok) {
+                setError("error" in result ? result.error : "Ștergerea nu a reușit.")
+                return
+              }
+              router.push("/app/clienti")
+            })
+          }}
+        />
       </CardContent>
     </Card>
   )
