@@ -1514,6 +1514,17 @@ export type Database = {
         }
         Returns: Json
       }
+      // scripts/016 — feedback submit (service_role only; the /feedback/[token]
+      // server action is the only caller). Single-use, expiry-checked.
+      submit_feedback_rpc: {
+        Args: {
+          p_token_hash: string
+          p_rating: number
+          p_comment: string
+          p_routed_to_google: boolean
+        }
+        Returns: Json
+      }
       expire_loyalty_points: { Args: Record<string, never>; Returns: undefined }
       handle_new_user: { Args: Record<string, never>; Returns: undefined }
       has_salon_role: {
