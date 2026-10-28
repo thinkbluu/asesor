@@ -22,3 +22,21 @@ export const LEGAL_DOCS: Record<LegalDocKey, { version: string; updated: string 
   cookies: { version: COOKIES_VERSION, updated: "28 octombrie 2026" },
   subprocessors: { version: SUBPROCESSORS_VERSION, updated: "28 octombrie 2026" },
 }
+
+/**
+ * Which legal documents the profile has not accepted at the current version.
+ * A missing version (null) counts as pending — profiles created before the
+ * acceptance tracking get the one-time modal too.
+ */
+export function pendingLegalDocs(profile: {
+  terms_version: string | null
+  privacy_version: string | null
+  dpa_version: string | null
+} | null): LegalDocKey[] {
+  if (!profile) return ["terms", "privacy", "dpa"]
+  const out: LegalDocKey[] = []
+  if (profile.terms_version !== TERMS_VERSION) out.push("terms")
+  if (profile.privacy_version !== PRIVACY_VERSION) out.push("privacy")
+  if (profile.dpa_version !== DPA_VERSION) out.push("dpa")
+  return out
+}

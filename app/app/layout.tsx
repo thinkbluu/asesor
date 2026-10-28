@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth/session"
+import { pendingLegalDocs } from "@/lib/legal"
 import { AppSidebar } from "@/components/app/app-sidebar"
+import { LegalAcceptanceModal } from "@/components/app/legal-acceptance-modal"
 import { Toaster } from "@/components/ui/sonner"
 
 // Server shell for the authenticated app. Resolves the session once and feeds
@@ -33,6 +35,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div className="lg:pl-64 transition-all duration-300">
         <main className="min-h-screen">{children}</main>
       </div>
+      {session.role === "owner" ? (
+        <LegalAcceptanceModal pending={pendingLegalDocs(session.profile)} />
+      ) : null}
       <Toaster position="bottom-right" richColors />
     </div>
   )
