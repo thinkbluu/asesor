@@ -44,6 +44,7 @@ export default async function SetariPage() {
       services={mapServiceRowsToSetariServices(state.services, state.staffServices, state.serviceProducts)}
       staff={state.staff.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}`.trim() }))}
       products={products}
+      deletedAt={salon.deleted_at}
     />
   )
 }

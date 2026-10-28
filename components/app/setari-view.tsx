@@ -83,6 +83,7 @@ interface SetariViewProps {
   services: SetariService[]
   staff: { id: string; name: string }[]
   products: { id: string; name: string }[]
+  deletedAt: string | null
 }
 
 // --- Initial state ---
@@ -142,6 +143,7 @@ export function SetariView({
   services,
   staff,
   products,
+  deletedAt,
 }: SetariViewProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -965,7 +967,7 @@ export function SetariView({
           {activeTab === "securitate" && <SettingsSecurity />}
 
           {/* ── DATE ȘI CONFIDENȚIALITATE ── */}
-          {activeTab === "date" && <SettingsPrivacy />}
+          {activeTab === "date" && <SettingsPrivacy deletedAt={deletedAt} />}
 
           {/* ── PERMISIUNI ── */}
           {activeTab === "permisiuni" && (
