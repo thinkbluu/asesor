@@ -5,6 +5,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from 'lucide-react';
 import Link from 'next/link';
+import { CookieSettingsLink } from '@/components/cookie-settings-link';
 
 interface FooterLink {
   title: string;
@@ -95,6 +96,11 @@ export function SiteFooter() {
                       </Link>
                     </li>
                   ))}
+                  {section.label === 'Companie' && (
+                    <li>
+                      <CookieSettingsLink />
+                    </li>
+                  )}
                 </ul>
               </div>
             </AnimatedContainer>

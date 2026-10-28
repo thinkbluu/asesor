@@ -53,6 +53,11 @@ export function CookieBanner() {
     } catch {
       // If localStorage is inaccessible, do not show banner (graceful degradation)
     }
+
+    // "Setări cookie-uri" footer link reopens the banner.
+    const onOpenSettings = () => setVisible(true)
+    window.addEventListener("asesor:open-cookie-settings", onOpenSettings)
+    return () => window.removeEventListener("asesor:open-cookie-settings", onOpenSettings)
   }, [])
 
   if (!visible) return null
