@@ -1152,6 +1152,7 @@ export type Database = {
           comment: string | null
           routed_to_google: boolean
           answered_at: string | null
+          emailed_at: string | null
           created_at: string
           updated_at: string
         }
@@ -1166,6 +1167,7 @@ export type Database = {
           comment?: string | null
           routed_to_google?: boolean
           answered_at?: string | null
+          emailed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1180,6 +1182,7 @@ export type Database = {
           comment?: string | null
           routed_to_google?: boolean
           answered_at?: string | null
+          emailed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -1188,7 +1191,7 @@ export type Database = {
       message_log: {
         Row: {
           id: string
-          salon_id: string
+          salon_id: string | null
           appointment_id: string | null
           channel: string
           kind: string
@@ -1201,7 +1204,7 @@ export type Database = {
         }
         Insert: {
           id?: string
-          salon_id: string
+          salon_id?: string | null
           appointment_id?: string | null
           channel?: string
           kind: string
