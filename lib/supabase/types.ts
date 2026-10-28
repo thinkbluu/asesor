@@ -1325,6 +1325,44 @@ export type Database = {
       }
     }
     Views: {
+      // staff_month_stats (scripts/012): postgres-owned view, NOT
+      // security_invoker — the WHERE guard is the RLS layer for financial
+      // data (owner/manager/receptionist see the salon, staff only their row).
+      staff_month_stats: {
+        Row: {
+          staff_id: string
+          salon_id: string
+          month_start: string
+          appointments_count: number
+          no_show_rate: number | null
+          revenue: number
+          services_count: number
+          scheduled_minutes: number
+          booked_minutes: number
+          utilization: number | null
+          avg_rating: number | null
+          commission_type: Database["public"]["Enums"]["commission_type"] | null
+          commission_rate: number | null
+          commission_amount: number
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      // staff_week_trend (scripts/012): postgres-owned view, same guard as
+      // staff_month_stats — one row per staff per day, last 7 days.
+      staff_week_trend: {
+        Row: {
+          staff_id: string
+          salon_id: string
+          day: string
+          appointments_count: number
+          revenue: number
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       // client_stats (scripts/010): security_invoker view — computed totals per
       // client (visits, spent, last visit); RLS of the underlying tables applies.
       client_stats: {
