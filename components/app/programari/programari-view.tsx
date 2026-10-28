@@ -35,6 +35,7 @@ import {
   getWeekDates, getMonthDates, todayBucharest, zonedParts,
 } from "@/lib/time"
 import type { AppRole } from "@/lib/auth/session"
+import { Checkbox } from "@/components/ui/checkbox"
 import type { RealtimeChannel } from "@supabase/supabase-js"
 import { createSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client"
 import {
@@ -628,7 +629,7 @@ function DayView({
   )
 }
 
-// ─── Week View ────────────────────────────────────────────────────────────────
+// ─── Week View ───────────────────────────────────────────────────────��────────
 
 function WeekView({
   weekDates, allAppointments, staff, onSelectApt, onDayClick,
@@ -932,6 +933,7 @@ function AppointmentModal({
   const [discount, setDiscount] = useState(0)
   const [discountType, setDiscountType] = useState<"procent" | "fix">("procent")
   const [recurrence, setRecurrence] = useState<RecurrenceType>("niciodata")
+  const [sendConfirmation, setSendConfirmation] = useState(false)
   const [scope, setScope] = useState<"single" | "rest_of_series">("single")
   const [serviceSearch, setServiceSearch] = useState("")
   const [saving, setSaving] = useState(false)
@@ -972,6 +974,7 @@ function AppointmentModal({
       setSelectedClient(null)
       setClientSearch("")
       setSelectedServices([])
+      setSendConfirmation(false)
       setStaffId(prefillStaffId ?? staff[0]?.id ?? "")
       setDate(prefillDate ?? todayBucharest())
       setStartTime(prefillTime ?? "09:00")
@@ -1085,6 +1088,7 @@ function AppointmentModal({
       discountType,
       recurrence,
       override,
+      sendConfirmation: isEdit ? undefined : sendConfirmation,
     }
     return isEdit ? { ...base, id: editing.id, scope } : base
   }
@@ -1428,6 +1432,18 @@ function AppointmentModal({
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Note interne..." className="h-9 resize-none text-sm" />
             </div>
           </div>
+
+          {/* P12: email confirmation tick (create only; skipped silently when
+              the client has no email address) */}
+          {!isEdit && (
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
+              <Checkbox
+                checked={sendConfirmation}
+                onCheckedChange={(v) => setSendConfirmation(v === true)}
+              />
+              Trimite confirmare pe email clientului
+            </label>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-2 border-t border-border">

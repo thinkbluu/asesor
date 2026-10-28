@@ -5,6 +5,8 @@ import { SITE } from "@/lib/site"
 export interface ContactNouData {
   name: string
   email: string
+  phone: string
+  salonName: string
   subject: string
   message: string
   sentAtLabel: string
@@ -32,6 +34,16 @@ export function ContactNou({ data }: { data: ContactNouData }) {
         <Text style={styles.listItem}>
           <strong>Subiect:</strong> {data.subject}
         </Text>
+        {data.phone ? (
+          <Text style={styles.listItem}>
+            <strong>Telefon:</strong> {data.phone}
+          </Text>
+        ) : null}
+        {data.salonName ? (
+          <Text style={styles.listItem}>
+            <strong>Salon:</strong> {data.salonName}
+          </Text>
+        ) : null}
         <Text style={{ ...styles.listItem, whiteSpace: "pre-wrap" }}>{data.message}</Text>
       </Section>
       <Text style={styles.text}>

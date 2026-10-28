@@ -107,6 +107,8 @@ export const SAMPLE_STOC_SCAZUT: StocScazutZilnicData = {
 export const SAMPLE_CONTACT_NOU: ContactNouData = {
   name: "Ion Ionescu",
   email: "ion@example.com",
+  phone: "0723 456 789",
+  salonName: "Salon Frumusețe",
   subject: "Întrebare despre abonament",
   message:
     "Bună ziua! Când pot afla mai multe despre abonamentul anual? Aș vrea să vin într-o ședință de probă în iunie. Mulțumesc!",

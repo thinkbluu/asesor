@@ -6,6 +6,8 @@ import crypto from "node:crypto"
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
 import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from "@/lib/supabase/config"
 import { serverEnv } from "@/lib/env.server"
+import { sendAppointmentConfirmation } from "@/lib/messaging/appointment-emails"
+import { absoluteUrl } from "@/lib/messaging/urls"
 import { bookingDetailsSchema, type BookingDetailsInput } from "@/lib/validation/booking"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -218,22 +220,44 @@ export async function createPublicBooking(
     return { ok: false, code: "invalid", message: GENERIC_ERROR }
   }
 
-  return {
-    ok: true,
-    data: {
-      code: res.code ?? "",
-      status: res.status ?? "confirmat",
-      startsAt: res.starts_at ?? "",
-      endsAt: res.ends_at ?? "",
-      totalPrice: Number(res.total_price ?? 0),
-      durationMin: Number(res.duration_min ?? 0),
-      services: (res.services ?? []).map((s) => ({
-        name: s.name,
-        price: Number(s.price),
-        durationMin: Number(s.duration_min),
-      })),
-      staffFirstName: res.staff_first_name ?? "",
-      managePath: `/booking/manage/${manageToken}`,
-    },
+  const bookingData = {
+    code: res.code ?? "",
+    status: res.status ?? "confirmat",
+    startsAt: res.starts_at ?? "",
+    endsAt: res.ends_at ?? "",
+    totalPrice: Number(res.total_price ?? 0),
+    durationMin: Number(res.duration_min ?? 0),
+    services: (res.services ?? []).map((s) => ({
+      name: s.name,
+      price: Number(s.price),
+      durationMin: Number(s.duration_min),
+    })),
+    staffFirstName: res.staff_first_name ?? "",
+    managePath: `/booking/manage/${manageToken}`,
   }
+
+  // Transactional emails (confirmation to the client, new-booking notice to
+  // the salon + specialist). Fire-and-forget: never fail the booking itself;
+  // sendMessage is idempotent via message_log unique(appointment_id, kind).
+  if (res.appointment_id) {
+    try {
+      const admin = createSupabaseAdminClient()
+      const { data: salonRow } = await admin
+        .from("salons")
+        .select("id")
+        .eq("slug", d.slug)
+        .maybeSingle()
+      if (salonRow) {
+        const manageUrl = await absoluteUrl(`/booking/manage/${manageToken}`)
+        await sendAppointmentConfirmation(salonRow.id, res.appointment_id, {
+          manageUrl,
+          clientEmail: d.email,
+        })
+      }
+    } catch (err) {
+      console.error("[v0] booking confirmation emails failed:", err)
+    }
+  }
+
+  return { ok: true, data: bookingData }
 }

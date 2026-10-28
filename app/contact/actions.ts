@@ -9,6 +9,7 @@ import { headers } from "next/headers"
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
 import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from "@/lib/supabase/config"
 import { serverEnv } from "@/lib/env.server"
+import { sendMessage } from "@/lib/messaging"
 import { contactSchema, type ContactSubject } from "@/lib/validation/contact"
 import { SITE } from "@/lib/site"
 import { zodToActionError } from "@/lib/validation/onboarding"
@@ -57,39 +58,32 @@ async function sendContactEmail(input: {
   subject: ContactSubject
   message: string
 }): Promise<void> {
-  const apiKey = serverEnv.RESEND_API_KEY
-  if (!apiKey) {
-    console.log("[v0] contact request saved (no RESEND_API_KEY — email skipped):", input.email)
-    return
-  }
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${apiKey}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "ASESOR <onboarding@resend.dev>",
-        to: SITE.emails.contact,
-        reply_to: input.email,
-        subject: `Mesaj contact — ${input.subject}`,
-        text: [
-          `Nume: ${input.name}`,
-          `Email: ${input.email}`,
-          `Telefon: ${input.phone}`,
-          `Salon: ${input.salonName || "—"}`,
-          `Subiect: ${input.subject}`,
-          "",
-          input.message,
-        ].join("\n"),
-      }),
-    })
-    if (!res.ok) {
-      console.error("[v0] Resend contact email failed:", res.status, await res.text().catch(() => ""))
-    }
-  } catch (error) {
-    console.error("[v0] Resend contact email failed:", error)
+  const sentAtLabel = new Intl.DateTimeFormat("ro-RO", {
+    timeZone: "Europe/Bucharest",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date())
+
+  const result = await sendMessage({
+    salonId: null,
+    kind: "contact_nou",
+    to: SITE.emails.contact,
+    replyTo: input.email,
+    data: {
+      name: input.name,
+      email: input.email,
+      phone: input.phone,
+      salonName: input.salonName,
+      subject: input.subject,
+      message: input.message,
+      sentAtLabel,
+    },
+  })
+  if (!result.ok) {
+    console.error("[v0] contact notification failed:", result.error)
   }
 }
 

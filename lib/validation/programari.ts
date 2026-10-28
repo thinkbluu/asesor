@@ -65,6 +65,9 @@ const appointmentBase = z.object({
   discountType: z.enum(["procent", "fix"]).default("procent"),
   recurrence: z.enum(RECURRENCES).default("niciodata"),
   override: z.boolean().default(false),
+  // P12: receptionist tick — email confirmation to the client (only sent
+  // when the client actually has an email address; silently skipped otherwise).
+  sendConfirmation: z.boolean().default(false),
 })
 
 const clientOrNewRefine = <T extends { clientId?: string | null; newClient?: unknown }>(d: T) =>

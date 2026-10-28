@@ -11,6 +11,7 @@ import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { writeAudit } from "@/lib/audit"
+import { sendMessage } from "@/lib/messaging"
 import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { getSession, MANAGEMENT_ROLES } from "./session"
 import type { AppRole } from "./session"
@@ -21,6 +22,13 @@ export type ActionResult =
   | MfaRequired
 
 const ROLES: AppRole[] = ["owner", "manager", "staff", "receptionist"]
+
+const ROLE_LABELS: Record<AppRole, string> = {
+  owner: "Proprietar",
+  manager: "Manager",
+  receptionist: "Receptionist",
+  staff: "Specialist",
+}
 
 function isRole(value: unknown): value is AppRole {
   return typeof value === "string" && ROLES.includes(value as AppRole)
@@ -116,9 +124,42 @@ export async function inviteMember(
     staff_id: verifiedStaffId,
   })
 
+  const inviteUrl = await buildInviteUrl(token)
+
+  // P12: email the invite (the copyable link stays as fallback in the UI).
+  // Fire-and-forget — an email failure must not fail the invite itself.
+  const salon = guard.session.salon
+  if (salon) {
+    const branding = (salon.branding ?? {}) as Record<string, unknown>
+    try {
+      await sendMessage({
+        salonId: salon.id,
+        kind: "invitatie_echipa",
+        to: normalizedEmail,
+        data: {
+          salon: {
+            name: salon.name,
+            accentColor:
+              typeof branding.primary_color === "string" ? branding.primary_color : null,
+            logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
+            address: salon.address,
+            city: salon.city,
+            phone: salon.phone,
+          },
+          inviteUrl,
+          roleLabel: ROLE_LABELS[role],
+          inviterName: guard.session.profile?.full_name ?? null,
+          expiresInDays: 7,
+        },
+      })
+    } catch (err) {
+      console.error("[v0] invite email failed:", err)
+    }
+  }
+
   revalidatePath("/app/setari")
   revalidatePath("/app/echipa")
-  return { ok: true, url: await buildInviteUrl(token) }
+  return { ok: true, url: inviteUrl }
 }
 
 export async function changeMemberRole(memberId: string, role: string): Promise<ActionResult> {

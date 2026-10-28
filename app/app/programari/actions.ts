@@ -20,6 +20,7 @@ import {
   updateStatusSchema,
 } from "@/lib/validation/programari"
 import { zodToActionError, type ActionResult } from "@/lib/validation/onboarding"
+import { sendAppointmentCancellation, sendAppointmentConfirmation } from "@/lib/messaging/appointment-emails"
 import type { Appointment } from "@/lib/mappers/programari"
 
 // Server actions for the Programări calendar. Reads are available to every
@@ -103,6 +104,19 @@ export async function createAppointmentAction(input: unknown): Promise<Appointme
       overridable: result.overridable,
     }
   }
+
+  // P12: optional confirmation email to the client (tick in the form). The
+  // helper silently skips clients without an email; sendMessage is
+  // idempotent via message_log unique(appointment_id, kind).
+  const appointmentId = (result.data as { appointmentId?: string } | null)?.appointmentId
+  if (parsed.data.sendConfirmation && appointmentId) {
+    try {
+      await sendAppointmentConfirmation(session.salon.id, appointmentId)
+    } catch (err) {
+      console.error("[v0] appointment confirmation email failed:", err)
+    }
+  }
+
   revalidatePath("/app/programari")
   revalidatePath("/app")
   return { ok: true, data: result.data }
@@ -161,6 +175,17 @@ export async function updateAppointmentStatusAction(input: unknown): Promise<Act
 
   const result = await dbUpdateStatus(session.salon.id, parsed.data)
   if (!result.ok) return { ok: false, error: result.error }
+
+  // P12: cancellation notice to the client (if it has an email) + the salon.
+  // Idempotent via message_log unique(appointment_id, kind).
+  if (parsed.data.status === "anulat") {
+    try {
+      await sendAppointmentCancellation(session.salon.id, parsed.data.id, parsed.data.cancelReason ?? null)
+    } catch (err) {
+      console.error("[v0] appointment cancellation email failed:", err)
+    }
+  }
+
   revalidatePath("/app/programari")
   revalidatePath("/app")
   return { ok: true }

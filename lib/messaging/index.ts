@@ -86,6 +86,8 @@ export async function sendMessage<K extends MessageKind>(input: {
   to: string
   data: TemplateDataMap[K]
   attachments?: MessageAttachment[]
+  /** Overrides the default reply-to (the salon email) — e.g. contact form sender. */
+  replyTo?: string
 }): Promise<SendMessageResult> {
   const to = input.to.trim()
   if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
@@ -168,7 +170,7 @@ export async function sendMessage<K extends MessageKind>(input: {
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
-      reply_to: salon?.email ?? undefined,
+      reply_to: input.replyTo ?? salon?.email ?? undefined,
     }
     if (input.attachments?.length) {
       payload.attachments = input.attachments.map((a) => ({
