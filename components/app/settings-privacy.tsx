@@ -59,12 +59,12 @@ export function SettingsPrivacy({ deletedAt }: { deletedAt: string | null }) {
     setDeletePending(true)
     const result = await requestSalonDeletionAction()
     setDeletePending(false)
-    if (!result.ok && "needsMfa" in result && result.needsMfa) {
-      setDeleteOpen(false)
-      setAal2Open(true)
-      return
-    }
     if (!result.ok) {
+      if ("needsMfa" in result) {
+        setDeleteOpen(false)
+        setAal2Open(true)
+        return
+      }
       toast.error(result.error)
       return
     }
