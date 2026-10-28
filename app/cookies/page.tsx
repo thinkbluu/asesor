@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { SITE } from "@/lib/site"
 
 export const metadata = {
   title: "Politica cookies — ASESOR",
@@ -116,8 +117,8 @@ export default function CookiesPage() {
         <h2 className="mb-3 mt-10 text-xl font-semibold">Contact</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
           Întrebări despre utilizarea cookie-urilor:{" "}
-          <a href="mailto:dpo@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">
-            dpo@asesor.ro
+          <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">
+            {SITE.emails.dpo}
           </a>
         </p>
       </main>

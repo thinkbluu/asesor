@@ -12,7 +12,7 @@ const modules = [
     features: [
       "Calendar vizual (zi / săptămână / lună)",
       "Programări online — clienții se programează singuri, 24/7",
-      "Confirmare și reminder automat prin SMS sau email",
+      "Confirmări și reamintiri pe email",
       "Reguli personalizate: timp buffer între programări, politică de anulare",
       "Atribuire automată sau manuală pe membrii echipei",
     ],

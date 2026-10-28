@@ -8,68 +8,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { PLANS, TRIAL_DAYS, TRIAL_REQUIRES_CARD, SHOW_YEARLY } from "@/lib/plans"
 
-const plans: PricingPlan[] = [
-  {
-    name: "Basic",
-    price: "49",
-    yearlyPrice: "39",
-    period: "lună",
-    features: [
-      "Până la 2 utilizatori",
-      "Calendar programări",
-      "Bază de date clienți (max 500)",
-      "Rapoarte de bază",
-      "Suport email",
-    ],
-    description: "Tehnicieni independenți sau saloane mici (1-2 persoane)",
-    buttonText: "Începe gratuit",
-    href: "/register",
-  },
-  {
-    name: "Pro",
-    price: "99",
-    yearlyPrice: "79",
-    period: "lună",
-    features: [
-      "Până la 10 utilizatori",
-      "Tot din Basic, plus:",
-      "Gestionare stocuri",
-      "Marketing automat (SMS/Email)",
-      "Rapoarte avansate",
-      "Program individual per specialist",
-      "Suport prioritar",
-    ],
-    description: "Saloane medii care vor control complet",
-    buttonText: "Alege Pro",
-    href: "/register",
-    isPopular: true,
-  },
-  {
-    name: "Premium",
-    price: "199",
-    yearlyPrice: "159",
-    period: "lună",
-    features: [
-      "Utilizatori nelimitați",
-      "Tot din Pro, plus:",
-      "Multiple locații",
-      "API access",
-      "Manager dedicat",
-      "Instruire personalizată",
-      "Integrări personalizate",
-    ],
-    description: "Saloane mari sau lanțuri cu multiple locații",
-    buttonText: "Contactează-ne",
-    href: "/contact",
-  },
-]
+const plans: PricingPlan[] = PLANS.map((plan) => ({
+  name: plan.name,
+  price: String(plan.monthly),
+  yearlyPrice: SHOW_YEARLY ? String(plan.yearly) : String(plan.monthly),
+  period: "lună",
+  features: [...plan.features],
+  description: plan.description,
+  buttonText: plan.id === "premium" ? "Contactează-ne" : "Începe gratuit",
+  href: plan.id === "premium" ? "/contact" : "/register",
+  isPopular: "highlighted" in plan ? plan.highlighted === true : false,
+}))
 
 const faqs = [
   {
     question: "Pot testa gratuit?",
-    answer:
-      "Da. Ai 14 zile să explorezi platforma, fără card bancar și fără obligații.",
+    answer: `Da. Ai ${TRIAL_DAYS} zile să explorezi platforma. La înregistrare este necesar un card bancar, dar nu se debitează nimic. Dacă anulezi înainte de finalul celor ${TRIAL_DAYS} de zile, nu se percepe nicio sumă.`,
   },
   {
     question: "Ce se întâmplă după perioada de test?",

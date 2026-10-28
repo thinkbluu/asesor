@@ -20,7 +20,7 @@ export default function RegisterPage() {
             <span className="text-[#2D8C3C]">un salon mai eficient.</span>
           </h1>
           <div className="space-y-3">
-            {["Configurare în 10 minute", "14 zile gratuit, fără card", "Suport dedicat în română"].map((item) => (
+            {["Configurare în 10 minute", "14 zile gratuit", "Suport dedicat în română"].map((item) => (
               <div key={item} className="flex items-center gap-3">
                 <div className="h-1.5 w-1.5 rounded-full bg-[#2D8C3C] shrink-0" />
                 <span className="text-white/60 text-sm">{item}</span>

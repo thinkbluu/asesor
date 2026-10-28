@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { SITE } from "@/lib/site"
 
 export const metadata = {
   title: "Politica de confidențialitate — ASESOR",
@@ -18,8 +19,8 @@ export default function PrivacyPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Identitatea operatorului</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          <strong className="text-foreground">ASESOR SRL</strong>, CUI: RO[XXXXXXXX], sediu: [Adresă completă], România.<br />
-          Contact DPO: <a href="mailto:dpo@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">dpo@asesor.ro</a>
+          <strong className="text-foreground">{SITE.legalEntity}</strong>, CUI: {SITE.cui}, sediu: {SITE.address}<br />
+          Contact DPO: <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.dpo}</a>
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">2. Ce date colectăm</h2>
@@ -88,7 +89,7 @@ export default function PrivacyPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">10. Contact</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Pentru orice solicitare legată de datele personale: <a href="mailto:dpo@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">dpo@asesor.ro</a>
+          Pentru orice solicitare legată de datele personale: <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.dpo}</a>
         </p>
       </main>
     </MarketingLayout>

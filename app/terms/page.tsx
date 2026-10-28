@@ -1,4 +1,6 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { SITE } from "@/lib/site"
+import { TRIAL_DAYS, TRIAL_REQUIRES_CARD } from "@/lib/plans"
 
 export const metadata = {
   title: "Termeni și condiții — ASESOR",
@@ -18,7 +20,7 @@ export default function TermsPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Definiții</h2>
         <ul className="mb-4 list-disc space-y-2 pl-5 text-muted-foreground">
-          <li><strong className="text-foreground">ASESOR / Furnizor</strong> — ASESOR SRL, furnizorul platformei.</li>
+          <li><strong className="text-foreground">ASESOR / Furnizor</strong> — {SITE.legalEntity}, furnizorul platformei.</li>
           <li><strong className="text-foreground">Utilizator / Abonat</strong> — persoana fizică sau juridică care creează un cont și utilizează platforma.</li>
           <li><strong className="text-foreground">Client final</strong> — clientul salonului gestionat de Abonat prin intermediul platformei.</li>
           <li><strong className="text-foreground">Serviciul</strong> — platforma software ASESOR accesibilă la asesor.ro.</li>
@@ -41,7 +43,7 @@ export default function TermsPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">5. Perioada de probă</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Fiecare cont nou beneficiază de o perioadă de probă gratuită de <strong className="text-foreground">14 zile</strong>, fără obligația furnizării datelor de card. La expirarea perioadei de probă, contul trece automat în plan gratuit limitat sau necesită selectarea unui abonament plătit.
+          Fiecare cont nou beneficiază de o perioadă de probă gratuită de <strong className="text-foreground">{TRIAL_DAYS} de zile</strong>.{TRIAL_REQUIRES_CARD ? " La înregistrare este necesar un card bancar, însă nu se debitează nicio sumă; dacă anulezi înainte de finalul perioadei de probă, nu se percepe nimic." : " Nu este necesară furnizarea datelor de card."} La expirarea perioadei de probă, contul trece automat în plan gratuit limitat sau necesită selectarea unui abonament plătit.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">6. Reînnoire automată și anulare</h2>
@@ -51,12 +53,12 @@ export default function TermsPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">7. Politica de rambursare</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Rambursările se acordă exclusiv în cazul unor defecțiuni tehnice majore atribuibile ASESOR, care au împiedicat utilizarea serviciului mai mult de 72 de ore consecutive într-o lună de facturare. Solicitările se transmit la <a href="mailto:facturare@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">facturare@asesor.ro</a> în termen de 14 zile de la incident.
+          Rambursările se acordă exclusiv în cazul unor defecțiuni tehnice majore atribuibile ASESOR, care au împiedicat utilizarea serviciului mai mult de 72 de ore consecutive într-o lună de facturare. Solicitările se transmit la <a href={`mailto:${SITE.emails.billing}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.billing}</a> în termen de 14 zile de la incident.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">8. Proprietate intelectuală</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Platforma ASESOR, codul sursă, designul, logo-urile și toate materialele asociate sunt proprietatea exclusivă a ASESOR SRL și sunt protejate de legislația privind drepturile de autor. Utilizatorul primește o licență limitată, non-exclusivă, netransferabilă, pentru utilizarea serviciului conform prezentelor termeni.
+          Platforma ASESOR, codul sursă, designul, logo-urile și toate materialele asociate sunt proprietatea exclusivă a {SITE.legalEntity} și sunt protejate de legislația privind drepturile de autor. Utilizatorul primește o licență limitată, non-exclusivă, netransferabilă, pentru utilizarea serviciului conform prezentelor termeni.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">9. Limitarea răspunderii</h2>
@@ -76,7 +78,7 @@ export default function TermsPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">Contact</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          <a href="mailto:legal@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">legal@asesor.ro</a>
+          <a href={`mailto:${SITE.emails.legal}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.legal}</a>
         </p>
       </main>
     </MarketingLayout>

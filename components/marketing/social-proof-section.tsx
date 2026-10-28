@@ -5,7 +5,7 @@ import { Calendar, MessageSquare, BarChart3 } from "lucide-react"
 
 const badges = [
   { icon: Calendar, label: "Programări online" },
-  { icon: MessageSquare, label: "Integrare SMS" },
+  { icon: MessageSquare, label: "Confirmări pe email" },
   { icon: BarChart3, label: "Rapoarte automate" },
 ]
 

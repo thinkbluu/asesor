@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { SITE } from "@/lib/site"
 
 export const metadata = {
   title: "Acord de prelucrare a datelor (DPA) — ASESOR",
@@ -22,7 +23,7 @@ export default function DPAPage() {
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Părțile</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
           <strong className="text-foreground">Operatorul (Controller):</strong> Abonatul ASESOR — salonul care utilizează platforma și gestionează datele clienților finali.<br />
-          <strong className="text-foreground">Persoana Împuternicită (Processor):</strong> ASESOR SRL, CUI: RO[XXXXXXXX].
+          <strong className="text-foreground">Persoana Împuternicită (Processor):</strong> {SITE.legalEntity}, CUI: {SITE.cui}.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">2. Obiectul și scopul prelucrării</h2>
@@ -73,7 +74,7 @@ export default function DPAPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">Contact</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          <a href="mailto:dpo@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">dpo@asesor.ro</a>
+          <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.dpo}</a>
         </p>
       </main>
     </MarketingLayout>

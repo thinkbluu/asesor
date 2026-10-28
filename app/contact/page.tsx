@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react"
+import { SITE } from "@/lib/site"
 
 export default function ContactPage() {
   const [gdprChecked, setGdprChecked] = useState(false)
@@ -46,7 +47,7 @@ export default function ContactPage() {
                 <CardHeader>
                   <CardTitle>Trimite un mesaj</CardTitle>
                   <CardDescription>
-                    Completează formularul și te contactăm în maxim 24 de ore.
+                    Completează formularul și te contactăm în maxim {SITE.responseTime}.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -163,8 +164,8 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">Email</p>
-                        <p className="text-muted-foreground">contact@asesor.ro</p>
-                        <p className="text-muted-foreground">support@asesor.ro</p>
+                        <p className="text-muted-foreground">{SITE.emails.contact}</p>
+                        <p className="text-muted-foreground">{SITE.emails.support}</p>
                       </div>
                     </div>
 
@@ -185,8 +186,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">Sediu</p>
-                        <p className="text-muted-foreground">Str. Exemplu 123</p>
-                        <p className="text-muted-foreground">București, România</p>
+                        <p className="text-muted-foreground">{SITE.address}</p>
                       </div>
                     </div>
 
@@ -196,8 +196,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">Program suport</p>
-                        <p className="text-muted-foreground">Luni - Vineri: 09:00 - 18:00</p>
-                        <p className="text-muted-foreground">Sâmbătă: 10:00 - 14:00</p>
+                        <p className="text-muted-foreground">{SITE.supportHours}</p>
                       </div>
                     </div>
                   </div>

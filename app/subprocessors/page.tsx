@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { SITE } from "@/lib/site"
 
 export const metadata = {
   title: "Sub-procesatori — ASESOR",
@@ -86,8 +87,8 @@ export default function SubprocessorsPage() {
 
         <p className="mt-8 text-sm text-muted-foreground">
           Pentru întrebări sau obiecții legate de sub-procesatori, contactează-ne la{" "}
-          <a href="mailto:dpo@asesor.ro" className="text-emerald-600 underline dark:text-emerald-400">
-            dpo@asesor.ro
+          <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">
+            {SITE.emails.dpo}
           </a>
           .
         </p>
