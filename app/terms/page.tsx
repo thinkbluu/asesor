@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { LegalDocHeader } from "@/components/legal/legal-doc-header"
 import { SITE } from "@/lib/site"
 import { TRIAL_DAYS, TRIAL_REQUIRES_CARD } from "@/lib/plans"
 
@@ -11,12 +12,11 @@ export default function TermsPage() {
   return (
     <MarketingLayout>
       <main className="mx-auto max-w-3xl px-6 py-16 text-foreground">
-        <div className="mb-8 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-5 py-4 text-sm text-yellow-700 dark:text-yellow-400">
-          <strong>Draft.</strong> Acest document este un draft. Consultă un avocat înainte de lansarea publică.
-        </div>
-
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">Termeni și condiții</h1>
-        <p className="mb-10 text-sm text-muted-foreground">Ultima actualizare: aprilie 2025</p>
+        <LegalDocHeader
+          doc="terms"
+          title="Termeni și condiții"
+          lead="Prezentați termeni reglementează utilizarea platformei ASESOR. Prelucrarea datelor personale este descrisă în Politica de confidențialitate (/privacy), iar prelucrarea datelor clienților salonului în Acordul de prelucrare a datelor (/dpa)."
+        />
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Definiții</h2>
         <ul className="mb-4 list-disc space-y-2 pl-5 text-muted-foreground">

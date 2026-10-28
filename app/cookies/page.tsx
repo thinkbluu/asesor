@@ -1,4 +1,5 @@
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
+import { LegalDocHeader } from "@/components/legal/legal-doc-header"
 import { SITE } from "@/lib/site"
 
 export const metadata = {
@@ -55,15 +56,11 @@ export default function CookiesPage() {
   return (
     <MarketingLayout>
       <main className="mx-auto max-w-4xl px-6 py-16 text-foreground">
-        <div className="mb-8 rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-5 py-4 text-sm text-yellow-700 dark:text-yellow-400">
-          <strong>Draft.</strong> Acest document este un draft. Consultă un avocat înainte de lansarea publică.
-        </div>
-
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">Politica cookies</h1>
-        <p className="mb-4 leading-relaxed text-muted-foreground">
-          Folosim un număr minim de cookie-uri, strict necesare funcționării platformei. Nu utilizăm cookie-uri de tracking terț sau publicitate comportamentală.
-        </p>
-        <p className="mb-10 text-sm text-muted-foreground">Ultima actualizare: aprilie 2025</p>
+        <LegalDocHeader
+          doc="cookies"
+          title="Politica cookies"
+          lead="Folosim un număr minim de cookie-uri, strict necesare funcționării platformei. Cookie-urile de analytics se încarcă doar după consimțământul exprimat în bannerul de cookie-uri. Nu utilizăm cookie-uri de tracking terț sau publicitate comportamentală. Prelucrarea datelor prin cookie-uri este reglementată de Legea nr. 506/2004 privind prelucrarea datelor cu caracter personal și protecția vieții private în sectorul comunicațiilor electronice."
+        />
 
         <h2 className="mb-3 mt-6 text-xl font-semibold">Ce sunt cookie-urile?</h2>
         <p className="mb-6 leading-relaxed text-muted-foreground">
@@ -109,6 +106,7 @@ export default function CookiesPage() {
           <li>Modifica setările browserului tău pentru a bloca sau șterge cookie-uri.</li>
           <li>Utiliza modul privat / incognito al browserului.</li>
           <li>Instala extensii de browser pentru blocarea trackerilor (ex. uBlock Origin).</li>
+          <li>Redeschide bannerul de consimțământ oricând, folosind linkul „Setări cookie-uri" din subsolul site-ului.</li>
         </ul>
         <p className="mb-4 leading-relaxed text-muted-foreground">
           Rețineți că dezactivarea cookie-urilor strict necesare (ex. cele de sesiune Supabase) va face imposibilă autentificarea în aplicație.
