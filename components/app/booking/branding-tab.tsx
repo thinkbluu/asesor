@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { Toaster, toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,8 +10,9 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Upload, Check, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
-
-const STORAGE_KEY = "asesor-booking-branding"
+import { SITE } from "@/lib/site"
+import type { SetariBranding } from "@/lib/mappers/setari"
+import { saveSetariBrandingAction } from "@/app/app/setari/actions"
 
 const PRESET_COLORS = [
   "#2D8C3C", // default ASESOR
@@ -25,74 +27,45 @@ const PRESET_COLORS = [
   "#059669", // emerald
 ]
 
-interface BrandingState {
-  slug: string
-  logoUrl: string
-  primaryColor: string
-  welcomeTitle: string
-  welcomeSubtitle: string
-  coverImageUrl: string
-  aboutText: string
-  showPrices: boolean
-  showDurations: boolean
-  requireDeposit: boolean
-  depositPercent: number
-  cancellationPolicy: string
-  minAdvanceHours: number
-  maxAdvanceDays: number
+interface Props {
+  initial: SetariBranding
 }
 
-const DEFAULT_STATE: BrandingState = {
-  slug: "salonul-ana",
-  logoUrl: "",
-  primaryColor: "#2D8C3C",
-  welcomeTitle: "Bine ai venit la Salonul Ana",
-  welcomeSubtitle: "Programează-te rapid și ușor, 24/7",
-  coverImageUrl: "",
-  aboutText:
-    "Un salon modern, cu accent pe calitate și experiență. Folosim produse profesionale și livrăm rezultate de care te vei îndrăgosti.",
-  showPrices: true,
-  showDurations: true,
-  requireDeposit: false,
-  depositPercent: 30,
-  cancellationPolicy:
-    "Anularea se face cu minim 24 de ore înainte. După acest termen, se percepe o taxă de 50 Lei.",
-  minAdvanceHours: 2,
-  maxAdvanceDays: 30,
-}
-
-export function BrandingTab() {
-  const [state, setState] = useState<BrandingState>(DEFAULT_STATE)
+export function BrandingTab({ initial }: Props) {
+  const [state, setState] = useState<SetariBranding>(initial)
   const [saved, setSaved] = useState(false)
   const [unsaved, setUnsaved] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        setState({ ...DEFAULT_STATE, ...JSON.parse(stored) })
-      } catch {
-        /* ignore */
-      }
-    }
-  }, [])
-
-  const update = <K extends keyof BrandingState>(key: K, value: BrandingState[K]) => {
+  const update = <K extends keyof SetariBranding>(key: K, value: SetariBranding[K]) => {
     setState((s) => ({ ...s, [key]: value }))
     setUnsaved(true)
     setSaved(false)
   }
 
-  const handleSave = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-    // TODO: înlocuiește cu Supabase upsert când backend-ul e conectat
-    setUnsaved(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  const handleSave = async () => {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await saveSetariBrandingAction(state)
+      if (res.ok) {
+        setUnsaved(false)
+        setSaved(true)
+        toast.success("Personalizarea a fost salvată.")
+        setTimeout(() => setSaved(false), 3000)
+      } else {
+        toast.error(res.error)
+      }
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px] mt-6">
+      <Toaster position="top-center" richColors />
       {/* Formular — coloană stângă */}
       <div className="space-y-6">
         {/* Slug + URL */}
@@ -103,7 +76,7 @@ export function BrandingTab() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground font-mono">asesor.ro/booking/</span>
+              <span className="text-sm text-muted-foreground font-mono">{SITE.url.replace(/^https?:\/\//, "")}/booking/</span>
               <Input
                 value={state.slug}
                 onChange={(e) =>
@@ -407,17 +380,17 @@ export function BrandingTab() {
               Programează-te
             </Button>
             <p className="text-xs text-muted-foreground text-center pt-2">
-              asesor.ro/booking/{state.slug}
+              {SITE.url.replace(/^https?:\/\//, "")}/booking/{state.slug}
             </p>
           </CardContent>
         </Card>
 
         <Button
           onClick={handleSave}
-          disabled={!unsaved}
+          disabled={!unsaved || saving}
           className="w-full bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-40"
         >
-          {saved ? "Salvat" : "Salvează modificările"}
+          {saving ? "Se salvează…" : saved ? "Salvat" : "Salvează modificările"}
         </Button>
         <p className="text-xs text-muted-foreground text-center">
           Modificările se aplică instant pe pagina publică

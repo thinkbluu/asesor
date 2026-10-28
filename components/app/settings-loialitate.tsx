@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,25 +16,25 @@ import {
   type RedemptionTier,
   type LoyaltyReward,
 } from "@/lib/loyalty"
+import { saveSetariLoyaltyAction } from "@/app/app/setari/actions"
 
 interface Props {
-  onDirty: () => void
+  initialConfig: LoyaltyConfig
 }
 
 let tierCounter = 100
 let rewardCounter = 100
 
-export function SettingsLoialitate({ onDirty }: Props) {
-  const [cfg, setCfg] = useState<LoyaltyConfig>(DEFAULT_LOYALTY_CONFIG)
+export function SettingsLoialitate({ initialConfig }: Props) {
+  const [cfg, setCfg] = useState<LoyaltyConfig>(initialConfig)
+  const [saving, setSaving] = useState(false)
 
   function patch<K extends keyof LoyaltyConfig>(key: K, value: LoyaltyConfig[K]) {
     setCfg(prev => ({ ...prev, [key]: value }))
-    onDirty()
   }
 
   function patchBonus<K extends keyof LoyaltyConfig["bonus"]>(key: K, value: LoyaltyConfig["bonus"][K]) {
     setCfg(prev => ({ ...prev, bonus: { ...prev.bonus, [key]: value } }))
-    onDirty()
   }
 
   function patchTier(id: string, patch: Partial<RedemptionTier>) {
@@ -41,7 +42,6 @@ export function SettingsLoialitate({ onDirty }: Props) {
       ...prev,
       tiers: prev.tiers.map(t => (t.id === id ? { ...t, ...patch } : t)),
     }))
-    onDirty()
   }
 
   function addTier() {
@@ -52,12 +52,10 @@ export function SettingsLoialitate({ onDirty }: Props) {
       label: "Nou tier",
     }
     setCfg(prev => ({ ...prev, tiers: [...prev.tiers, next] }))
-    onDirty()
   }
 
   function removeTier(id: string) {
     setCfg(prev => ({ ...prev, tiers: prev.tiers.filter(t => t.id !== id) }))
-    onDirty()
   }
 
   function patchReward(id: string, patch: Partial<LoyaltyReward>) {
@@ -65,7 +63,6 @@ export function SettingsLoialitate({ onDirty }: Props) {
       ...prev,
       rewards: prev.rewards.map(r => (r.id === id ? { ...r, ...patch } : r)),
     }))
-    onDirty()
   }
 
   function addReward() {
@@ -77,12 +74,27 @@ export function SettingsLoialitate({ onDirty }: Props) {
       active: true,
     }
     setCfg(prev => ({ ...prev, rewards: [...prev.rewards, next] }))
-    onDirty()
   }
 
   function removeReward(id: string) {
     setCfg(prev => ({ ...prev, rewards: prev.rewards.filter(r => r.id !== id) }))
-    onDirty()
+  }
+
+  async function handleSave() {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await saveSetariLoyaltyAction(cfg)
+      if (res.ok) {
+        toast.success("Configurația de loialitate a fost salvată.")
+      } else {
+        toast.error(res.error)
+      }
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -417,6 +429,17 @@ export function SettingsLoialitate({ onDirty }: Props) {
           ))}
         </CardContent>
       </Card>
+
+      {/* Save */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          {saving ? "Se salvează…" : "Salvează configurația"}
+        </Button>
+      </div>
     </div>
   )
 }

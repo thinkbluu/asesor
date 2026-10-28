@@ -218,7 +218,7 @@ export async function saveSetariReviews(salonId: string, input: ReviewsConfigInp
 
 // ─── Servicii: categorii ─────────────────────────────────────────────────────
 
-export async function upsertSetariCategory(salonId: string, input: SetariCategoryInput): Promise<DataResult> {
+export async function upsertSetariCategory(salonId: string, input: SetariCategoryInput): Promise<DataResult<{ id: string }>> {
   const supabase = await createSupabaseServerClient()
   if (input.id) {
     const { error } = await supabase
@@ -227,7 +227,7 @@ export async function upsertSetariCategory(salonId: string, input: SetariCategor
       .eq("id", input.id)
       .eq("salon_id", salonId)
     if (error) return dbError("upsertSetariCategory/update", error)
-    return { ok: true }
+    return { ok: true, data: { id: input.id } }
   }
   const { data: lastRow } = await supabase
     .from("service_categories")
@@ -236,11 +236,13 @@ export async function upsertSetariCategory(salonId: string, input: SetariCategor
     .order("sort_order", { ascending: false })
     .limit(1)
   const nextSort = ((lastRow?.[0]?.sort_order as number | undefined) ?? -1) + 1
-  const { error } = await supabase
+  const { data: inserted, error } = await supabase
     .from("service_categories")
     .insert({ salon_id: salonId, name: input.name, sort_order: nextSort })
-  if (error) return dbError("upsertSetariCategory/insert", error)
-  return { ok: true }
+    .select("id")
+    .single()
+  if (error || !inserted) return dbError("upsertSetariCategory/insert", error)
+  return { ok: true, data: { id: inserted.id } }
 }
 
 export async function deleteSetariCategory(salonId: string, categoryId: string): Promise<DataResult> {
@@ -257,7 +259,7 @@ export async function deleteSetariCategory(salonId: string, categoryId: string):
 
 // ─── Servicii: servicii ──────────────────────────────────────────────────────
 
-export async function upsertSetariService(salonId: string, input: SetariServiceInput): Promise<DataResult> {
+export async function upsertSetariService(salonId: string, input: SetariServiceInput): Promise<DataResult<{ id: string }>> {
   const supabase = await createSupabaseServerClient()
 
   const payload = {
@@ -321,7 +323,7 @@ export async function upsertSetariService(salonId: string, input: SetariServiceI
     if (spErr) return dbError("upsertSetariService/serviceProducts-insert", spErr)
   }
 
-  return { ok: true }
+  return { ok: true, data: { id: serviceId } }
 }
 
 export async function deleteSetariService(salonId: string, serviceId: string): Promise<DataResult> {
@@ -358,4 +360,36 @@ export async function reorderSetariCategories(salonId: string, input: SetariReor
     if (error) return dbError("reorderSetariCategories", error)
   }
   return { ok: true }
+}
+
+// ─── Produse (pentru consumul pe servicii) ───────────────────────────────────
+
+export async function loadSetariProducts(salonId: string): Promise<{ id: string; name: string }[]> {
+  const supabase = await createSupabaseServerClient()
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name")
+    .eq("salon_id", salonId)
+    .order("name")
+  if (error) {
+    console.error("[v0] loadSetariProducts failed:", error)
+    return []
+  }
+  return (data ?? []) as { id: string; name: string }[]
+}
+
+// ─── Salon row (for branding / booking page) ─────────────────────────────────
+
+export async function getSalonRow(salonId: string): Promise<Database["public"]["Tables"]["salons"]["Row"] | null> {
+  const supabase = await createSupabaseServerClient()
+  const { data, error } = await supabase
+    .from("salons")
+    .select("*")
+    .eq("id", salonId)
+    .maybeSingle()
+  if (error) {
+    console.error("[v0] getSalonRow failed:", error)
+    return null
+  }
+  return (data as Database["public"]["Tables"]["salons"]["Row"] | null) ?? null
 }

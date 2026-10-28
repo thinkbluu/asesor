@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -10,13 +12,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Star, ExternalLink, Clock, Shield, MessageSquare } from "lucide-react"
 import { DEFAULT_REVIEWS_CONFIG, type ReviewsConfig } from "@/lib/reviews"
 import { cn } from "@/lib/utils"
+import { saveSetariReviewsAction } from "@/app/app/setari/actions"
 
-export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
-  const [cfg, setCfg] = useState<ReviewsConfig>(DEFAULT_REVIEWS_CONFIG)
+export function SettingsReviews({ initialConfig }: { initialConfig: ReviewsConfig }) {
+  const [cfg, setCfg] = useState<ReviewsConfig>(initialConfig)
+  const [saving, setSaving] = useState(false)
 
   function patch<K extends keyof ReviewsConfig>(key: K, value: ReviewsConfig[K]) {
     setCfg(prev => ({ ...prev, [key]: value }))
-    onDirty()
+  }
+
+  async function handleSave() {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await saveSetariReviewsAction(cfg)
+      if (res.ok) {
+        toast.success("Configurația de recenzii a fost salvată.")
+      } else {
+        toast.error(res.error)
+      }
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   const isUrlValid = /^https?:\/\/.+/.test(cfg.googleBusinessUrl)
@@ -239,6 +259,17 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Save */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          {saving ? "Se salvează…" : "Salvează configurația"}
+        </Button>
+      </div>
     </div>
   )
 }

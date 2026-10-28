@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { Toaster, toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,35 +40,25 @@ import {
   MoreHorizontal,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type { SetariCategory, SetariService } from "@/lib/mappers/setari"
+import {
+  upsertSetariServiceAction,
+  deleteSetariServiceAction,
+  upsertSetariCategoryAction,
+  deleteSetariCategoryAction,
+} from "@/app/app/setari/actions"
 
 // ── Types ─────────────────────────────────────────────────────────────
-interface ProductLink {
-  productName: string
-  quantity: string
-}
 
-interface Service {
-  id: string
-  name: string
-  categoryId: string
-  duration: number
-  price: number
-  description: string
-  products: ProductLink[]
-  staff: string[]
-  color: string
-  onlineBooking: boolean
-  active: boolean
-}
-
-interface Category {
-  id: string
-  name: string
-  icon: keyof typeof CATEGORY_ICONS
-  color: string
+interface Props {
+  categories: SetariCategory[]
+  services: SetariService[]
+  staff: { id: string; name: string }[]
+  products: { id: string; name: string }[]
 }
 
 // ── Constants ─────────────────────────────────────────────────────────
+
 const CATEGORY_ICONS = {
   Scissors,
   Sparkles,
@@ -94,16 +85,12 @@ const COLOR_OPTIONS = [
 
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120, 180]
 
-const STAFF_LIST: string[] = []
-
-const initialCategories: Category[] = []
-const initialServices: Service[] = []
-
 // ── Empty modal state ─────────────────────────────────────────────────
-const emptyService = (): Service => ({
+
+const emptyService = (): SetariService => ({
   id: "",
   name: "",
-  categoryId: "",
+  categoryId: null,
   duration: 60,
   price: 0,
   description: "",
@@ -114,7 +101,7 @@ const emptyService = (): Service => ({
   active: true,
 })
 
-const emptyCategory = (): Category => ({
+const emptyCategory = (): SetariCategory => ({
   id: "",
   name: "",
   icon: "Star",
@@ -122,20 +109,24 @@ const emptyCategory = (): Category => ({
 })
 
 // ── Component ─────────────────────────────────────────────────────────
-export function SettingsServicii() {
-  const [services, setServices] = useState<Service[]>(initialServices)
-  const [categories, setCategories] = useState<Category[]>(initialCategories)
+// Iconițele și culorile (categorie + serviciu) sunt UI-only — schema nu are
+// coloane pentru ele; se salvează doar datele cu coloane (docs/data-pattern.md).
+
+export function SettingsServicii({ categories: initialCategories, services: initialServices, staff, products }: Props) {
+  const [services, setServices] = useState<SetariService[]>(initialServices)
+  const [categories, setCategories] = useState<SetariCategory[]>(initialCategories)
   const [search, setSearch] = useState("")
   const [filterCat, setFilterCat] = useState("all")
+  const [saving, setSaving] = useState(false)
 
   // Service modal
   const [serviceModal, setServiceModal] = useState(false)
-  const [editingService, setEditingService] = useState<Service>(emptyService())
+  const [editingService, setEditingService] = useState<SetariService>(emptyService())
   const [isNewService, setIsNewService] = useState(true)
 
   // Category modal
   const [catModal, setCatModal] = useState(false)
-  const [editingCat, setEditingCat] = useState<Category>(emptyCategory())
+  const [editingCat, setEditingCat] = useState<SetariCategory>(emptyCategory())
   const [isNewCat, setIsNewCat] = useState(true)
 
   // Filtered services
@@ -147,102 +138,190 @@ export function SettingsServicii() {
     })
   }, [services, search, filterCat])
 
-  // Group by category
+  // Group by category (services without a category go under „Fără categorie")
   const grouped = useMemo(() => {
-    const map: Record<string, Service[]> = {}
+    const map: Record<string, SetariService[]> = {}
     for (const cat of categories) {
       const items = filtered.filter((s) => s.categoryId === cat.id)
       if (items.length > 0) map[cat.id] = items
     }
+    const orphans = filtered.filter((s) => !s.categoryId || !categories.some((c) => c.id === s.categoryId))
+    if (orphans.length > 0) map["none"] = orphans
     return map
   }, [filtered, categories])
 
   // ── Service modal handlers ─────────────────────────────────────────
+
   const openNewService = () => {
-    setEditingService(emptyService())
+    setEditingService({ ...emptyService(), categoryId: categories[0]?.id ?? null })
     setIsNewService(true)
     setServiceModal(true)
   }
 
-  const openEditService = (s: Service) => {
-    setEditingService({ ...s })
+  const openEditService = (s: SetariService) => {
+    setEditingService({ ...s, products: s.products.map((p) => ({ ...p })), staff: [...s.staff] })
     setIsNewService(false)
     setServiceModal(true)
   }
 
-  const saveService = () => {
+  const saveService = async () => {
+    if (saving) return
     if (!editingService.name.trim() || editingService.price <= 0) return
-    if (isNewService) {
-      setServices((prev) => [...prev, { ...editingService, id: `s${Date.now()}` }])
-    } else {
-      setServices((prev) => prev.map((s) => s.id === editingService.id ? editingService : s))
+    setSaving(true)
+    try {
+      const res = await upsertSetariServiceAction({
+        id: editingService.id || undefined,
+        categoryId: editingService.categoryId,
+        name: editingService.name,
+        description: editingService.description,
+        durationMin: editingService.duration,
+        bufferMin: 0,
+        price: editingService.price,
+        priceFrom: false,
+        onlineBookable: editingService.onlineBooking,
+        active: editingService.active,
+        staffIds: editingService.staff,
+        products: editingService.products
+          .filter((p) => p.productId)
+          .map((p) => ({ productId: p.productId, quantityPerUse: Number(p.quantity) || 1 })),
+      })
+      if (!res.ok) {
+        toast.error(res.error)
+        return
+      }
+      const savedService: SetariService = { ...editingService, id: res.data.id }
+      if (isNewService) {
+        setServices((prev) => [...prev, savedService])
+      } else {
+        setServices((prev) => prev.map((s) => (s.id === savedService.id ? savedService : s)))
+      }
+      toast.success(isNewService ? "Serviciu adăugat." : "Serviciu salvat.")
+      setServiceModal(false)
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
     }
-    setServiceModal(false)
   }
 
-  const deleteService = (id: string) => {
+  const deleteService = async (id: string) => {
+    const res = await deleteSetariServiceAction({ id })
+    if (!res.ok) {
+      toast.error(res.error)
+      return
+    }
     setServices((prev) => prev.filter((s) => s.id !== id))
+    toast.success("Serviciu șters.")
   }
 
-  const toggleActive = (id: string) => {
-    setServices((prev) => prev.map((s) => s.id === id ? { ...s, active: !s.active } : s))
+  const toggleActive = async (id: string) => {
+    const svc = services.find((s) => s.id === id)
+    if (!svc) return
+    const next = !svc.active
+    setServices((prev) => prev.map((s) => (s.id === id ? { ...s, active: next } : s)))
+    const res = await upsertSetariServiceAction({
+      id: svc.id,
+      categoryId: svc.categoryId,
+      name: svc.name,
+      description: svc.description,
+      durationMin: svc.duration,
+      bufferMin: 0,
+      price: svc.price,
+      priceFrom: false,
+      onlineBookable: svc.onlineBooking,
+      active: next,
+      staffIds: svc.staff,
+      products: svc.products.map((p) => ({ productId: p.productId, quantityPerUse: Number(p.quantity) || 1 })),
+    })
+    if (!res.ok) {
+      setServices((prev) => prev.map((s) => (s.id === id ? { ...s, active: !next } : s)))
+      toast.error(res.error)
+    }
   }
 
   // ── Category modal handlers ────────────────────────────────────────
+
   const openNewCat = () => {
     setEditingCat(emptyCategory())
     setIsNewCat(true)
     setCatModal(true)
   }
 
-  const openEditCat = (c: Category) => {
+  const openEditCat = (c: SetariCategory) => {
     setEditingCat({ ...c })
     setIsNewCat(false)
     setCatModal(true)
   }
 
-  const saveCat = () => {
+  const saveCat = async () => {
+    if (saving) return
     if (!editingCat.name.trim()) return
-    if (isNewCat) {
-      const id = editingCat.name.toLowerCase().replace(/\s+/g, "-")
-      setCategories((prev) => [...prev, { ...editingCat, id }])
-    } else {
-      setCategories((prev) => prev.map((c) => c.id === editingCat.id ? editingCat : c))
+    setSaving(true)
+    try {
+      const res = await upsertSetariCategoryAction({
+        id: editingCat.id || undefined,
+        name: editingCat.name,
+        icon: editingCat.icon,
+        color: editingCat.color,
+      })
+      if (!res.ok) {
+        toast.error(res.error)
+        return
+      }
+      if (isNewCat) {
+        setCategories((prev) => [...prev, { ...editingCat, id: res.data.id }])
+      } else {
+        setCategories((prev) => prev.map((c) => (c.id === editingCat.id ? { ...editingCat, id: res.data.id } : c)))
+      }
+      toast.success(isNewCat ? "Categorie adăugată." : "Categorie salvată.")
+      setCatModal(false)
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
     }
-    setCatModal(false)
   }
 
-  const deleteCat = (id: string) => {
+  const deleteCat = async (id: string) => {
+    const res = await deleteSetariCategoryAction({ id })
+    if (!res.ok) {
+      toast.error(res.error)
+      return
+    }
+    // Serviciile rămân, devin „Fără categorie" (category_id → null în DB).
     setCategories((prev) => prev.filter((c) => c.id !== id))
-    setServices((prev) => prev.filter((s) => s.categoryId !== id))
+    setServices((prev) => prev.map((s) => (s.categoryId === id ? { ...s, categoryId: null } : s)))
+    toast.success("Categorie ștearsă.")
   }
 
   // ── Product links ──────────────────────────────────────────────────
   const addProduct = () => {
-    setEditingService((prev) => ({ ...prev, products: [...prev.products, { productName: "", quantity: "1" }] }))
+    setEditingService((prev) => ({ ...prev, products: [...prev.products, { productId: "", quantity: "1" }] }))
   }
-  const updateProduct = (i: number, field: keyof ProductLink, val: string) => {
+  const updateProduct = (i: number, field: "productId" | "quantity", val: string) => {
     setEditingService((prev) => ({
       ...prev,
       products: prev.products.map((p, idx) => idx === i ? { ...p, [field]: val } : p),
     }))
   }
   const removeProduct = (i: number) => {
-    setEditingService((prev) => ({ ...prev, products: prev.products.filter((_, idx) => idx !== i) }))
-  }
-
-  // ── Staff toggle ───────────────────────────────────────────────────
-  const toggleStaff = (name: string) => {
     setEditingService((prev) => ({
       ...prev,
-      staff: prev.staff.includes(name) ? prev.staff.filter((s) => s !== name) : [...prev.staff, name],
+      products: prev.products.filter((_, idx) => idx !== i),
     }))
   }
 
-  const getCategoryById = (id: string) => categories.find((c) => c.id === id)
+  // ── Staff toggle ───────────────────────────────────────────────────
+  const toggleStaff = (staffId: string) => {
+    setEditingService((prev) => ({
+      ...prev,
+      staff: prev.staff.includes(staffId) ? prev.staff.filter((s) => s !== staffId) : [...prev.staff, staffId],
+    }))
+  }
 
   return (
     <div className="max-w-5xl space-y-6">
+      <Toaster position="top-center" richColors />
       {/* Header bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -286,7 +365,7 @@ export function SettingsServicii() {
       {/* Category management strip */}
       <div className="flex flex-wrap gap-2">
         {categories.map((cat) => {
-          const Icon = CATEGORY_ICONS[cat.icon]
+          const Icon = CATEGORY_ICONS[cat.icon as keyof typeof CATEGORY_ICONS] ?? Star
           return (
             <div
               key={cat.id}
@@ -313,17 +392,16 @@ export function SettingsServicii() {
         </div>
       ) : (
         <div className="space-y-4">
-          {categories.map((cat) => {
-            const items = grouped[cat.id]
-            if (!items) return null
-            const Icon = CATEGORY_ICONS[cat.icon]
+          {Object.entries(grouped).map(([catId, items]) => {
+            const cat = categories.find((c) => c.id === catId)
+            const Icon = cat ? CATEGORY_ICONS[cat.icon as keyof typeof CATEGORY_ICONS] ?? Star : Scissors
             return (
-              <div key={cat.id} className="overflow-hidden rounded-xl border border-border">
+              <div key={catId} className="overflow-hidden rounded-xl border border-border">
                 {/* Category header */}
                 <div className="flex items-center gap-2.5 border-b border-border bg-muted/30 px-4 py-2.5">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat?.color ?? "#6b7280" }} />
                   <Icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-semibold">{cat.name}</span>
+                  <span className="text-sm font-semibold">{cat?.name ?? "Fără categorie"}</span>
                   <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
                     {items.length}
                   </Badge>
@@ -420,11 +498,15 @@ export function SettingsServicii() {
               </div>
               <div className="space-y-1.5">
                 <Label>Categorie</Label>
-                <Select value={editingService.categoryId} onValueChange={(v) => setEditingService((p) => ({ ...p, categoryId: v }))}>
+                <Select
+                  value={editingService.categoryId ?? "none"}
+                  onValueChange={(v) => setEditingService((p) => ({ ...p, categoryId: v === "none" ? null : v }))}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">Fără categorie</SelectItem>
                     {categories.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                     ))}
@@ -483,7 +565,7 @@ export function SettingsServicii() {
               />
             </div>
 
-            {/* Color tag */}
+            {/* Color tag — UI-only */}
             <div className="space-y-1.5">
               <Label>Culoare tag calendar</Label>
               <div className="flex gap-2 flex-wrap">
@@ -505,45 +587,56 @@ export function SettingsServicii() {
             {/* Staff */}
             <div className="space-y-1.5">
               <Label>Personal alocat <span className="text-xs text-muted-foreground">(implicit toți)</span></Label>
-              <div className="flex flex-wrap gap-2">
-                {STAFF_LIST.map((name) => (
-                  <button
-                    key={name}
-                    type="button"
-                    onClick={() => toggleStaff(name)}
-                    className={cn(
-                      "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                      editingService.staff.includes(name)
-                        ? "border-accent bg-accent/10 text-accent"
-                        : "border-border text-muted-foreground hover:border-accent/50"
-                    )}
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
+              {staff.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Nu ai angajați încă — adaugă în tab-ul Echipă.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {staff.map((member) => (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={() => toggleStaff(member.id)}
+                      className={cn(
+                        "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                        editingService.staff.includes(member.id)
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border text-muted-foreground hover:border-accent/50"
+                      )}
+                    >
+                      {member.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product consumption */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Consum produse</Label>
-                <Button variant="ghost" size="sm" onClick={addProduct} className="h-7 gap-1 text-xs">
+                <Button variant="ghost" size="sm" onClick={addProduct} className="h-7 gap-1 text-xs" disabled={products.length === 0}>
                   <Plus className="h-3 w-3" /> Adaugă produs
                 </Button>
               </div>
-              {editingService.products.length === 0 ? (
+              {products.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Nu ai produse în stoc — adaugă în modulul Stocuri.</p>
+              ) : editingService.products.length === 0 ? (
                 <p className="text-xs text-muted-foreground">Niciun produs adăugat.</p>
               ) : (
                 <div className="space-y-2">
                   {editingService.products.map((p, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <Input
-                        placeholder="Nume produs"
-                        value={p.productName}
-                        onChange={(e) => updateProduct(i, "productName", e.target.value)}
-                        className="flex-1 h-8 text-sm"
-                      />
+                      <Select value={p.productId || "none"} onValueChange={(v) => updateProduct(i, "productId", v === "none" ? "" : v)}>
+                        <SelectTrigger className="flex-1 h-8 text-sm">
+                          <SelectValue placeholder="Alege produsul" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Alege produsul</SelectItem>
+                          {products.map((prod) => (
+                            <SelectItem key={prod.id} value={prod.id}>{prod.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Input
                         placeholder="Cant."
                         value={p.quantity}
@@ -588,10 +681,10 @@ export function SettingsServicii() {
             <Button variant="outline" onClick={() => setServiceModal(false)}>Anulează</Button>
             <Button
               onClick={saveService}
-              disabled={!editingService.name.trim() || editingService.price <= 0}
+              disabled={!editingService.name.trim() || editingService.price <= 0 || saving}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
-              {isNewService ? "Adaugă serviciu" : "Salvează modificările"}
+              {saving ? "Se salvează…" : isNewService ? "Adaugă serviciu" : "Salvează modificările"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -655,16 +748,19 @@ export function SettingsServicii() {
                 ))}
               </div>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Iconița și culoarea rămân doar pe acest dispozitiv (nu se salvează în baza de date).
+            </p>
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setCatModal(false)}>Anulează</Button>
             <Button
               onClick={saveCat}
-              disabled={!editingCat.name.trim()}
+              disabled={!editingCat.name.trim() || saving}
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
-              {isNewCat ? "Adaugă" : "Salvează"}
+              {saving ? "Se salvează…" : isNewCat ? "Adaugă" : "Salvează"}
             </Button>
           </DialogFooter>
         </DialogContent>

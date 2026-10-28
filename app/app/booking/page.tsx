@@ -1,15 +1,14 @@
-"use client"
+import { getSession } from "@/lib/auth/session"
+import { getSalonRow } from "@/lib/data/setari"
+import { mapSalonToBranding } from "@/lib/mappers/setari"
+import { BookingTabSwitcher } from "@/components/app/booking/booking-tab-switcher"
 
-import { useSearchParams } from "next/navigation"
-import { OverviewTab } from "@/components/app/booking/overview-tab"
-import { BrandingTab } from "@/components/app/booking/branding-tab"
-import { PreviewTab } from "@/components/app/booking/preview-tab"
+// Pagina de programare online: datele de branding vin din DB (salons.branding +
+// booking_settings), iar tab-urile rămân client-side după ?tab=.
+export default async function BookingPage() {
+  const session = await getSession()
+  const salon = session?.salon ? await getSalonRow(session.salon.id) : null
+  if (!salon) return null
 
-export default function BookingPage() {
-  const searchParams = useSearchParams()
-  const tab = searchParams.get("tab") ?? "overview"
-
-  if (tab === "branding") return <BrandingTab />
-  if (tab === "preview") return <PreviewTab />
-  return <OverviewTab />
+  return <BookingTabSwitcher branding={mapSalonToBranding(salon)} />
 }
