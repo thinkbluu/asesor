@@ -1493,6 +1493,27 @@ export type Database = {
         Args: { p_salon: string; p_from: string; p_to: string }
         Returns: Json
       }
+      // scripts/015 — public booking creation (service_role only; the server
+      // action is the only caller). Rate limits → validation → slot re-check →
+      // client find-or-create → insert with the exclusion constraint as guard.
+      create_public_booking_rpc: {
+        Args: {
+          p_slug: string
+          p_service_ids: string[]
+          p_staff_id: string
+          p_day: string
+          p_time: string
+          p_first_name: string
+          p_last_name: string
+          p_phone: string
+          p_email: string
+          p_notes: string
+          p_marketing_consent: boolean
+          p_ip_hash: string
+          p_manage_token: string
+        }
+        Returns: Json
+      }
       expire_loyalty_points: { Args: Record<string, never>; Returns: undefined }
       handle_new_user: { Args: Record<string, never>; Returns: undefined }
       has_salon_role: {
