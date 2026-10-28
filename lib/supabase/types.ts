@@ -1020,6 +1020,7 @@ export type Database = {
           description: string | null
           amount: number
           frequency: string
+          parent_id: string | null
           receipt_path: string | null
           notes: string | null
           created_by: string | null
@@ -1034,6 +1035,7 @@ export type Database = {
           description?: string | null
           amount: number
           frequency?: string
+          parent_id?: string | null
           receipt_path?: string | null
           notes?: string | null
           created_by?: string | null
@@ -1048,6 +1050,7 @@ export type Database = {
           description?: string | null
           amount?: number
           frequency?: string
+          parent_id?: string | null
           receipt_path?: string | null
           notes?: string | null
           created_by?: string | null
@@ -1467,6 +1470,27 @@ export type Database = {
           p_override?: boolean
           p_scope?: string
         }
+        Returns: Json
+      }
+      // scripts/014 — atomic checkout (o/m/r; security definer)
+      checkout_appointment_rpc: {
+        Args: {
+          p_appointment_id: string
+          p_discount: number
+          p_tip: number
+          p_method1: Database['public']['Enums']['payment_method']
+          p_amount1: number
+          p_method2?: string | null
+          p_amount2?: number | null
+          p_redeem_points?: number
+        }
+        Returns: Json
+      }
+      // scripts/014 — recurring expense catch-up (o/m; idempotent)
+      generate_recurring_expenses: { Args: { p_salon: string }; Returns: number }
+      // scripts/014 — reports for a date range (o/m only)
+      fin_report: {
+        Args: { p_salon: string; p_from: string; p_to: string }
         Returns: Json
       }
       expire_loyalty_points: { Args: Record<string, never>; Returns: undefined }
