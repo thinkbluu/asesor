@@ -1325,6 +1325,33 @@ export type Database = {
       }
     }
     Views: {
+      // client_stats (scripts/010): security_invoker view — computed totals per
+      // client (visits, spent, last visit); RLS of the underlying tables applies.
+      client_stats: {
+        Row: {
+          client_id: string
+          salon_id: string
+          total_visits: number
+          total_spent: number
+          last_visit_at: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
+      // client_safety_flags (scripts/010): postgres-owned view, NOT
+      // security_invoker — readable by every salon role (safety signal for the
+      // calendar). Exposes ONLY the boolean, never ciphertext or plaintext.
+      client_safety_flags: {
+        Row: {
+          client_id: string
+          salon_id: string
+          has_allergies: boolean
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       // products_public (scripts/008): postgres-owned view, NOT security_invoker.
       // Bypasses the products table RLS (owner/manager-only), filters rows with
       // is_salon_member(salon_id), and deliberately omits cost_price.
