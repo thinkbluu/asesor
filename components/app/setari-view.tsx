@@ -39,6 +39,7 @@ import {
   Star,
   Users,
   KeyRound,
+  Database,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SettingsServicii } from "@/components/app/settings-servicii"
@@ -47,6 +48,7 @@ import { SettingsLoialitate } from "@/components/app/settings-loialitate"
 import { SettingsReviews } from "@/components/app/settings-reviews"
 import { SettingsEchipa } from "@/components/app/settings-echipa"
 import { SettingsSecurity } from "@/components/app/settings-security"
+import { SettingsPrivacy } from "@/components/app/settings-privacy"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
 import type { LoyaltyConfig } from "@/lib/loyalty"
 import type { ReviewsConfig, ReviewsStats } from "@/lib/reviews"
@@ -122,11 +124,12 @@ const TABS = [
   { id: "abonament", label: "Abonament", icon: CreditCard },
   { id: "echipa", label: "Echipă și acces", icon: Users },
   { id: "securitate", label: "Securitate", icon: KeyRound },
+  { id: "date", label: "Date și confidențialitate", icon: Database },
   { id: "permisiuni", label: "Permisiuni", icon: Shield },
 ]
 
 // Tab-urile care se salvează din panoul lor propriu (nu din butonul global).
-const SELF_SAVING_TABS = new Set(["servicii", "echipa", "loialitate", "recenzii"])
+const SELF_SAVING_TABS = new Set(["servicii", "echipa", "loialitate", "recenzii", "date"])
 
 export function SetariView({
   profil: initialProfil,
@@ -960,6 +963,9 @@ export function SetariView({
 
           {/* ── SECURITATE ── */}
           {activeTab === "securitate" && <SettingsSecurity />}
+
+          {/* ── DATE ȘI CONFIDENȚIALITATE ── */}
+          {activeTab === "date" && <SettingsPrivacy />}
 
           {/* ── PERMISIUNI ── */}
           {activeTab === "permisiuni" && (
