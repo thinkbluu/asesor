@@ -17,7 +17,7 @@ function CTA() {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-3xl md:text-5xl tracking-tighter max-w-xl font-regular">
-              14 zile gratuit. Fără card. Fără obligații.
+              14 zile gratuit. Fără obligații.
             </h3>
             <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl">
               Configurezi salonul în 10 minute. Dacă nu ești convins, anulezi oricând. Zero risc.

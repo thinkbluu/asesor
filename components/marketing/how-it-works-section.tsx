@@ -9,24 +9,24 @@ const steps = [
     icon: Settings2,
     title: "Configurezi salonul",
     description:
-      "Adaugi serviciile, prețurile, programul și echipa. Import din Excel dacă ai deja date.",
+      "Adaugi serviciile, prețurile, programul de lucru și echipa. Dacă ai deja date într-un Excel, caiet sau alt sistem — te ajutăm să le muți.",
     time: "~10 minute",
   },
   {
     number: "02",
     icon: CalendarCheck,
-    title: "Primești programări",
+    title: "Clienții se programează singuri",
     description:
-      "Clienții se programează singuri online, sau le adaugi manual. Confirmare și reminder automat.",
-    time: "Automat, 24/7",
+      "Partajezi link-ul de programări pe Instagram, WhatsApp, sau direct de pe Google Maps. Clienții aleg serviciul, ora și specialistul. Confirmarea vine automat.",
+    time: "Funcționează 24/7, inclusiv când dormi",
   },
   {
     number: "03",
     icon: TrendingUp,
-    title: "Vezi ce contează",
+    title: "Tu vezi rezultatele",
     description:
-      "Venituri pe zi, clienți fideli, servicii rentabile. Decizii pe baza de date, nu de presupuneri.",
-    time: "În fiecare seară, 5 minute",
+      "La finalul zilei, deschizi raportul: câți clienți, câte servicii, cât ai încasat. Fără foi, fără calcule.",
+    time: "Seară de seară, în 2 minute",
   },
 ]
 
@@ -42,11 +42,8 @@ export function HowItWorksSection() {
           className="text-center"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-balance">
-            De la programare la plată, în 3 pași
+            Cum începi
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground text-pretty">
-            Fără learning curve. Fără setup complicat. Fără consultant.
-          </p>
         </motion.div>
 
         <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -68,16 +65,12 @@ export function HowItWorksSection() {
                   <Icon className="h-5 w-5 text-accent" />
                 </div>
                 <h3 className="text-xl font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{step.description}</p>
                 <p className="mt-4 text-xs text-muted-foreground/70">{step.time}</p>
               </motion.div>
             )
           })}
         </div>
-
-        <p className="mt-12 text-sm text-muted-foreground text-center">
-          Poți migra de pe agendă, Excel, Booksy sau orice alt sistem. Te ajutăm noi.
-        </p>
       </div>
     </section>
   )

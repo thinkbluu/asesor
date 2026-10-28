@@ -46,13 +46,12 @@ import {
   MessageCircle,
 } from "lucide-react"
 import {
-  CLIENTS_DATA,
-  getClientById,
   getInitials,
   formatDate,
   getDaysSince,
   TAG_COLORS,
   type ComunicarePreferinta,
+  type Client,
 } from "@/lib/clienti-data"
 import { cn } from "@/lib/utils"
 import { ClientLoyaltyCard } from "@/components/app/client-loyalty-card"
@@ -67,12 +66,13 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "loialitate", label: "Loialitate" },
 ]
 
+const CLIENTS_DATA: Client[] = []
 const ALL_STAFF = ["Ana Ionescu", "Cristina Popa", "Mara Stancu", "Diana Florea"]
 
 export default function ClientProfilePage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const client = getClientById(id)
+  const client = CLIENTS_DATA.find((item) => item.id === id)
 
   const [tab, setTab] = useState<TabId>("istoric")
   const [expandedHistory, setExpandedHistory] = useState<Set<string>>(new Set())

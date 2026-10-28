@@ -21,9 +21,13 @@ import { Switch } from "@/components/ui/switch"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 import {
-  CAMPAIGNS, AUTOMATIONS, PROMOTIONS, AUDIENCE_SEGMENTS, EMAIL_TEMPLATES,
+  AUDIENCE_SEGMENTS, EMAIL_TEMPLATES,
   type Campaign, type Automation, type Promotion,
 } from "@/lib/marketing-data"
+
+const CAMPAIGNS: Campaign[] = []
+const AUTOMATIONS: Automation[] = []
+const PROMOTIONS: Promotion[] = []
 import { ReviewsWidget } from "@/components/app/reviews-widget"
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -504,7 +508,10 @@ export default function MarketingPage() {
   }
 
   const sentThisMonth = CAMPAIGNS.filter(c => c.sentDate?.startsWith("2025-01")).reduce((s, c) => s + c.sent, 0)
-  const avgOpenRate = CAMPAIGNS.filter(c => c.sent > 0).reduce((s, c) => s + c.openRate, 0) / CAMPAIGNS.filter(c => c.sent > 0).length
+  const sentCampaigns = CAMPAIGNS.filter((campaign) => campaign.sent > 0)
+  const avgOpenRate = sentCampaigns.length
+    ? sentCampaigns.reduce((total, campaign) => total + campaign.openRate, 0) / sentCampaigns.length
+    : 0
   const attributedRevenue = CAMPAIGNS.reduce((s, c) => s + c.revenue, 0)
 
   function toggleAutomation(id: string) {

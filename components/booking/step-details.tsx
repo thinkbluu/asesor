@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { CLIENTS_DATA } from "@/lib/clienti-data"
+import type { Client } from "@/lib/clienti-data"
 import { normalizePhone } from "@/lib/booking-logic"
+
+const CLIENTS_DATA: Client[] = []
 import type { BookingState } from "./booking-flow"
 
 export function StepDetails({

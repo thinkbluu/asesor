@@ -10,13 +10,19 @@ import {
 } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
 import {
-  SERVICE_CATEGORIES,
   getServiceByName,
   formatPriceRON,
   formatDurationMin,
 } from "@/lib/booking-logic"
 import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
+
+type ServiceCategory = {
+  name: string
+  services: string[]
+}
+
+const SERVICE_CATEGORIES: ServiceCategory[] = []
 
 export function StepServices({
   state,

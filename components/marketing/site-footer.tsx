@@ -65,7 +65,7 @@ export function SiteFooter() {
           <Link href="/" className="flex items-center gap-2">
             <img
               src="/asesor-logo.png"
-              alt="ASESOR"
+              alt="Logo ASESOR"
               className="h-10 w-10 rounded-lg bg-white object-cover ring-1 ring-black/10 shrink-0"
             />
             <span className="text-2xl font-bold">ASESOR</span>

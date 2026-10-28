@@ -2,10 +2,12 @@
 
 import { useMemo } from "react"
 import { Check, Sparkles, Star, User } from "lucide-react"
-import { STAFF_DATA, getFullName, getInitials } from "@/lib/echipa-data"
+import { getFullName, getInitials, type StaffMember } from "@/lib/echipa-data"
 import { getQualifiedStaff } from "@/lib/booking-logic"
 import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
+
+const STAFF_DATA: StaffMember[] = []
 
 export function StepStaff({
   state,

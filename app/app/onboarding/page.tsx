@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -637,7 +636,6 @@ function Step5({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const { user } = useUser()
   const router = useRouter()
   const [step, setStep] = useState(1)
 
@@ -664,11 +662,6 @@ export default function OnboardingPage() {
     if (step < 5) {
       setStep(step + 1)
     } else {
-      if (user) {
-        await user.update({
-          unsafeMetadata: { ...user.unsafeMetadata, has_completed_onboarding: true },
-        })
-      }
       router.push("/app")
     }
   }

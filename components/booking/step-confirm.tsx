@@ -16,7 +16,7 @@ import {
   Check,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { STAFF_DATA, getFullName } from "@/lib/echipa-data"
+import { getFullName, type StaffMember } from "@/lib/echipa-data"
 import {
   getServiceByName,
   formatPriceRON,
@@ -27,6 +27,8 @@ import {
   type SalonInfo,
 } from "@/lib/booking-logic"
 import type { BookingState } from "./booking-flow"
+
+const STAFF_DATA: StaffMember[] = []
 
 function Review({
   salon,

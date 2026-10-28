@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { SignIn } from "@clerk/nextjs"
 
 export default function LoginPage() {
   return (
@@ -37,34 +36,9 @@ export default function LoginPage() {
             />
             <span className="text-xl font-semibold text-[#0A0A0A] tracking-tight">ASESOR</span>
           </div>
-          <SignIn
-            appearance={{
-              elements: {
-                rootBox: "w-full max-w-md",
-                card: "shadow-sm border border-black/10 rounded-2xl bg-white p-8",
-                headerTitle: "text-2xl font-bold text-[#0A0A0A]",
-                headerSubtitle: "text-sm text-[#0A0A0A]/50",
-                formButtonPrimary: "bg-[#2D8C3C] hover:bg-[#256b30] text-white font-semibold rounded-xl h-11 w-full",
-                formFieldInput: "h-11 border border-black/15 bg-white rounded-xl px-3 text-sm w-full",
-                formFieldLabel: "text-sm font-medium text-[#0A0A0A] mb-1",
-                footerActionLink: "text-[#2D8C3C] hover:text-[#256b30] font-semibold",
-                dividerLine: "bg-black/10",
-                dividerText: "text-[#0A0A0A]/40 text-xs",
-                socialButtonsBlockButton: "border border-black/15 bg-white hover:bg-black/5 text-[#0A0A0A] font-medium h-11 rounded-xl w-full",
-                alertText: "text-red-600 text-sm",
-                formFieldErrorText: "text-red-500 text-xs mt-1",
-              },
-              variables: {
-                colorPrimary: "#2D8C3C",
-                colorBackground: "#ffffff",
-                colorText: "#0A0A0A",
-                colorTextSecondary: "rgba(10,10,10,0.5)",
-                colorInputBackground: "#ffffff",
-                borderRadius: "0.75rem",
-                fontFamily: "inherit",
-              },
-            }}
-          />
+          <div className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-8 text-center shadow-sm">
+            <p className="text-lg font-semibold text-[#0A0A0A]">Autentificare in curand</p>
+          </div>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { Warp, PulsingBorder } from "@paper-design/shaders-react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { ArrowUpRight, Sparkles } from "lucide-react"
+import Image from "next/image"
 
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -113,10 +114,10 @@ export function HeroSection() {
                 backgroundPosition: { duration: 8, repeat: Infinity, ease: "linear" },
               }}
             >
-              Salonul tău.
+              Salonul tău merge mai bine
             </motion.span>
             <span className="block font-black text-white drop-shadow-2xl text-balance">
-              Într-un singur loc.
+              când totul e clar.
             </span>
           </motion.h1>
 
@@ -175,8 +176,24 @@ export function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.3 }}
           >
-            14 zile gratuit · Fără card · Anulare instant
+            Configurare în câteva minute. Vezi demo.
           </motion.p>
+
+          {/* Logo */}
+          <motion.div
+            className="mt-10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.5 }}
+          >
+            <Image
+              src="/asesor-logo.png"
+              alt="ASESOR"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-lg bg-white/90 object-cover ring-1 ring-white/20"
+            />
+          </motion.div>
         </div>
       </main>
 

@@ -4,7 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { AnalyticsWithConsent } from "@/components/analytics-with-consent"
 import { CookieBanner } from "@/components/cookie-banner"
 import { ThemeProvider } from "@/components/theme-provider"
-import { ClerkProvider } from "@clerk/nextjs"
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -25,24 +24,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ro" suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <ClerkProvider
-          signInUrl="/login"
-          signUpUrl="/register"
-          signInFallbackRedirectUrl="/app"
-          signUpFallbackRedirectUrl="/app/onboarding"
-          appearance={{ cssLayerName: "clerk" }}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          storageKey="asesor-theme"
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            storageKey="asesor-theme"
-          >
-            {children}
-          </ThemeProvider>
-        </ClerkProvider>
-        <CookieBanner />
-        <AnalyticsWithConsent />
+          {children}
+          <CookieBanner />
+          <AnalyticsWithConsent />
+        </ThemeProvider>
       </body>
     </html>
   )

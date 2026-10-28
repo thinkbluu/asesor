@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Copy, QrCode, ExternalLink, TrendingUp, Users, Calendar, Eye, Check } from "lucide-react"
+import { Copy, QrCode, ExternalLink, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const SLUG = "salonul-ana" // TODO: citește din config salon când Supabase e activ
+const SLUG = "salonul-meu"
 const FULL_URL = `https://asesor.ro/booking/${SLUG}`
 
 export function OverviewTab() {
@@ -22,13 +22,7 @@ export function OverviewTab() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Mock stats — va veni din Supabase
-  const stats = [
-    { label: "Vizualizări luna aceasta", value: 247, icon: Eye, sub: "+18% vs luna trecută" },
-    { label: "Programări primite", value: 34, icon: Calendar, sub: "din care 28 confirmate" },
-    { label: "Rată conversie", value: "13.8%", icon: TrendingUp, sub: "vizitatori → programări" },
-    { label: "Clienți noi", value: 12, icon: Users, sub: "prima programare via link" },
-  ]
+  const stats: { label: string; value: string | number; sub: string }[] = []
 
   return (
     <div className="space-y-6 mt-6">
@@ -122,22 +116,13 @@ export function OverviewTab() {
         <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
           Statistici
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => (
-            <Card key={s.label}>
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
-                    <s.icon className="h-4 w-4 text-accent" />
-                  </div>
-                </div>
-                <p className="text-2xl font-bold">{s.value}</p>
-                <p className="text-sm text-muted-foreground mt-0.5">{s.label}</p>
-                <p className="text-xs text-muted-foreground/70 mt-1">{s.sub}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {stats.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-sm text-muted-foreground">
+              Statisticile vor apărea după ce primești primele programări online.
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
 
       {/* Quick tips */}

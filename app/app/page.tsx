@@ -14,10 +14,15 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { cn } from "@/lib/utils"
 
 // ── Data imports from all modules ─────────────────────────────────────────────
-import { APPOINTMENTS_DATA, STATUS_CONFIG, toDateString, type AppointmentStatus } from "@/lib/programari-data"
-import { STAFF_DATA } from "@/lib/echipa-data"
-import { CLIENTS_DATA as CLIENTS } from "@/lib/clienti-data"
-import { TRANSACTIONS, formatRON, formatRONShort } from "@/lib/financiar-data"
+import { STATUS_CONFIG, toDateString, type Appointment, type AppointmentStatus } from "@/lib/programari-data"
+import type { StaffMember } from "@/lib/echipa-data"
+import type { Client } from "@/lib/clienti-data"
+import { formatRON, formatRONShort, type Transaction } from "@/lib/financiar-data"
+
+const APPOINTMENTS_DATA: Appointment[] = []
+const STAFF_DATA: StaffMember[] = []
+const CLIENTS: Client[] = []
+const TRANSACTIONS: Transaction[] = []
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const todayStr = toDateString(new Date())
@@ -110,13 +115,7 @@ function useAlerts() {
   return useMemo(() => {
     // Low stock — inline from stocuri page data (same INITIAL_PRODUCTS shape)
     // We derive it from a simple import-compatible structure
-    const lowStockProducts = [
-      { name: "Majirel 50ml #9.1",  stock: 8,  minStock: 10 },
-      { name: "Olaplex No.1 100ml", stock: 4,  minStock: 6  },
-      { name: "Olaplex No.2 250ml", stock: 3,  minStock: 6  },
-      { name: "Vinylux #Beau 15ml", stock: 7,  minStock: 10 },
-      { name: "Fibre Crimper 150ml",stock: 0,  minStock: 5  },
-    ]
+const lowStockProducts: { name: string; stock: number; minStock: number }[] = []
 
     const noShows = APPOINTMENTS_DATA.filter(a => a.date === yesterdayStr && a.status === "no_show")
     const pendingConfirmations = APPOINTMENTS_DATA.filter(a => a.date >= todayStr && a.status === "in_asteptare")

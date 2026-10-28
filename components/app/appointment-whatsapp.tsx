@@ -16,7 +16,6 @@ import {
 import { cn } from "@/lib/utils"
 import {
   WHATSAPP_TEMPLATES,
-  getMessagesForAppointment,
   renderTemplate,
   toWhatsAppE164,
   type WhatsAppTemplate,
@@ -80,7 +79,7 @@ export function AppointmentWhatsApp({
   const effectiveNumber = clientWhatsApp || clientPhone
   const e164 = useMemo(() => toWhatsAppE164(effectiveNumber), [effectiveNumber])
 
-  const messages = useMemo(() => getMessagesForAppointment(appointmentId, 3), [appointmentId])
+  const messages = useMemo<WhatsAppMessage[]>(() => [], [appointmentId])
 
   const approvedTemplates = WHATSAPP_TEMPLATES.filter((t) => t.status === "approved")
 

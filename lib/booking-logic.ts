@@ -1,9 +1,8 @@
 import type { StaffMember } from "./echipa-data"
 import {
-  CATALOG_SERVICES,
-  APPOINTMENTS_DATA,
   timeToMinutes,
   minutesToTime,
+  type Appointment,
   type AppointmentService,
 } from "./programari-data"
 
@@ -17,65 +16,13 @@ export interface SalonInfo {
   cancellationPolicy: string
 }
 
-export const DEMO_SALON: SalonInfo = {
-  slug: "salonul-ana",
-  name: "Salonul Ana",
-  address: "Str. Victoriei 25, București, Sector 1",
-  phone: "0722 100 111",
-  hours: "Luni–Vineri 09:00–20:00 · Sâmbătă 10:00–15:00",
-  description: "Salon de înfrumusețare complet: păr, unghii, tratamente faciale, masaj și extensii gene.",
-  cancellationPolicy:
-    "Programarea poate fi modificată sau anulată gratuit cu minim 4 ore înainte de ora stabilită. Anularile tardive sau neprezentările pot fi taxate conform politicii salonului.",
+export function getServiceByName(
+  name: string,
+  services: AppointmentService[] = [],
+): AppointmentService | undefined {
+  return services.find((service) => service.name === name)
 }
 
-export const SERVICE_CATEGORIES = [
-  {
-    name: "Păr",
-    icon: "Scissors" as const,
-    services: [
-      "Tuns și coafat",
-      "Vopsit rădăcini",
-      "Vopsit complet",
-      "Balayage / Highlights",
-      "Tratament keratină",
-      "Coafat ocazie",
-      "Tratament par",
-    ],
-  },
-  {
-    name: "Unghii",
-    icon: "Sparkles" as const,
-    services: ["Manichiură simplă", "Manichiură gel", "Pedichiură", "Nail art"],
-  },
-  {
-    name: "Față",
-    icon: "Smile" as const,
-    services: [
-      "Tratament facial hidratant",
-      "Curățare față profundă",
-      "Masaj facial",
-      "Epilare față",
-    ],
-  },
-  {
-    name: "Gene & Sprâncene",
-    icon: "Eye" as const,
-    services: ["Extensii gene clasic", "Extensii gene volum"],
-  },
-  {
-    name: "Masaj",
-    icon: "Hand" as const,
-    services: ["Masaj relaxant 60min", "Masaj relaxant 90min", "Masaj sportiv"],
-  },
-]
-
-export function getServiceByName(name: string): AppointmentService | undefined {
-  const s = CATALOG_SERVICES.find((c) => c.name === name)
-  if (!s) return
-  return { name: s.name, duration: s.duration, price: s.price }
-}
-
-// Day names in Romanian matching StaffMember.schedule keys
 const DAY_NAMES_RO = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"]
 
 export function getDayNameRO(date: Date): string {
@@ -83,26 +30,23 @@ export function getDayNameRO(date: Date): string {
 }
 
 export function toISODate(date: Date): string {
-  // Use local date to avoid TZ shift from toISOString
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
 
-// Staff who perform ALL the selected services, are active, and not the "inactiv" status
 export function getQualifiedStaff(
   staff: StaffMember[],
   selectedServiceNames: string[],
 ): StaffMember[] {
-  const active = staff.filter((s) => s.status !== "inactiv")
+  const active = staff.filter((member) => member.status !== "inactiv")
   if (selectedServiceNames.length === 0) return active
-  return active.filter((s) =>
-    selectedServiceNames.every((name) => s.services.includes(name)),
+  return active.filter((member) =>
+    selectedServiceNames.every((name) => member.services.includes(name)),
   )
 }
 
-// Can the date be picked at all (any qualified staff working that day, not on leave)?
 export function isDateBookable(date: Date, qualifiedStaff: StaffMember[]): boolean {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -112,79 +56,79 @@ export function isDateBookable(date: Date, qualifiedStaff: StaffMember[]): boole
 
   const day = getDayNameRO(date)
   const dateStr = toISODate(date)
-  return qualifiedStaff.some((s) => {
-    const sched = s.schedule[day]
-    if (!sched?.active) return false
-    const onLeave = s.timeOffRequests.some(
-      (t) =>
-        t.status === "approved" && dateStr >= t.startDate && dateStr <= t.endDate,
+  return qualifiedStaff.some((member) => {
+    const schedule = member.schedule[day]
+    if (!schedule?.active) return false
+    return !member.timeOffRequests.some(
+      (request) =>
+        request.status === "approved" &&
+        dateStr >= request.startDate &&
+        dateStr <= request.endDate,
     )
-    return !onLeave
   })
 }
 
 export interface TimeSlot {
-  time: string      // "HH:MM"
-  staffId: string   // first staff member available at this time
+  time: string
+  staffId: string
 }
 
 export function getAvailableSlots(
   staffList: StaffMember[],
   dateStr: string,
   totalDuration: number,
+  appointments: Appointment[] = [],
 ): TimeSlot[] {
   if (totalDuration <= 0) return []
-  const date = new Date(dateStr + "T12:00:00")
+  const date = new Date(`${dateStr}T12:00:00`)
   const day = getDayNameRO(date)
   const slotMap = new Map<string, string>()
 
-  for (const s of staffList) {
-    const sched = s.schedule[day]
-    if (!sched?.active) continue
+  for (const member of staffList) {
+    const schedule = member.schedule[day]
+    if (!schedule?.active) continue
 
-    const onLeave = s.timeOffRequests.some(
-      (t) =>
-        t.status === "approved" && dateStr >= t.startDate && dateStr <= t.endDate,
+    const onLeave = member.timeOffRequests.some(
+      (request) =>
+        request.status === "approved" &&
+        dateStr >= request.startDate &&
+        dateStr <= request.endDate,
     )
     if (onLeave) continue
 
-    const existing = APPOINTMENTS_DATA.filter(
-      (a) =>
-        a.staffId === s.id &&
-        a.date === dateStr &&
-        a.status !== "anulat" &&
-        a.status !== "no_show",
+    const existing = appointments.filter(
+      (appointment) =>
+        appointment.staffId === member.id &&
+        appointment.date === dateStr &&
+        appointment.status !== "anulat" &&
+        appointment.status !== "no_show",
     )
-    const blocked = s.blockedSlots.filter((b) => b.date === dateStr)
-
-    const startMin = timeToMinutes(sched.start)
-    const endMin = timeToMinutes(sched.end)
+    const blocked = member.blockedSlots.filter((slot) => slot.date === dateStr)
+    const startMin = timeToMinutes(schedule.start)
+    const endMin = timeToMinutes(schedule.end)
     const lastStart = endMin - totalDuration
-
-    // Past-time filter if the date is today
     const now = new Date()
     const isToday = toISODate(now) === dateStr
-    const nowMin = now.getHours() * 60 + now.getMinutes() + 15 // buffer
+    const nowMin = now.getHours() * 60 + now.getMinutes() + 15
 
-    for (let m = startMin; m <= lastStart; m += 15) {
-      if (isToday && m < nowMin) continue
-
-      const conflict = existing.some((a) => {
-        const aStart = timeToMinutes(a.startTime)
-        const aEnd = timeToMinutes(a.endTime)
-        return m < aEnd && m + totalDuration > aStart
+    for (let minute = startMin; minute <= lastStart; minute += 15) {
+      if (isToday && minute < nowMin) continue
+      const conflict = existing.some((appointment) => {
+        const start = timeToMinutes(appointment.startTime)
+        const end = timeToMinutes(appointment.endTime)
+        return minute < end && minute + totalDuration > start
       })
       if (conflict) continue
 
-      const blockedConflict = blocked.some((b) => {
-        const bStart = timeToMinutes(b.startTime)
-        const bEnd = timeToMinutes(b.endTime)
-        return m < bEnd && m + totalDuration > bStart
+      const blockedConflict = blocked.some((slot) => {
+        const start = timeToMinutes(slot.startTime)
+        const end = timeToMinutes(slot.endTime)
+        return minute < end && minute + totalDuration > start
       })
       if (blockedConflict) continue
 
-      const slotStart = minutesToTime(m)
-      if (!slotMap.has(slotStart)) slotMap.set(slotStart, s.id)
+      const slotStart = minutesToTime(minute)
+      if (!slotMap.has(slotStart)) slotMap.set(slotStart, member.id)
     }
   }
 
@@ -202,27 +146,25 @@ export function groupSlotsByPeriod(slots: TimeSlot[]): {
   const afternoon: TimeSlot[] = []
   const evening: TimeSlot[] = []
   slots.forEach((slot) => {
-    const h = Number(slot.time.split(":")[0])
-    if (h < 12) morning.push(slot)
-    else if (h < 17) afternoon.push(slot)
+    const hour = Number(slot.time.split(":")[0])
+    if (hour < 12) morning.push(slot)
+    else if (hour < 17) afternoon.push(slot)
     else evening.push(slot)
   })
   return { morning, afternoon, evening }
 }
 
-// Find next available date within the next 60 days
 export function findNextAvailableDate(
   qualifiedStaff: StaffMember[],
   totalDuration: number,
 ): Date | null {
   const start = new Date()
   start.setHours(0, 0, 0, 0)
-  for (let i = 0; i < 60; i++) {
+  for (let index = 0; index < 60; index++) {
     const probe = new Date(start)
-    probe.setDate(start.getDate() + i)
+    probe.setDate(start.getDate() + index)
     if (!isDateBookable(probe, qualifiedStaff)) continue
-    const slots = getAvailableSlots(qualifiedStaff, toISODate(probe), totalDuration)
-    if (slots.length > 0) return probe
+    if (getAvailableSlots(qualifiedStaff, toISODate(probe), totalDuration).length > 0) return probe
   }
   return null
 }
@@ -230,11 +172,11 @@ export function findNextAvailableDate(
 export function generateConfirmationNumber(): string {
   const date = new Date()
   const datePart = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase()
-  return `ASE-${datePart}-${rand}`
+  const random = Math.random().toString(36).slice(2, 6).toUpperCase()
+  return `ASE-${datePart}-${random}`
 }
 
-export function generateICS(opts: {
+export function generateICS(options: {
   title: string
   description: string
   location: string
@@ -242,16 +184,13 @@ export function generateICS(opts: {
   time: string
   durationMin: number
 }): string {
-  const [y, m, d] = opts.date.split("-").map(Number)
-  const [hh, mm] = opts.time.split(":").map(Number)
-  // Treat event as local time; .ics with TZID would be better but this is widely accepted
-  const pad = (n: number) => String(n).padStart(2, "0")
-  const startLocal = `${y}${pad(m)}${pad(d)}T${pad(hh)}${pad(mm)}00`
-  const endTotal = hh * 60 + mm + opts.durationMin
-  const endH = Math.floor(endTotal / 60)
-  const endM = endTotal % 60
-  const endLocal = `${y}${pad(m)}${pad(d)}T${pad(endH)}${pad(endM)}00`
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z"
+  const [year, month, day] = options.date.split("-").map(Number)
+  const [hour, minute] = options.time.split(":").map(Number)
+  const pad = (value: number) => String(value).padStart(2, "0")
+  const startLocal = `${year}${pad(month)}${pad(day)}T${pad(hour)}${pad(minute)}00`
+  const endTotal = hour * 60 + minute + options.durationMin
+  const endLocal = `${year}${pad(month)}${pad(day)}T${pad(Math.floor(endTotal / 60))}${pad(endTotal % 60)}00`
+  const stamp = `${new Date().toISOString().replace(/[-:]/g, "").split(".")[0]}Z`
 
   return [
     "BEGIN:VCALENDAR",
@@ -263,16 +202,16 @@ export function generateICS(opts: {
     `DTSTAMP:${stamp}`,
     `DTSTART:${startLocal}`,
     `DTEND:${endLocal}`,
-    `SUMMARY:${escapeICS(opts.title)}`,
-    `DESCRIPTION:${escapeICS(opts.description)}`,
-    `LOCATION:${escapeICS(opts.location)}`,
+    `SUMMARY:${escapeICS(options.title)}`,
+    `DESCRIPTION:${escapeICS(options.description)}`,
+    `LOCATION:${escapeICS(options.location)}`,
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n")
 }
 
-function escapeICS(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")
+function escapeICS(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;")
 }
 
 export function normalizePhone(phone: string): string {
@@ -287,16 +226,16 @@ export function formatPriceRON(amount: number): string {
   }).format(amount)
 }
 
-export function formatDurationMin(mins: number): string {
-  if (mins < 60) return `${mins} min`
-  const h = Math.floor(mins / 60)
-  const m = mins % 60
-  if (m === 0) return `${h}h`
-  return `${h}h ${m}min`
+export function formatDurationMin(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  if (remainingMinutes === 0) return `${hours}h`
+  return `${hours}h ${remainingMinutes}min`
 }
 
 export function formatDateLong(dateStr: string): string {
-  return new Date(dateStr + "T12:00:00").toLocaleDateString("ro-RO", {
+  return new Date(`${dateStr}T12:00:00`).toLocaleDateString("ro-RO", {
     weekday: "long",
     day: "numeric",
     month: "long",

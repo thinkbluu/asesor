@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useSearchParams, useRouter } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import {
   LayoutDashboard,
   Calendar,
@@ -27,7 +27,6 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible"
 import { useState, useEffect } from "react"
-import { useClerk, useUser } from "@clerk/nextjs"
 
 type NavItem = {
   name: string
@@ -121,9 +120,7 @@ export function AppSidebar() {
   const [mounted, setMounted] = useState(false)
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({})
   const { resolvedTheme, setTheme } = useTheme()
-  const { signOut } = useClerk()
-  const { user } = useUser()
-  const router = useRouter()
+  const user = { fullName: "Utilizator", email: "" }
 
   useEffect(() => {
     setMounted(true)
@@ -147,10 +144,7 @@ export function AppSidebar() {
     }
   }, [expandedMap, mounted])
 
-  const handleLogout = async () => {
-    await signOut()
-    router.push("/login")
-  }
+  const handleLogout = () => {}
 
   const toggleExpanded = (href: string, isInSection: boolean) => {
     // Active section is always open per spec — chevron click is a no-op.
@@ -158,14 +152,9 @@ export function AppSidebar() {
     setExpandedMap((prev) => (prev[href] ? {} : { [href]: true }))
   }
 
-  const firstName = user?.firstName ?? ""
-  const lastName = user?.lastName ?? ""
-  const email = user?.primaryEmailAddress?.emailAddress ?? ""
-  const displayName = [firstName, lastName].filter(Boolean).join(" ") || email
-  const salonName = (user?.publicMetadata?.salon_name as string) || "Salonul meu"
-  const initials = firstName && lastName
-    ? `${firstName[0]}${lastName[0]}`.toUpperCase()
-    : (email[0] ?? "?").toUpperCase()
+  const displayName = user.fullName || user.email
+  const salonName = "Salonul meu"
+  const initials = (user.fullName[0] ?? "?").toUpperCase()
 
   const activeTabParam = searchParams.get("tab")
 

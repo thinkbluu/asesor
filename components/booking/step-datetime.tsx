@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { CalendarX, Sun, Cloud, Moon, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { STAFF_DATA } from "@/lib/echipa-data"
+import type { StaffMember } from "@/lib/echipa-data"
 import {
   getQualifiedStaff,
   getServiceByName,
@@ -19,6 +19,8 @@ import {
 import { ro } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
+
+const STAFF_DATA: StaffMember[] = []
 
 export function StepDatetime({
   state,

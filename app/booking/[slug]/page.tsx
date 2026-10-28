@@ -1,12 +1,8 @@
 import { notFound } from "next/navigation"
-import { BookingFlow } from "@/components/booking/booking-flow"
-import { DEMO_SALON } from "@/lib/booking-logic"
+import type { SalonInfo } from "@/lib/booking-logic"
 
-// In a real app this would look up the salon by slug from the DB.
-// For the demo, any slug resolves to the same salon info — we just reflect the slug in the URL.
-async function getSalonBySlug(slug: string) {
-  if (!slug) return null
-  return { ...DEMO_SALON, slug }
+async function getSalonBySlug(_slug: string): Promise<SalonInfo | null> {
+  return null
 }
 
 export default async function BookingPage({
@@ -18,5 +14,5 @@ export default async function BookingPage({
   const salon = await getSalonBySlug(slug)
   if (!salon) notFound()
 
-  return <BookingFlow salon={salon} />
+  return null
 }

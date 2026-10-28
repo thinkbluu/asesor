@@ -145,13 +145,41 @@ export default function FunctionalitatiPage() {
                     </div>
                   </div>
                   <div
-                    className={`rounded-xl border border-border bg-muted/30 p-8 ${
-                      index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""
-                    }`}
+                    className={`rounded-xl border border-border bg-muted/30 ${
+                      module.id === "programari" || module.id === "clienti" || module.id === "echipa" || module.id === "stocuri"
+                        ? "group overflow-hidden"
+                        : ""
+                    } ${index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""}`}
                   >
-                    <div className="flex aspect-video items-center justify-center">
-                      <module.icon className="h-24 w-24 text-accent/20" />
-                    </div>
+                    {module.id === "programari" ? (
+                      <img
+                        src="/asesor-programari.webp"
+                        alt="ASESOR — Calendar programări salon"
+                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : module.id === "clienti" ? (
+                      <img
+                        src="/asesor-clienti.webp"
+                        alt="ASESOR — Gestionare clienți salon"
+                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : module.id === "echipa" ? (
+                      <img
+                        src="/asesor-echipa.webp"
+                        alt="ASESOR — Management echipă salon"
+                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : module.id === "stocuri" ? (
+                      <img
+                        src="/asesor-stocuri.webp"
+                        alt="ASESOR — Gestiune stocuri produse salon"
+                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center p-8">
+                        <module.icon className="h-24 w-24 text-accent/20" />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

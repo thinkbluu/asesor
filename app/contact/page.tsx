@@ -28,11 +28,10 @@ export default function ContactPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-                Hai să vorbim
+                Contactează-ne.
               </h1>
               <p className="mt-4 text-lg text-muted-foreground text-pretty">
-                Avem răspunsuri la toate întrebările tale. Suntem aici să te ajutăm să alegi soluția
-                potrivită pentru salonul tău.
+                Îți răspundem în cel mai scurt timp.
               </p>
             </div>
           </div>
