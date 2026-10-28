@@ -23,7 +23,7 @@ const PREFIX = "v1"
 const IV_BYTES = 12
 const KEY_BYTES = 32
 
-let cachedKey: Buffer | null | undefined
+let cachedKey: Buffer | undefined
 
 function loadKey(): Buffer {
   if (cachedKey !== undefined) return cachedKey

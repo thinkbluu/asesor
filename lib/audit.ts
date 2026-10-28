@@ -2,6 +2,7 @@ import "server-only"
 
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { getSession } from "@/lib/auth/session"
+import type { Database } from "@/lib/supabase/types"
 
 /**
  * Audit trail for sensitive-data access and edits. Fire-and-forget from the
@@ -25,7 +26,7 @@ export async function writeAudit(
       action,
       entity,
       entity_id: entityId,
-      meta: meta ?? null,
+      meta: (meta ?? null) as Database["public"]["Tables"]["audit_log"]["Insert"]["meta"],
     })
     if (error) {
       console.error("[v0] writeAudit insert failed:", error.message)

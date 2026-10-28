@@ -34,7 +34,7 @@ import {
   ShieldCheck,
   Trash2,
 } from "lucide-react"
-import { TAG_COLORS, formatDate, getInitials } from "@/lib/clienti-data"
+import { TAG_COLORS, formatDate, getInitials } from "@/lib/clienti-format"
 import type {
   ClientDetail,
   ClientHistoryItem,

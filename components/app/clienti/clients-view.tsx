@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { AlertTriangle, Download, Plus, Search, Users } from "lucide-react"
-import { TAG_COLORS, getInitials, formatDate } from "@/lib/clienti-data"
+import { TAG_COLORS, getInitials, formatDate } from "@/lib/clienti-format"
 import type { ClientListItem } from "@/lib/mappers/clienti"
 import type { ClientListPage } from "@/lib/data/clienti"
 import { CLIENT_SOURCES, CLIENT_TAGS } from "@/lib/validation/clienti"

@@ -418,7 +418,7 @@ export async function updateAppointmentStatus(
 ): Promise<DataResult> {
   const supabase = await createSupabaseServerClient()
 
-  const patch: Record<string, unknown> = {
+  const patch: Database["public"]["Tables"]["appointments"]["Update"] = {
     status: input.status,
     cancel_reason: input.status === "anulat" ? (input.cancelReason || null) : null,
     updated_at: new Date().toISOString(),
@@ -446,4 +446,4 @@ export async function updateAppointmentStatus(
   return { ok: true }
 }
 
-// ─── helpers ─────────────────────────────────────────────────────────────────
+// ─── helpers ─���───────────────────────────────────────────────────────────────

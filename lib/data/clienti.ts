@@ -581,7 +581,7 @@ export async function exportClientData(
 
   // Export includes the DECRYPTED sensitive fields (GDPR right to data
   // portability) — owner/manager only, enforced by the action layer.
-  let sensitive: Record<string, unknown> = null
+  let sensitive: Record<string, unknown> | null = null
   const s = sensitiveRes.data
   if (s) {
     try {
@@ -720,5 +720,7 @@ export async function importClients(
     data: { imported: toInsert.length, skipped: rows.length - toInsert.length },
   }
 }
+
+// sync-kick
 
 // sync-kick

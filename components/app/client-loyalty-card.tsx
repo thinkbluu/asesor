@@ -35,6 +35,7 @@ export function ClientLoyaltyCard({
 }) {
   const history: LoyaltyTransaction[] = entries.map((e) => ({
     id: e.id,
+    clientId: "",
     type: e.type,
     points: e.points,
     reason: e.note ?? "Puncte loialitate",

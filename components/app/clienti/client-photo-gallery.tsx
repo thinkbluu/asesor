@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Camera, Trash2 } from "lucide-react"
-import { formatDate } from "@/lib/clienti-data"
+import { formatDate } from "@/lib/clienti-format"
 import type { ClientPhoto } from "@/lib/mappers/clienti"
 import { uploadPhotoAction, deletePhotoAction, listPhotosAction } from "@/app/app/clienti/actions"
 
