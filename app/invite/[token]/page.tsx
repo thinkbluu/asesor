@@ -5,8 +5,11 @@ import { createSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase
 import { isSupabaseAdminConfigured, createSupabaseAdminClient } from "@/lib/supabase/admin"
 import { getSession } from "@/lib/auth/session"
 import { mapAuthError } from "@/lib/auth/errors"
+import { writeAudit } from "@/lib/audit"
 
 type InviteRow = {
+  id: string
+  salon_id: string
   email: string
   role: string
   expires_at: string
@@ -48,7 +51,7 @@ export default async function InvitePage({
   const admin = createSupabaseAdminClient()
   const { data: invite } = await admin
     .from("salon_invites")
-    .select("email, role, expires_at, accepted_at, salons(name)")
+    .select("id, salon_id, email, role, expires_at, accepted_at, salons(name)")
     .eq("token_hash", tokenHash)
     .maybeSingle<InviteRow>()
 
@@ -93,6 +96,10 @@ export default async function InvitePage({
         </InviteShell>
       )
     }
+    await writeAudit(invite.salon_id, "invite_accepted", "salon_invites", invite.id, {
+      email: invite.email,
+      role: invite.role,
+    })
     redirect("/app")
   }
 

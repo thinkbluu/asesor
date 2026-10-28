@@ -10,6 +10,7 @@ import { createHash, randomBytes } from "node:crypto"
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { writeAudit } from "@/lib/audit"
 import { getSession, MANAGEMENT_ROLES } from "./session"
 import type { AppRole } from "./session"
 
@@ -105,6 +106,12 @@ export async function inviteMember(
   })
   if (error) return { ok: false, error: "Invitația nu a putut fi creată. Încearcă din nou." }
 
+  await writeAudit(salonId, "invite_created", "salon_invites", null, {
+    email: normalizedEmail,
+    role,
+    staff_id: verifiedStaffId,
+  })
+
   revalidatePath("/app/setari")
   revalidatePath("/app/echipa")
   return { ok: true, url: await buildInviteUrl(token) }
@@ -145,6 +152,11 @@ export async function changeMemberRole(memberId: string, role: string): Promise<
     .eq("salon_id", salonId)
   if (error) return { ok: false, error: "Rolul nu a putut fi schimbat. Încearcă din nou." }
 
+  await writeAudit(salonId, "change_member_role", "salon_members", memberId, {
+    from: member.role,
+    to: role,
+  })
+
   revalidatePath("/app/setari")
   return { ok: true }
 }
@@ -181,6 +193,10 @@ export async function removeMember(memberId: string): Promise<ActionResult> {
     .eq("id", memberId)
     .eq("salon_id", salonId)
   if (error) return { ok: false, error: "Membrul nu a putut fi eliminat. Încearcă din nou." }
+
+  await writeAudit(salonId, "remove_member", "salon_members", memberId, {
+    role: member.role,
+  })
 
   revalidatePath("/app/setari")
   return { ok: true }

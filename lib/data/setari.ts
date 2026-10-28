@@ -1,6 +1,7 @@
 import "server-only"
 
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { writeAudit } from "@/lib/audit"
 import type { Database } from "@/lib/supabase/types"
 import { withBookingSettingsPatch } from "@/lib/mappers/onboarding"
 import type {
@@ -149,7 +150,7 @@ export async function saveSetariBranding(salonId: string, input: SetariBrandingI
 
   const { data: salonRow, error: readErr } = await supabase
     .from("salons")
-    .select("branding, booking_settings")
+    .select("slug, branding, booking_settings")
     .eq("id", salonId)
     .single()
   if (readErr || !salonRow) return dbError("saveSetariBranding/read", readErr)
@@ -187,6 +188,12 @@ export async function saveSetariBranding(salonId: string, input: SetariBrandingI
       return { ok: false, error: "Acest slug este deja folosit de alt salon. Încearcă altul." }
     }
     return dbError("saveSetariBranding/update", error)
+  }
+  if (salonRow.slug !== input.slug) {
+    await writeAudit(salonId, "slug_change", "salons", salonId, {
+      from: salonRow.slug,
+      to: input.slug,
+    })
   }
   return { ok: true }
 }
