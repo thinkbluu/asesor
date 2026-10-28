@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/auth/session"
 import {
   createAppointment as dbCreateAppointment,
   createClientInline,
+  getAppointmentStaffId,
   loadProgramariRange,
   searchClients,
   updateAppointment as dbUpdateAppointment,
@@ -145,6 +146,17 @@ export async function updateAppointmentStatusAction(input: unknown): Promise<Act
 
   if (parsed.data.status === "anulat" && !parsed.data.cancelReason) {
     return { ok: false, error: "Introdu motivul anularii." }
+  }
+
+  // Staff may change status/notes only on their own appointments (mirrors the
+  // appointments_update_staff_own RLS policy from scripts/004).
+  if (session.role === "staff") {
+    if (!session.staffId) return { ok: false, error: "Nu ai un profil de specialist asociat." }
+    const owner = await getAppointmentStaffId(session.salon.id, parsed.data.id)
+    if (!owner.ok) return { ok: false, error: owner.error }
+    if (owner.data !== session.staffId) {
+      return { ok: false, error: "Poți modifica doar programările tale." }
+    }
   }
 
   const result = await dbUpdateStatus(session.salon.id, parsed.data)

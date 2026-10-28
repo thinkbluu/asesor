@@ -108,6 +108,9 @@ export const updateStatusSchema = z.object({
     .max(500, "Motivul este prea lung.")
     .optional()
     .nullable(),
+  // Staff may also edit notes on their own appointments (RLS is row-level
+  // only; the column restriction is enforced here and in the data layer).
+  notes: z.string().trim().max(2000).optional(),
 })
 export type UpdateStatusInput = z.infer<typeof updateStatusSchema>
 

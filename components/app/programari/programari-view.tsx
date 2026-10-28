@@ -106,11 +106,11 @@ interface DragState {
 }
 
 function AppointmentBlock({
-  apt, staffColor, canEdit, onOpen, onDragStart,
+  apt, staffColor, canDrag, onOpen, onDragStart,
 }: {
   apt: Appointment
   staffColor: string
-  canEdit: boolean
+  canDrag: boolean
   onOpen: (a: Appointment) => void
   onDragStart: (e: React.PointerEvent, apt: Appointment, mode: "move" | "resize") => void
 }) {
@@ -124,7 +124,7 @@ function AppointmentBlock({
       className={cn(
         "absolute left-1 right-1 rounded-md select-none overflow-hidden",
         "transition-shadow hover:z-20 hover:shadow-lg",
-        canEdit && "cursor-grab active:cursor-grabbing",
+        canDrag && "cursor-grab active:cursor-grabbing",
         cfg.bg, "border border-current", cfg.color,
       )}
       style={{
@@ -136,7 +136,7 @@ function AppointmentBlock({
         touchAction: "none",
       }}
       onPointerDown={(e) => {
-        if (!canEdit || e.button !== 0) return
+        if (!canDrag || e.button !== 0) return
         onDragStart(e, apt, "move")
       }}
       onClick={() => onOpen(apt)}
@@ -158,7 +158,7 @@ function AppointmentBlock({
           </>
         )}
       </div>
-      {canEdit && (
+      {canDrag && (
         <div
           className="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize"
           onPointerDown={(e) => {
@@ -174,13 +174,14 @@ function AppointmentBlock({
 // ─── Detail Panel ────────────────────────────────────────────────────────────
 
 function AppointmentDetail({
-  apt, onClose, onStatusChange, onEdit, canEdit, clientInfo,
+  apt, onClose, onStatusChange, onEdit, canEdit, canStatus, clientInfo,
 }: {
   apt: Appointment
   onClose: () => void
   onStatusChange: (id: string, status: AppointmentStatus) => void
   onEdit: (apt: Appointment) => void
   canEdit: boolean
+  canStatus: boolean
   clientInfo: ClientSearchResult | null
 }) {
   const cfg = STATUS_CONFIG[apt.status]
@@ -308,12 +309,15 @@ function AppointmentDetail({
         />
       </div>
 
-      {/* Actions */}
-      {canEdit && (
+      {/* Actions — status changes for staff on their own appointments too;
+          full edit (services/staff/time) only for owner/manager/receptionist */}
+      {(canEdit || canStatus) && (
         <div className="p-4 border-t border-border space-y-2">
-          <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => onEdit(apt)}>
-            <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editează
-          </Button>
+          {canEdit && (
+            <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => onEdit(apt)}>
+              <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editează
+            </Button>
+          )}
           <div className="grid grid-cols-2 gap-2">
             <Button size="sm" variant="outline" className="text-xs" onClick={() => onStatusChange(apt.id, "anulat")}>
               <Ban className="h-3.5 w-3.5 mr-1.5" /> Anulează
@@ -529,7 +533,7 @@ function DayView({
                       key={apt.id}
                       apt={apt}
                       staffColor={s.color}
-                      canEdit={canEditApt(apt)}
+                      canDrag={canEditApt(apt)}
                       onOpen={(a) => {
                         if (justDraggedRef.current) {
                           justDraggedRef.current = false
@@ -1466,8 +1470,14 @@ export function ProgramariView({
   const [clientInfo, setClientInfo] = useState<ClientSearchResult | null>(null)
 
   const canCreate = role !== "staff"
+  // Full edit (services/staff/time, drag & resize): owner/manager/receptionist.
+  // Staff may only change status/notes on their own appointments.
   const canEditApt = useCallback(
-    (a: Appointment) => role !== "staff" || a.staffId === staffId,
+    (a: Appointment) => role !== "staff",
+    [role],
+  )
+  const canStatusApt = useCallback(
+    (a: Appointment) => role !== "staff" || (staffId != null && a.staffId === staffId),
     [role, staffId],
   )
 
@@ -1901,6 +1911,7 @@ export function ProgramariView({
               onStatusChange={handleStatusChange}
               onEdit={openEditApt}
               canEdit={canEditApt(selectedApt)}
+              canStatus={canStatusApt(selectedApt)}
               clientInfo={clientInfo}
             />
           </div>

@@ -354,19 +354,42 @@ export async function updateAppointment(
   }
 }
 
+/**
+ * Returns the staff_id of an appointment, or null when it does not belong to
+ * the salon. Used by the action layer to enforce the staff-role restriction
+ * (staff may only touch their own appointments) before writing.
+ */
+export async function getAppointmentStaffId(
+  salonId: string,
+  appointmentId: string,
+): Promise<DataResult<string | null>> {
+  const supabase = await createSupabaseServerClient()
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("staff_id")
+    .eq("id", appointmentId)
+    .eq("salon_id", salonId)
+    .maybeSingle()
+  if (error) return dbError("getAppointmentStaffId", error)
+  return { ok: true, data: (data?.staff_id as string | null) ?? null }
+}
+
 export async function updateAppointmentStatus(
   salonId: string,
   input: UpdateStatusInput,
 ): Promise<DataResult> {
   const supabase = await createSupabaseServerClient()
 
+  const patch: Record<string, unknown> = {
+    status: input.status,
+    cancel_reason: input.status === "anulat" ? (input.cancelReason || null) : null,
+    updated_at: new Date().toISOString(),
+  }
+  if (input.notes !== undefined) patch.notes = input.notes
+
   const { data, error } = await supabase
     .from("appointments")
-    .update({
-      status: input.status,
-      cancel_reason: input.status === "anulat" ? (input.cancelReason || null) : null,
-      updated_at: new Date().toISOString(),
-    })
+    .update(patch)
     .eq("id", input.id)
     .eq("salon_id", salonId)
     .select("id")
