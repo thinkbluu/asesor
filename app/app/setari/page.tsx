@@ -36,12 +36,14 @@ import {
   Scissors,
   Award,
   Star,
+  Users,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SettingsServicii } from "@/components/app/settings-servicii"
 import { SettingsWhatsApp } from "@/components/app/settings-whatsapp"
 import { SettingsLoialitate } from "@/components/app/settings-loialitate"
 import { SettingsReviews } from "@/components/app/settings-reviews"
+import { SettingsEchipa } from "@/components/app/settings-echipa"
 
 // --- Types ---
 interface DaySchedule {
@@ -110,6 +112,7 @@ const TABS = [
   { id: "loialitate", label: "Loialitate", icon: Award },
   { id: "recenzii", label: "Recenzii Google", icon: Star },
   { id: "abonament", label: "Abonament", icon: CreditCard },
+  { id: "echipa", label: "Echipă și acces", icon: Users },
   { id: "permisiuni", label: "Permisiuni", icon: Shield },
 ]
 
@@ -405,6 +408,9 @@ export default function SettingsPage() {
 
           {/* ── SERVICII ── */}
           {activeTab === "servicii" && <SettingsServicii />}
+
+          {/* ── ECHIPĂ ȘI ACCES ── */}
+          {activeTab === "echipa" && <SettingsEchipa />}
 
           {/* ── PROGRAM DE LUCRU ── */}
           {activeTab === "program" && (

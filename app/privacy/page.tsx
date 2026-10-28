@@ -60,8 +60,7 @@ export default function PrivacyPage() {
         <p className="mb-4 leading-relaxed text-muted-foreground">
           Datele pot fi transferate către sub-procesatorii noștri autorizați. Lista completă este disponibilă la{" "}
           <a href="/subprocessors" className="text-emerald-600 underline dark:text-emerald-400">asesor.ro/subprocessors</a>.
-          Principalii sub-procesatori: <strong className="text-foreground">Clerk Inc.</strong> (autentificare),{" "}
-          <strong className="text-foreground">Supabase</strong> (bază de date, EU-Frankfurt),{" "}
+          Principalii sub-procesatori: <strong className="text-foreground">Supabase</strong> (bază de date și autentificare, EU-Frankfurt),{" "}
           <strong className="text-foreground">Vercel</strong> (hosting).
         </p>
 

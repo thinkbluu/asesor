@@ -344,27 +344,35 @@ grant execute on function public.public_staff(text, uuid[]) to anon, authenticat
 grant execute on function public.public_availability(text, uuid[], uuid, date) to anon, authenticated;
 
 -- ------------------------------------------------------------
--- products_public: view without cost_price for staff/receptionist
--- (security_invoker → the caller's RLS applies; see 004 for the products note)
+-- products_public: view WITHOUT cost_price for staff/receptionist.
+-- NOT security_invoker: owned by postgres so it bypasses the products
+-- table RLS (products is owner/manager-only since 008); rows are filtered
+-- with is_salon_member(salon_id). Select granted to authenticated only.
+-- Mirrors 008_products_cost_privacy.sql.
 -- ------------------------------------------------------------
 
-create or replace view public.products_public
-with (security_invoker = true) as
-  select id,
-         salon_id,
-         name,
-         brand,
-         category,
-         sku,
-         unit,
-         stock,
-         min_stock,
-         retail_price,
-         supplier_name,
-         supplier_phone,
-         supplier_email,
-         notes,
-         active,
-         created_at,
-         updated_at
-  from public.products;
+drop view if exists public.products_public;
+
+create view public.products_public as
+  select p.id,
+         p.salon_id,
+         p.name,
+         p.brand,
+         p.category,
+         p.sku,
+         p.unit,
+         p.stock,
+         p.min_stock,
+         p.retail_price,
+         p.supplier_name,
+         p.supplier_phone,
+         p.supplier_email,
+         p.notes,
+         p.active,
+         p.created_at,
+         p.updated_at
+  from public.products p
+  where public.is_salon_member(p.salon_id);
+
+revoke all on public.products_public from anon, authenticated;
+grant select on public.products_public to authenticated;

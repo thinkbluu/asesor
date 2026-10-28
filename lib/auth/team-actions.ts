@@ -1,0 +1,167 @@
+"use server"
+
+// Team management ("Echipă și acces" tab): invite by email, change role,
+// remove member. All actions re-verify the caller's role server-side and rely
+// on RLS as the backstop.
+
+import { createHash, randomBytes } from "node:crypto"
+import { headers } from "next/headers"
+import { revalidatePath } from "next/cache"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { getSession, MANAGEMENT_ROLES } from "./session"
+import type { AppRole } from "./session"
+
+export type ActionResult = { ok: true } | { ok: false; error: string }
+
+const ROLES: AppRole[] = ["owner", "manager", "staff", "receptionist"]
+
+function isRole(value: unknown): value is AppRole {
+  return typeof value === "string" && ROLES.includes(value as AppRole)
+}
+
+async function requireManagerSession() {
+  const session = await getSession()
+  if (!session) return { error: "Sesiune expirată. Autentifică-te din nou." as const, session: null }
+  if (!session.salon || !session.role || !MANAGEMENT_ROLES.includes(session.role)) {
+    return { error: "Nu ai permisiunea să gestionezi echipa." as const, session: null }
+  }
+  return { error: null, session }
+}
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex")
+}
+
+async function buildInviteUrl(token: string): Promise<string> {
+  const h = await headers()
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000"
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https")
+  return `${proto}://${host}/invite/${token}`
+}
+
+export async function inviteMember(
+  email: string,
+  role: string,
+): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  const guard = await requireManagerSession()
+  if (!guard.session) return { ok: false, error: guard.error }
+
+  const normalizedEmail = email.trim().toLowerCase()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    return { ok: false, error: "Adresa de email nu este validă." }
+  }
+  if (!isRole(role)) {
+    return { ok: false, error: "Rolul selectat nu este valid." }
+  }
+
+  const supabase = await createSupabaseServerClient()
+  const salonId = guard.session.salon!.id
+
+  // One pending invite per email per salon; accept_invite() itself rejects
+  // users who are already members when they redeem the link.
+  const { data: pendingInvite } = await supabase
+    .from("salon_invites")
+    .select("id")
+    .eq("salon_id", salonId)
+    .eq("email", normalizedEmail)
+    .is("accepted_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle()
+  if (pendingInvite) {
+    return { ok: false, error: "Există deja o invitație în așteptare pentru acest email." }
+  }
+
+  // Only the sha256 hash is stored; the raw token exists solely in the
+  // invite link shown to the manager.
+  const token = randomBytes(32).toString("base64url")
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+
+  const { error } = await supabase.from("salon_invites").insert({
+    salon_id: salonId,
+    email: normalizedEmail,
+    role,
+    token_hash: sha256(token),
+    expires_at: expiresAt,
+    invited_by: guard.session.user.id,
+  })
+  if (error) return { ok: false, error: "Invitația nu a putut fi creată. Încearcă din nou." }
+
+  revalidatePath("/app/setari")
+  return { ok: true, url: await buildInviteUrl(token) }
+}
+
+export async function changeMemberRole(memberId: string, role: string): Promise<ActionResult> {
+  const guard = await requireManagerSession()
+  if (!guard.session) return { ok: false, error: guard.error }
+  if (!isRole(role)) return { ok: false, error: "Rolul selectat nu este valid." }
+
+  const supabase = await createSupabaseServerClient()
+  const salonId = guard.session.salon!.id
+
+  const { data: member } = await supabase
+    .from("salon_members")
+    .select("id, role")
+    .eq("id", memberId)
+    .eq("salon_id", salonId)
+    .maybeSingle()
+  if (!member) return { ok: false, error: "Membrul nu a fost găsit." }
+  if (member.role === role) return { ok: true }
+
+  if (member.role === "owner" && role !== "owner") {
+    const { count } = await supabase
+      .from("salon_members")
+      .select("id", { count: "exact", head: true })
+      .eq("salon_id", salonId)
+      .eq("role", "owner")
+    if ((count ?? 0) <= 1) {
+      return { ok: false, error: "Nu poți schimba rolul ultimului proprietar." }
+    }
+  }
+
+  const { error } = await supabase
+    .from("salon_members")
+    .update({ role })
+    .eq("id", memberId)
+    .eq("salon_id", salonId)
+  if (error) return { ok: false, error: "Rolul nu a putut fi schimbat. Încearcă din nou." }
+
+  revalidatePath("/app/setari")
+  return { ok: true }
+}
+
+export async function removeMember(memberId: string): Promise<ActionResult> {
+  const guard = await requireManagerSession()
+  if (!guard.session) return { ok: false, error: guard.error }
+
+  const supabase = await createSupabaseServerClient()
+  const salonId = guard.session.salon!.id
+
+  const { data: member } = await supabase
+    .from("salon_members")
+    .select("id, role")
+    .eq("id", memberId)
+    .eq("salon_id", salonId)
+    .maybeSingle()
+  if (!member) return { ok: false, error: "Membrul nu a fost găsit." }
+
+  if (member.role === "owner") {
+    const { count } = await supabase
+      .from("salon_members")
+      .select("id", { count: "exact", head: true })
+      .eq("salon_id", salonId)
+      .eq("role", "owner")
+    if ((count ?? 0) <= 1) {
+      return { ok: false, error: "Nu poți elimina ultimul proprietar al salonului." }
+    }
+  }
+
+  const { error } = await supabase
+    .from("salon_members")
+    .delete()
+    .eq("id", memberId)
+    .eq("salon_id", salonId)
+  if (error) return { ok: false, error: "Membrul nu a putut fi eliminat. Încearcă din nou." }
+
+  revalidatePath("/app/setari")
+  return { ok: true }
+}

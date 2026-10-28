@@ -26,6 +26,7 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@/components/ui/collapsible"
+import { signOutAction } from "@/lib/auth/actions"
 import { useState, useEffect } from "react"
 
 type NavItem = {
@@ -105,6 +106,7 @@ const bottomNavigation: NavItem[] = [
       { name: "Politici", tab: "politici" },
       { name: "Notificări", tab: "notificari" },
       { name: "Abonament", tab: "abonament" },
+      { name: "Echipă și acces", tab: "echipa" },
       { name: "Permisiuni", tab: "permisiuni" },
     ],
   },
@@ -112,7 +114,13 @@ const bottomNavigation: NavItem[] = [
 
 const STORAGE_KEY = "asesor-sidebar-expanded"
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  salonName: string
+  userFullName: string
+  role: string | null
+}
+
+export function AppSidebar({ salonName, userFullName, role }: AppSidebarProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [collapsed, setCollapsed] = useState(false)
@@ -120,7 +128,13 @@ export function AppSidebar() {
   const [mounted, setMounted] = useState(false)
   const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({})
   const { resolvedTheme, setTheme } = useTheme()
-  const user = { fullName: "Utilizator", email: "" }
+
+  // Staff and receptionists don't get Financiar, Marketing or Setări.
+  const isRestricted = role === "staff" || role === "receptionist"
+  const visibleNavigation = isRestricted
+    ? navigation.filter((item) => !["Financiar", "Marketing"].includes(item.name))
+    : navigation
+  const visibleBottomNavigation = isRestricted ? [] : bottomNavigation
 
   useEffect(() => {
     setMounted(true)
@@ -144,17 +158,14 @@ export function AppSidebar() {
     }
   }, [expandedMap, mounted])
 
-  const handleLogout = () => {}
-
   const toggleExpanded = (href: string, isInSection: boolean) => {
     // Active section is always open per spec — chevron click is a no-op.
     if (isInSection) return
     setExpandedMap((prev) => (prev[href] ? {} : { [href]: true }))
   }
 
-  const displayName = user.fullName || user.email
-  const salonName = "Salonul meu"
-  const initials = (user.fullName[0] ?? "?").toUpperCase()
+  const displayName = userFullName
+  const initials = (displayName[0] ?? "?").toUpperCase()
 
   const activeTabParam = searchParams.get("tab")
 
@@ -315,12 +326,12 @@ export function AppSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4">
-          {navigation.map(renderNavItem)}
+          {visibleNavigation.map(renderNavItem)}
         </nav>
 
         {/* Bottom navigation */}
         <div className="border-t border-sidebar-border px-2 py-4">
-          {bottomNavigation.map(renderNavItem)}
+          {visibleBottomNavigation.map(renderNavItem)}
 
           <div className="mt-4 border-t border-sidebar-border pt-4">
             <div
@@ -366,18 +377,20 @@ export function AppSidebar() {
                 )}
               </button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className={cn(
-                "mt-2 w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                collapsed && "justify-center px-0"
-              )}
-            >
-              <LogOut className="h-4 w-4" />
-              {!collapsed && <span className="ml-2">Deconectare</span>}
-            </Button>
+            <form action={signOutAction}>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="submit"
+                className={cn(
+                  "mt-2 w-full justify-start text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  collapsed && "justify-center px-0"
+                )}
+              >
+                <LogOut className="h-4 w-4" />
+                {!collapsed && <span className="ml-2">Deconectare</span>}
+              </Button>
+            </form>
           </div>
         </div>
       </aside>

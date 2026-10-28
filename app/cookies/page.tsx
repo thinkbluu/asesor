@@ -8,18 +8,18 @@ export const metadata = {
 
 const cookies = [
   {
-    name: "__clerk_db_jwt",
-    provider: "Clerk",
+    name: "sb-* (cookie-uri de autentificare Supabase)",
+    provider: "Supabase",
     category: "Strict necesare",
-    purpose: "Sesiunea de autentificare a utilizatorului. Necesar pentru funcționarea aplicației.",
-    duration: "Sesiune / 7 zile (remember me)",
+    purpose: "Sesiunea de autentificare a utilizatorului (token de acces și de reîmprospătare). Necesar pentru funcționarea aplicației.",
+    duration: "Sesiune / până la 7 zile (sesiune persistentă)",
   },
   {
-    name: "__session",
-    provider: "Clerk",
+    name: "asesor_salon",
+    provider: "ASESOR",
     category: "Strict necesare",
-    purpose: "Identificator sesiune Clerk pentru gestionarea stării de autentificare.",
-    duration: "Sesiune",
+    purpose: "Reține salonul activ pentru utilizatorii care aparțin mai multor saloane.",
+    duration: "Persistent (până la ștergere)",
   },
   {
     name: "_vercel_no_cache",
@@ -111,7 +111,7 @@ export default function CookiesPage() {
           <li>Instala extensii de browser pentru blocarea trackerilor (ex. uBlock Origin).</li>
         </ul>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Rețineți că dezactivarea cookie-urilor strict necesare (ex. cele de sesiune Clerk) va face imposibilă autentificarea în aplicație.
+          Rețineți că dezactivarea cookie-urilor strict necesare (ex. cele de sesiune Supabase) va face imposibilă autentificarea în aplicație.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">Contact</h2>

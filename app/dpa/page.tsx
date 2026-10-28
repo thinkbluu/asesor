@@ -59,7 +59,7 @@ export default function DPAPage() {
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">6. Transferuri internaționale</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
-          Datele sunt stocate prioritar în EU (Supabase Frankfurt). Unde sunt implicați sub-procesatori din afara SEE (ex. Clerk Inc., SUA), transferurile se realizează pe baza Clauzelor Contractuale Standard adoptate prin Decizia 2021/914/EU a Comisiei Europene.
+          Datele sunt stocate prioritar în EU (Supabase Frankfurt). Unde sunt implicați sub-procesatori din afara SEE (ex. Resend Inc., SUA), transferurile se realizează pe baza Clauzelor Contractuale Standard adoptate prin Decizia 2021/914/EU a Comisiei Europene.
         </p>
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">7. Durata</h2>

@@ -559,11 +559,13 @@ create policy day_closes_delete on public.day_closes
   using (public.has_salon_role(salon_id, array['owner', 'manager']::public.member_role[]));
 
 -- ------------------------------------------------------------
--- products: direct table access for owner/manager. Other roles read through
--- the products_public view (005), which omits cost_price.
--- NOTE: Postgres column grants cannot distinguish app roles (all app users are
--- the `authenticated` DB role), so cost_price confidentiality for staff/
--- receptionist is enforced at the application layer via products_public.
+-- products: direct table access for owner/manager ONLY (all four
+-- operations). Other roles read through the products_public view (005),
+-- which is owned by postgres (no security_invoker), bypasses this table's
+-- RLS, filters rows with is_salon_member(salon_id) and omits cost_price —
+-- so staff/receptionist can never read cost_price through PostgREST.
+-- The authoritative policies live in 008_products_cost_privacy.sql; the
+-- ones below are kept in sync for a fresh 001→008 run.
 -- ------------------------------------------------------------
 
 drop policy if exists products_select on public.products;
@@ -573,12 +575,12 @@ create policy products_select on public.products
 drop policy if exists products_insert on public.products;
 create policy products_insert on public.products
   for insert to authenticated
-  with check (public.has_salon_role(salon_id, array['owner', 'manager', 'receptionist']::public.member_role[]));
+  with check (public.has_salon_role(salon_id, array['owner', 'manager']::public.member_role[]));
 drop policy if exists products_update on public.products;
 create policy products_update on public.products
   for update to authenticated
-  using (public.has_salon_role(salon_id, array['owner', 'manager', 'receptionist']::public.member_role[]))
-  with check (public.has_salon_role(salon_id, array['owner', 'manager', 'receptionist']::public.member_role[]));
+  using (public.has_salon_role(salon_id, array['owner', 'manager']::public.member_role[]))
+  with check (public.has_salon_role(salon_id, array['owner', 'manager']::public.member_role[]));
 drop policy if exists products_delete on public.products;
 create policy products_delete on public.products
   for delete to authenticated

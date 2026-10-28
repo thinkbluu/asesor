@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { cn } from "@/lib/utils"
+import { ForbiddenBanner } from "@/components/app/forbidden-banner"
 
 // ── Data imports from all modules ─────────────────────────────────────────────
 import { STATUS_CONFIG, toDateString, type Appointment, type AppointmentStatus } from "@/lib/programari-data"
@@ -358,6 +359,7 @@ export default function DashboardPage() {
 
   return (
     <div className="p-4 pt-16 lg:p-8 lg:pt-8 max-w-[1600px]">
+      <ForbiddenBanner />
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>

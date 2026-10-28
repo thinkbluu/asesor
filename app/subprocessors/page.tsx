@@ -8,15 +8,9 @@ export const metadata = {
 
 const subprocessors = [
   {
-    name: "Clerk Inc.",
-    scope: "Autentificare utilizatori, gestionarea sesiunilor și a conturilor",
-    location: "SUA (cu Clauze Contractuale Standard — SCC)",
-    dpa: "https://clerk.com/legal/dpa",
-  },
-  {
     name: "Supabase Inc.",
-    scope: "Bază de date relațională, stocare fișiere, autorizare Row Level Security",
-    location: "EU — Frankfurt, Germania (AWS eu-central-1)",
+    scope: "Bază de date relațională, autentificare utilizatori, gestionarea sesiunilor, stocare fișiere, autorizare Row Level Security",
+    location: "EU — Frankfurt, Germania (AWS eu-central-1); companie înregistrată în SUA (cu Clauze Contractuale Standard — SCC)",
     dpa: "https://supabase.com/privacy",
   },
   {

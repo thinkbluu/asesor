@@ -15,7 +15,8 @@ fără modificări.
 | 5 | `005_public_rpc.sql` | RPC-uri publice pentru pagina de programare (`public_salon_profile`, `public_services`, `public_staff`, `public_availability`) + view-ul `products_public` |
 | 6 | `006_storage.sql` | Bucket-uri (`client-photos`, `receipts` private; `salon-public` public) + politici pe `storage.objects` |
 | 7 | `007_seed_demo.sql` | Salon demo `salonul-ana` (3 staff, 8 servicii, program, 5 clienți, 10 programări) |
-| 8 | `tests/rls_isolation.sql` | Test de izolare multi-tenant (rulează după 007) |
+| 8 | `008_products_cost_privacy.sql` | Confidențialitate `cost_price`: tabelul `products` doar owner/manager; `products_public` fără `security_invoker`, filtrat pe membership, fără `cost_price` |
+| 9 | `tests/rls_isolation.sql` | Test de izolare multi-tenant (rulează după 008) |
 
 ## Cum rulezi în Supabase SQL Editor
 
@@ -33,6 +34,10 @@ fără modificări.
 
 - **Nu există încă UI conectat la Supabase.** Codul de aplicație va fi conectat
   într-un pas ulterior; `lib/supabase/types.ts` este deja aliniat cu schema.
+- `products_public` (005/008) NU folosește `security_invoker`: e deținut de
+  postgres, ocolește RLS-ul tabelului `products` (care e owner/manager-only),
+  filtrează rândurile cu `is_salon_member(salon_id)` și nu expune `cost_price`.
+  Select pe view doar pentru `authenticated`.
 - `contact_requests` și `rate_limits` au RLS activat dar **fără politici** —
   accesibile doar prin service role (server).
 - Crearea programărilor din pagina publică NU este expusă anon — se va face

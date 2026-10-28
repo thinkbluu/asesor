@@ -1325,6 +1325,10 @@ export type Database = {
       }
     }
     Views: {
+      // products_public (scripts/008): postgres-owned view, NOT security_invoker.
+      // Bypasses the products table RLS (owner/manager-only), filters rows with
+      // is_salon_member(salon_id), and deliberately omits cost_price.
+      // Select granted to authenticated only.
       products_public: {
         Row: {
           id: string
