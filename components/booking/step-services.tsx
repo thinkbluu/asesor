@@ -9,45 +9,48 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Input } from "@/components/ui/input"
-import {
-  getServiceByName,
-  formatPriceRON,
-  formatDurationMin,
-} from "@/lib/booking-logic"
+import { formatPriceRON, formatDurationMin, type BookingService } from "@/lib/booking-logic"
 import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
-
-type ServiceCategory = {
-  name: string
-  services: string[]
-}
-
-const SERVICE_CATEGORIES: ServiceCategory[] = []
 
 export function StepServices({
   state,
   update,
+  services,
 }: {
   state: BookingState
   update: (patch: Partial<BookingState>) => void
+  services: BookingService[]
 }) {
   const [search, setSearch] = useState("")
 
-  const filteredCategories = useMemo(() => {
-    if (!search.trim()) return SERVICE_CATEGORIES
-    const q = search.toLowerCase().trim()
-    return SERVICE_CATEGORIES.map((cat) => ({
-      ...cat,
-      services: cat.services.filter((name) => name.toLowerCase().includes(q)),
-    })).filter((cat) => cat.services.length > 0)
-  }, [search])
+  const categories = useMemo(() => {
+    const map = new Map<string, BookingService[]>()
+    for (const s of services) {
+      const list = map.get(s.category) ?? []
+      list.push(s)
+      map.set(s.category, list)
+    }
+    return Array.from(map.entries()).map(([name, list]) => ({ name, services: list }))
+  }, [services])
 
-  const toggleService = (name: string) => {
-    const selected = new Set(state.serviceNames)
-    if (selected.has(name)) selected.delete(name)
-    else selected.add(name)
+  const filteredCategories = useMemo(() => {
+    if (!search.trim()) return categories
+    const q = search.toLowerCase().trim()
+    return categories
+      .map((cat) => ({
+        ...cat,
+        services: cat.services.filter((s) => s.name.toLowerCase().includes(q)),
+      }))
+      .filter((cat) => cat.services.length > 0)
+  }, [categories, search])
+
+  const toggleService = (id: string) => {
+    const selected = new Set(state.serviceIds)
+    if (selected.has(id)) selected.delete(id)
+    else selected.add(id)
     update({
-      serviceNames: Array.from(selected),
+      serviceIds: Array.from(selected),
       // Reset downstream selections when services change
       staffId: null,
       date: null,
@@ -58,15 +61,15 @@ export function StepServices({
   const totals = useMemo(() => {
     let d = 0
     let p = 0
-    for (const name of state.serviceNames) {
-      const s = getServiceByName(name)
+    for (const id of state.serviceIds) {
+      const s = services.find((x) => x.id === id)
       if (s) {
-        d += s.duration
+        d += s.durationMin
         p += s.price
       }
     }
     return { duration: d, price: p }
-  }, [state.serviceNames])
+  }, [state.serviceIds, services])
 
   return (
     <div className="space-y-6">
@@ -93,11 +96,11 @@ export function StepServices({
       ) : (
         <Accordion
           type="multiple"
-          defaultValue={SERVICE_CATEGORIES.map((c) => c.name)}
+          defaultValue={categories.map((c) => c.name)}
           className="space-y-2"
         >
           {filteredCategories.map((cat) => {
-            const selectedInCat = cat.services.filter((s) => state.serviceNames.includes(s)).length
+            const selectedInCat = cat.services.filter((s) => state.serviceIds.includes(s.id)).length
             return (
               <AccordionItem
                 key={cat.name}
@@ -116,42 +119,40 @@ export function StepServices({
                 </AccordionTrigger>
                 <AccordionContent className="pb-0">
                   <ul className="divide-y divide-zinc-100 border-t border-zinc-100">
-                    {cat.services.map((name) => {
-                      const svc = getServiceByName(name)
-                      if (!svc) return null
-                      const isSelected = state.serviceNames.includes(name)
+                    {cat.services.map((svc) => {
+                      const selected = state.serviceIds.includes(svc.id)
                       return (
-                        <li key={name}>
+                        <li key={svc.id}>
                           <button
                             type="button"
-                            onClick={() => toggleService(name)}
+                            onClick={() => toggleService(svc.id)}
                             className={cn(
-                              "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors",
-                              "hover:bg-zinc-50",
-                              isSelected && "bg-emerald-50/50",
+                              "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-zinc-50",
+                              selected && "bg-emerald-50/60",
                             )}
                           >
                             <div
                               className={cn(
-                                "flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
-                                isSelected
+                                "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+                                selected
                                   ? "border-emerald-600 bg-emerald-600 text-white"
                                   : "border-zinc-300 bg-white",
                               )}
                             >
-                              {isSelected && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                              {selected && <Check className="h-3 w-3" strokeWidth={3} />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="truncate text-base font-medium text-zinc-900">
-                                {name}
-                              </div>
-                              <div className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
+                              <div className="text-sm font-medium text-zinc-900">{svc.name}</div>
+                              <div className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
                                 <Clock className="h-3 w-3" />
-                                <span>{formatDurationMin(svc.duration)}</span>
+                                {formatDurationMin(svc.durationMin)}
                               </div>
                             </div>
-                            <div className="shrink-0 text-base font-semibold text-zinc-900">
+                            <div className="shrink-0 text-sm font-semibold text-zinc-900">
                               {formatPriceRON(svc.price)}
+                              {svc.priceFrom && (
+                                <span className="ml-1 text-xs font-normal text-zinc-400">de la</span>
+                              )}
                             </div>
                           </button>
                         </li>
@@ -165,21 +166,12 @@ export function StepServices({
         </Accordion>
       )}
 
-      {/* Running total (desktop - mobile sees the sticky bar) */}
-      {state.serviceNames.length > 0 && (
-        <div className="hidden items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 md:flex">
-          <div>
-            <div className="text-sm font-medium text-emerald-700">
-              {state.serviceNames.length}{" "}
-              {state.serviceNames.length === 1 ? "serviciu selectat" : "servicii selectate"}
-            </div>
-            <div className="mt-0.5 text-xs text-emerald-700/80">
-              Durată totală: {formatDurationMin(totals.duration)}
-            </div>
+      {totals.duration > 0 && (
+        <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+          <div className="text-sm font-medium text-emerald-900">
+            Total selectat · {formatDurationMin(totals.duration)}
           </div>
-          <div className="text-2xl font-bold text-emerald-700">
-            {formatPriceRON(totals.price)}
-          </div>
+          <div className="text-lg font-bold text-emerald-700">{formatPriceRON(totals.price)}</div>
         </div>
       )}
     </div>

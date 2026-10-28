@@ -14,62 +14,67 @@ import {
   Phone,
   MapPin,
   Check,
+  Link2,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getFullName, type StaffMember } from "@/lib/echipa-data"
+import type { SalonInfo, BookingService } from "@/lib/booking-logic"
 import {
-  getServiceByName,
   formatPriceRON,
   formatDurationMin,
   formatDateLong,
-  generateConfirmationNumber,
   generateICS,
-  type SalonInfo,
 } from "@/lib/booking-logic"
 import type { BookingState } from "./booking-flow"
 
-const STAFF_DATA: StaffMember[] = []
+type SubmitResult =
+  | { ok: false; code: string; message: string }
+  | null
 
 function Review({
   salon,
   state,
-  update,
+  services,
+  staffName,
+  onSubmit,
 }: {
   salon: SalonInfo
   state: BookingState
-  update: (patch: Partial<BookingState>) => void
+  services: BookingService[]
+  staffName: string | null
+  onSubmit: () => Promise<SubmitResult>
 }) {
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const services = useMemo(
+  const selectedServices = useMemo(
     () =>
-      state.serviceNames
-        .map((name) => getServiceByName(name))
-        .filter((s): s is NonNullable<ReturnType<typeof getServiceByName>> => !!s),
-    [state.serviceNames],
+      state.serviceIds
+        .map((id) => services.find((s) => s.id === id))
+        .filter((s): s is BookingService => !!s),
+    [state.serviceIds, services],
   )
 
   const totals = useMemo(() => {
     let d = 0
     let p = 0
-    for (const s of services) {
-      d += s.duration
+    for (const s of selectedServices) {
+      d += s.durationMin
       p += s.price
     }
     return { duration: d, price: p }
-  }, [services])
-
-  const staff = useMemo(() => {
-    if (!state.staffId) return null
-    return STAFF_DATA.find((s) => s.id === state.staffId) ?? null
-  }, [state.staffId])
+  }, [selectedServices])
 
   const confirmBooking = async () => {
     setSubmitting(true)
-    // Simulated persistence — in a real app, POST to /api/bookings
-    await new Promise((r) => setTimeout(r, 600))
-    update({ confirmationNumber: generateConfirmationNumber() })
-    setSubmitting(false)
+    setError(null)
+    const res = await onSubmit()
+    if (res && !res.ok) {
+      setError(res.message)
+      setSubmitting(false)
+      return
+    }
+    // On success the flow swaps to the Success screen; keep submitting state
+    // until then to avoid a double submit.
   }
 
   return (
@@ -77,6 +82,12 @@ function Review({
       <p className="text-sm text-zinc-600 md:text-base">
         Verifică detaliile programării înainte de a confirma.
       </p>
+
+      {error && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
+          {error}
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-4">
@@ -94,12 +105,13 @@ function Review({
             {state.time ?? "—"} · {formatDurationMin(totals.duration)}
           </SummaryRow>
           <SummaryRow icon={User} label="Specialist">
-            {staff ? getFullName(staff) : "Fără preferință (alegem noi)"}
+            {staffName ?? "Oricine e disponibil (alegem noi)"}
           </SummaryRow>
+
           <SummaryRow icon={Scissors} label="Servicii">
             <ul className="space-y-1.5">
-              {services.map((s) => (
-                <li key={s.name} className="flex items-center justify-between gap-3">
+              {selectedServices.map((s) => (
+                <li key={s.id} className="flex items-center justify-between gap-3">
                   <span className="text-zinc-700">{s.name}</span>
                   <span className="shrink-0 font-medium text-zinc-900">
                     {formatPriceRON(s.price)}
@@ -124,11 +136,8 @@ function Review({
       {/* Cancellation policy */}
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
         <div className="flex items-start gap-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-amber-900">Politică de anulare</div>
-            <p className="mt-1 text-sm text-amber-900/90">{salon.cancellationPolicy}</p>
-          </div>
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <p className="text-sm text-amber-900">{salon.cancellationPolicy}</p>
         </div>
       </div>
 
@@ -136,32 +145,10 @@ function Review({
         size="lg"
         disabled={submitting}
         onClick={confirmBooking}
-        className="h-14 w-full bg-emerald-600 text-base font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-600/60"
+        className="h-12 w-full bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 disabled:bg-zinc-300 sm:w-auto sm:px-10"
       >
-        {submitting ? "Se procesează..." : "Confirmă programarea"}
+        {submitting ? "Se trimite..." : "Confirmă programarea"}
       </Button>
-    </div>
-  )
-}
-
-function SummaryRow({
-  icon: Icon,
-  label,
-  children,
-}: {
-  icon: typeof Calendar
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex items-start gap-4 px-5 py-4">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
-        <Icon className="h-4 w-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</dt>
-        <dd className="mt-1 text-sm text-zinc-900">{children}</dd>
-      </div>
     </div>
   )
 }
@@ -176,33 +163,30 @@ function Success({
   onReset: () => void
 }) {
   const [copied, setCopied] = useState(false)
-  const services = state.serviceNames
-    .map((name) => getServiceByName(name))
-    .filter((s): s is NonNullable<ReturnType<typeof getServiceByName>> => !!s)
-  const totalDuration = services.reduce((sum, s) => sum + s.duration, 0)
-  const totalPrice = services.reduce((sum, s) => sum + s.price, 0)
-  const staff = state.staffId ? STAFF_DATA.find((s) => s.id === state.staffId) : null
+  const result = state.result!
+  const date = result.startsAt.slice(0, 10)
+  const time = result.startsAt.slice(11, 16)
 
   const icsHref = useMemo(() => {
-    if (!state.date || !state.time) return "#"
     const ics = generateICS({
-      title: `Programare ${salon.name}`,
-      description: `Servicii: ${services.map((s) => s.name).join(", ")}\nSpecialist: ${staff ? getFullName(staff) : "Fără preferință"}\nCod confirmare: ${state.confirmationNumber}`,
-      location: salon.address,
-      date: state.date,
-      time: state.time,
-      durationMin: totalDuration,
+      title: `${salon.name} — programare`,
+      description: `Cod confirmare: ${result.code}. Servicii: ${result.services.map((s) => s.name).join(", ")}.`,
+      location: `${salon.name}, ${salon.address}`,
+      date,
+      time,
+      durationMin: result.durationMin,
     })
     return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`
-  }, [state, salon, services, staff, totalDuration])
+  }, [salon, result, date, time])
 
   const copyConfirmation = async () => {
-    if (!state.confirmationNumber) return
     try {
-      await navigator.clipboard.writeText(state.confirmationNumber)
+      await navigator.clipboard.writeText(result.code)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {}
+    } catch {
+      // clipboard unavailable — non-critical
+    }
   }
 
   return (
@@ -232,10 +216,14 @@ function Success({
             <CheckCircle2 className="h-8 w-8 text-emerald-600" strokeWidth={2.5} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
-            Programare confirmată!
+            {result.status === "in_asteptare"
+              ? "Programare trimisă spre confirmare!"
+              : "Programare confirmată!"}
           </h1>
           <p className="mt-2 text-base text-zinc-600">
-            Te așteptăm la {salon.name}. Toate detaliile sunt mai jos.
+            {result.status === "in_asteptare"
+              ? `${salon.name} va confirma programarea în cel mai scurt timp.`
+              : `Te așteptăm la ${salon.name}. Toate detaliile sunt mai jos.`}
           </p>
         </div>
 
@@ -246,7 +234,7 @@ function Success({
               Cod confirmare
             </div>
             <div className="mt-0.5 font-mono text-lg font-semibold text-zinc-900">
-              {state.confirmationNumber}
+              {result.code}
             </div>
           </div>
           <Button
@@ -273,17 +261,17 @@ function Success({
         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
           <dl className="divide-y divide-zinc-100">
             <SummaryRow icon={Calendar} label="Data">
-              <span className="capitalize">{state.date ? formatDateLong(state.date) : "—"}</span>
+              <span className="capitalize">{formatDateLong(date)}</span>
             </SummaryRow>
             <SummaryRow icon={Clock} label="Ora">
-              {state.time} · {formatDurationMin(totalDuration)}
+              {time} · {formatDurationMin(result.durationMin)}
             </SummaryRow>
             <SummaryRow icon={User} label="Specialist">
-              {staff ? getFullName(staff) : "Fără preferință"}
+              {result.staffFirstName || "Oricine e disponibil"}
             </SummaryRow>
             <SummaryRow icon={Scissors} label="Servicii">
               <ul className="space-y-1">
-                {services.map((s) => (
+                {result.services.map((s) => (
                   <li key={s.name} className="flex items-center justify-between gap-3">
                     <span className="text-zinc-700">{s.name}</span>
                     <span className="shrink-0 font-medium text-zinc-900">
@@ -308,7 +296,9 @@ function Success({
 
           <div className="flex items-center justify-between border-t border-zinc-100 bg-emerald-50 px-5 py-4">
             <div className="text-sm font-medium text-emerald-900">Total</div>
-            <div className="text-2xl font-bold text-emerald-700">{formatPriceRON(totalPrice)}</div>
+            <div className="text-2xl font-bold text-emerald-700">
+              {formatPriceRON(result.totalPrice)}
+            </div>
           </div>
         </div>
 
@@ -316,30 +306,31 @@ function Success({
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <a
             href={icsHref}
-            download={`programare-${state.confirmationNumber}.ics`}
+            download={`programare-${result.code}.ics`}
             className="flex h-12 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50"
           >
             <CalendarPlus className="h-4 w-4" />
             Adaugă în calendar
           </a>
-          <Button
-            onClick={onReset}
-            className="h-12 bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
+          <a
+            href={result.managePath}
+            className="flex h-12 items-center justify-center gap-2 rounded-lg bg-emerald-600 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
           >
-            Programează din nou
-          </Button>
+            <Link2 className="h-4 w-4" />
+            Gestionează programarea
+          </a>
         </div>
 
         <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
           <p>
-            Vrei să modifici sau să anulezi programarea? Sună la{" "}
+            Vrei să modifici sau să anulezi programarea? Folosește linkul de mai sus sau sună la{" "}
             <a
               href={`tel:${salon.phone.replace(/\s/g, "")}`}
               className="font-medium text-emerald-700 hover:text-emerald-800"
             >
               {salon.phone}
-            </a>{" "}
-            cu minim 4 ore înainte de ora programată.
+            </a>
+            .
           </p>
         </div>
       </main>
@@ -347,6 +338,26 @@ function Success({
       <footer className="border-t border-zinc-200 px-4 py-4 text-center text-xs text-zinc-500">
         Programare gestionată prin <span className="font-semibold text-zinc-700">ASESOR</span>
       </footer>
+    </div>
+  )
+}
+
+function SummaryRow({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: typeof Calendar
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex items-start gap-3 px-5 py-3.5">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400" />
+      <div className="min-w-0 flex-1">
+        <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</div>
+        <div className="mt-0.5 text-sm text-zinc-900">{children}</div>
+      </div>
     </div>
   )
 }
