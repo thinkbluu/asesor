@@ -12,6 +12,7 @@ import {
   mapServiceRowsToSetariServices,
 } from "@/lib/mappers/setari"
 import { SetariView } from "@/components/app/setari-view"
+import { readNotificationSettings } from "@/lib/messaging/settings"
 
 export const metadata: Metadata = {
   title: "Setări | ASESOR",
@@ -45,6 +46,7 @@ export default async function SetariPage() {
       staff={state.staff.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}`.trim() }))}
       products={products}
       deletedAt={salon.deleted_at}
+      notifications={readNotificationSettings((salonRow ?? salon).booking_settings)}
     />
   )
 }

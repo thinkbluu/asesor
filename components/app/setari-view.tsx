@@ -30,7 +30,6 @@ import {
   Copy,
   Check,
   AlertCircle,
-  MessageSquare,
   TrendingUp,
   ChevronRight,
   Download,
@@ -345,7 +344,7 @@ export function SetariView({
         {/* Content */}
         <main className="flex-1 overflow-auto px-4 py-6 lg:px-8">
 
-          {/* ── PROFIL SALON ── */}
+          {/* ─��� PROFIL SALON ── */}
           {activeTab === "profil" && (
             <div className="max-w-3xl space-y-6">
               <Card>
