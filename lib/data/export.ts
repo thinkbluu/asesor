@@ -46,7 +46,15 @@ type Row = Record<string, unknown>
 
 async function fetchAll(table: string, salonId: string, columns: string): Promise<Row[]> {
   const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase.from(table).select(columns).eq("salon_id", salonId)
+  // Dynamic table/columns across the export tables — the typed client can't
+  // express a union query builder, so cast at this single boundary.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const from = (supabase.from as any).bind(supabase) as (t: string) => {
+    select: (c: string) => {
+      eq: (col: string, val: string) => PromiseLike<{ data: unknown[] | null; error: { message: string } | null }>
+    }
+  }
+  const { data, error } = await from(table).select(columns).eq("salon_id", salonId)
   if (error) throw dbError(`export.${table}`, error)
   return (data ?? []) as Row[]
 }

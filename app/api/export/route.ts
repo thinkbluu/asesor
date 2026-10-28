@@ -1,6 +1,6 @@
 import "server-only" // eslint-disable-line
 
-import archiver from "archiver"
+import { ZipArchive } from "archiver"
 import { Readable } from "node:stream"
 
 import { requireRole } from "@/lib/auth/session"
@@ -27,7 +27,7 @@ export async function GET() {
     files: result.data.map((f) => f.name),
   })
 
-  const archive = archiver("zip", { zlib: { level: 9 } })
+  const archive = new ZipArchive({ zlib: { level: 9 } })
   for (const file of result.data) {
     archive.append(file.csv, { name: file.name })
   }
