@@ -44,12 +44,13 @@ export interface SetariState {
   staffServices: Pick<StaffServiceRow, "service_id" | "staff_id" | "price_override" | "duration_override">[]
   serviceProducts: Pick<ServiceProductRow, "service_id" | "product_id" | "quantity_per_use">[]
   staff: Pick<StaffRow, "id" | "first_name" | "last_name">[]
+  hours: Database["public"]["Tables"]["salon_hours"]["Row"][]
 }
 
 export async function loadSetariState(salonId: string): Promise<SetariState> {
   const supabase = await createSupabaseServerClient()
 
-  const [categoriesRes, servicesRes, staffServicesRes, serviceProductsRes, staffRes] = await Promise.all([
+  const [categoriesRes, servicesRes, staffServicesRes, serviceProductsRes, staffRes, hoursRes] = await Promise.all([
     supabase.from("service_categories").select("*").eq("salon_id", salonId).order("sort_order"),
     supabase.from("services").select("*").eq("salon_id", salonId).order("sort_order"),
     supabase.from("staff_services").select("service_id, staff_id, price_override, duration_override").eq("salon_id", salonId),
@@ -60,6 +61,7 @@ export async function loadSetariState(salonId: string): Promise<SetariState> {
       .eq("salon_id", salonId)
       .is("deleted_at", null)
       .order("sort_order"),
+    supabase.from("salon_hours").select("*").eq("salon_id", salonId).order("weekday"),
   ])
 
   if (categoriesRes.error) console.error("[v0] loadSetariState/categories:", categoriesRes.error)
@@ -67,6 +69,7 @@ export async function loadSetariState(salonId: string): Promise<SetariState> {
   if (staffServicesRes.error) console.error("[v0] loadSetariState/staffServices:", staffServicesRes.error)
   if (serviceProductsRes.error) console.error("[v0] loadSetariState/serviceProducts:", serviceProductsRes.error)
   if (staffRes.error) console.error("[v0] loadSetariState/staff:", staffRes.error)
+  if (hoursRes.error) console.error("[v0] loadSetariState/hours:", hoursRes.error)
 
   return {
     categories: (categoriesRes.data ?? []) as ServiceCategoryRow[],
@@ -74,6 +77,7 @@ export async function loadSetariState(salonId: string): Promise<SetariState> {
     staffServices: (staffServicesRes.data ?? []) as SetariState["staffServices"],
     serviceProducts: (serviceProductsRes.data ?? []) as SetariState["serviceProducts"],
     staff: (staffRes.data ?? []) as SetariState["staff"],
+    hours: (hoursRes.data ?? []) as SetariState["hours"],
   }
 }
 
@@ -362,7 +366,7 @@ export async function reorderSetariCategories(salonId: string, input: SetariReor
   return { ok: true }
 }
 
-// ─── Produse (pentru consumul pe servicii) ───────────────────────────────────
+// ���── Produse (pentru consumul pe servicii) ───────────────────────────────────
 
 export async function loadSetariProducts(salonId: string): Promise<{ id: string; name: string }[]> {
   const supabase = await createSupabaseServerClient()
