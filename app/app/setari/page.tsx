@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { requireRole } from "@/lib/auth/session"
 import { loadSetariState, loadSetariProducts, getSalonRow } from "@/lib/data/setari"
+import { getReviewsStatsForSalon } from "@/lib/data/feedback"
 import {
   mapSalonToProfil,
   mapHoursRowsToSetariSchedule,
@@ -24,10 +25,11 @@ export default async function SetariPage() {
   const salon = session.salon
   if (!salon) return null
 
-  const [state, salonRow, products] = await Promise.all([
+  const [state, salonRow, products, reviewsStats] = await Promise.all([
     loadSetariState(salon.id),
     getSalonRow(salon.id),
     loadSetariProducts(salon.id),
+    getReviewsStatsForSalon(salon.id),
   ])
 
   return (
@@ -37,6 +39,7 @@ export default async function SetariPage() {
       politici={mapSalonToPolitici(salonRow ?? salon)}
       loyalty={mapLoyaltyJson((salonRow ?? salon).loyalty_config)}
       reviews={mapReviewsJson(salonRow ?? salon)}
+      reviewsStats={reviewsStats}
       categories={mapCategoryRowsToSetariCategories(state.categories)}
       services={mapServiceRowsToSetariServices(state.services, state.staffServices, state.serviceProducts)}
       staff={state.staff.map((s) => ({ id: s.id, name: `${s.first_name} ${s.last_name}`.trim() }))}

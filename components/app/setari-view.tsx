@@ -47,7 +47,7 @@ import { SettingsReviews } from "@/components/app/settings-reviews"
 import { SettingsEchipa } from "@/components/app/settings-echipa"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
 import type { LoyaltyConfig } from "@/lib/loyalty"
-import type { ReviewsConfig } from "@/lib/reviews"
+import type { ReviewsConfig, ReviewsStats } from "@/lib/reviews"
 import {
   saveSetariProfilAction,
   saveSetariProgramAction,
@@ -74,6 +74,7 @@ interface SetariViewProps {
   politici: SetariPolitici
   loyalty: LoyaltyConfig
   reviews: ReviewsConfig
+  reviewsStats: ReviewsStats
   categories: SetariCategory[]
   services: SetariService[]
   staff: { id: string; name: string }[]
@@ -130,6 +131,7 @@ export function SetariView({
   politici: initialPolitici,
   loyalty,
   reviews,
+  reviewsStats,
   categories,
   services,
   staff,
@@ -837,7 +839,7 @@ export function SetariView({
 
           {/* ── RECENZII GOOGLE ── */}
           {activeTab === "recenzii" && (
-            <SettingsReviews initialConfig={reviews} />
+            <SettingsReviews initialConfig={reviews} stats={reviewsStats} />
           )}
 
           {/* ── ABONAMENT ── */}

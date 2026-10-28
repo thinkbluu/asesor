@@ -10,11 +10,17 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Star, ExternalLink, Clock, Shield, MessageSquare } from "lucide-react"
-import { DEFAULT_REVIEWS_CONFIG, type ReviewsConfig } from "@/lib/reviews"
+import { DEFAULT_REVIEWS_CONFIG, type ReviewsConfig, type ReviewsStats } from "@/lib/reviews"
 import { cn } from "@/lib/utils"
 import { saveSetariReviewsAction } from "@/app/app/setari/actions"
 
-export function SettingsReviews({ initialConfig }: { initialConfig: ReviewsConfig }) {
+export function SettingsReviews({
+  initialConfig,
+  stats,
+}: {
+  initialConfig: ReviewsConfig
+  stats: ReviewsStats
+}) {
   const [cfg, setCfg] = useState<ReviewsConfig>(initialConfig)
   const [saving, setSaving] = useState(false)
 
@@ -43,6 +49,45 @@ export function SettingsReviews({ initialConfig }: { initialConfig: ReviewsConfi
 
   return (
     <div className="max-w-3xl space-y-6">
+      {/* Real feedback received so far */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MessageSquare className="h-4 w-4 text-emerald-600" />
+            Feedback primit
+          </CardTitle>
+          <CardDescription>
+            Răspunsurile reale din sondajele trimise clienților după programările finalizate.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {stats.total === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Încă nu ai primit feedback. Sondajele pleacă automat după fiecare programare încasată.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-bold">{stats.averageRating.toFixed(1)}</span>
+                <span className="text-sm text-muted-foreground">
+                  din {stats.total} {stats.total === 1 ? "răspuns" : "răspunsuri"}
+                </span>
+              </div>
+              {stats.recentComments.length > 0 && (
+                <ul className="space-y-2">
+                  {stats.recentComments.slice(0, 3).map((c, i) => (
+                    <li key={i} className="rounded-lg border bg-muted/30 p-3 text-xs">
+                      <span className="font-medium">{c.rating}★</span>{" "}
+                      <span className="text-muted-foreground">{c.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Master toggle */}
       <Card>
         <CardHeader>
