@@ -206,3 +206,15 @@ export const setariReorderSchema = z.object({
 })
 
 export type SetariReorderInput = z.infer<typeof setariReorderSchema>
+
+// ─── Notificări (P12) ────────────────────────────────────────────────────────
+
+export const notificationSettingsSchema = z.object({
+  confirmare: z.boolean(),
+  reamintire: z.boolean(),
+  anulare: z.boolean(),
+  programare_noua: z.boolean(),
+  feedback: z.boolean(),
+  stoc_scazut: z.boolean(),
+})
+export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>

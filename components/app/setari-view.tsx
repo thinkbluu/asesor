@@ -49,6 +49,8 @@ import { SettingsReviews } from "@/components/app/settings-reviews"
 import { SettingsEchipa } from "@/components/app/settings-echipa"
 import { SettingsSecurity } from "@/components/app/settings-security"
 import { SettingsPrivacy } from "@/components/app/settings-privacy"
+import { SettingsNotificari } from "@/components/app/settings-notificari"
+import type { NotificationSettings } from "@/lib/messaging/settings"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
 import type { LoyaltyConfig } from "@/lib/loyalty"
 import type { ReviewsConfig, ReviewsStats } from "@/lib/reviews"
@@ -84,6 +86,7 @@ interface SetariViewProps {
   staff: { id: string; name: string }[]
   products: { id: string; name: string }[]
   deletedAt: string | null
+  notifications: NotificationSettings
 }
 
 // --- Initial state ---
@@ -130,7 +133,7 @@ const TABS = [
 ]
 
 // Tab-urile care se salvează din panoul lor propriu (nu din butonul global).
-const SELF_SAVING_TABS = new Set(["servicii", "echipa", "loialitate", "recenzii", "date"])
+const SELF_SAVING_TABS = new Set(["servicii", "echipa", "loialitate", "recenzii", "date", "notificari"])
 
 export function SetariView({
   profil: initialProfil,
@@ -144,6 +147,7 @@ export function SetariView({
   staff,
   products,
   deletedAt,
+  notifications,
 }: SetariViewProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -189,16 +193,8 @@ export function SetariView({
     depositAmount: "50",
   })
 
-  // Notificari state
-  const [notif, setNotif] = useState({
-    smsConfirmare: true,
-    emailConfirmare: true,
-    smsReminder: true,
-    smsReminderHours: "24",
-    emailReminder: true,
-    noShowAlert: true,
-    dailySummary: false,
-  })
+  // Notificari state — the real email toggles live in SettingsNotificari
+  // (self-saving tab); no local state needed here anymore.
 
   // Roles state
   const [roles, setRoles] = useState<RolePermissions[]>(initialRoles)
@@ -268,8 +264,6 @@ export function SetariView({
     )
     markDirty()
   }
-
-  const smsPreview = `Buna ziua, {{nume_client}}! Va asteptam la {{salon}} pe {{data}} la ora {{ora}} pentru {{serviciu}}. Va multumim!`
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -765,75 +759,7 @@ export function SetariView({
           {/* ── NOTIFICARI ── */}
           {activeTab === "notificari" && (
             <div className="max-w-3xl space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Canale de notificare</CardTitle>
-                  <CardDescription>Configurează ce mesaje automate trimite ASESOR</CardDescription>
-                </CardHeader>
-                <CardContent className="divide-y divide-border">
-                  {[
-                    { key: "smsConfirmare", label: "SMS confirmare programare", desc: "Trimis imediat după ce clientul se programează" },
-                    { key: "emailConfirmare", label: "Email confirmare programare", desc: "Email detaliat cu informații despre programare" },
-                    { key: "emailReminder", label: "Email reminder", desc: "Trimis cu o zi înainte de programare" },
-                    { key: "noShowAlert", label: "Notificare no-show către proprietar", desc: "Alertă când un client nu s-a prezentat" },
-                    { key: "dailySummary", label: "Email rezumat zilnic", desc: "Rezumatul zilei trimis seara la proprietar" },
-                  ].map(({ key, label, desc }) => (
-                    <div key={key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                      <div>
-                        <p className="text-sm font-medium">{label}</p>
-                        <p className="text-xs text-muted-foreground">{desc}</p>
-                      </div>
-                      <Switch
-                        checked={notif[key as keyof typeof notif] as boolean}
-                        onCheckedChange={(v) => { setNotif({ ...notif, [key]: v }); markDirty() }}
-                      />
-                    </div>
-                  ))}
-
-                  {/* SMS Reminder with hours selector */}
-                  <div className="flex items-center justify-between py-4">
-                    <div>
-                      <p className="text-sm font-medium">SMS reminder</p>
-                      <p className="text-xs text-muted-foreground">Trimis automat înainte de programare</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {notif.smsReminder && (
-                        <Select value={notif.smsReminderHours} onValueChange={(v) => { setNotif({ ...notif, smsReminderHours: v }); markDirty() }}>
-                          <SelectTrigger className="h-8 w-28 text-xs"><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {["2", "4", "12", "24"].map((h) => <SelectItem key={h} value={h}>{h}h înainte</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      <Switch checked={notif.smsReminder} onCheckedChange={(v) => { setNotif({ ...notif, smsReminder: v }); markDirty() }} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* SMS Template preview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    Template SMS
-                  </CardTitle>
-                  <CardDescription>Previzualizarea mesajului SMS trimis clienților</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="rounded-xl border border-border bg-muted/50 p-4 font-mono text-sm leading-relaxed">
-                    {smsPreview}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {["{{nume_client}}", "{{serviciu}}", "{{data}}", "{{ora}}", "{{salon}}"].map((v) => (
-                      <Badge key={v} variant="outline" className="font-mono text-xs">{v}</Badge>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Variabilele de mai sus sunt înlocuite automat cu datele programării.
-                  </p>
-                </CardContent>
-              </Card>
+              <SettingsNotificari initial={notifications} />
 
               {/* WhatsApp Business */}
               <SettingsWhatsApp onDirty={markDirty} />

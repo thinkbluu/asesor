@@ -13,6 +13,7 @@ import {
   setariCategorySchema,
   setariServiceSchema,
   setariReorderSchema,
+  notificationSettingsSchema,
 } from "@/lib/validation/setari"
 import { zodToActionError, type ActionResult } from "@/lib/validation/onboarding"
 import {
@@ -22,6 +23,7 @@ import {
   saveSetariBranding,
   saveSetariLoyalty,
   saveSetariReviews,
+  saveSetariNotifications,
   upsertSetariCategory,
   deleteSetariCategory,
   upsertSetariService,
@@ -29,6 +31,9 @@ import {
   reorderSetariServices,
   reorderSetariCategories,
 } from "@/lib/data/setari"
+import { sendMessage } from "@/lib/messaging"
+import { sampleWithSalon } from "@/lib/messaging/test-sample"
+import type { MessageKind } from "@/emails/templates"
 
 // Setări: doar owner/manager pot modifica. `salon_id` vine din sesiune.
 
@@ -196,5 +201,56 @@ export async function reorderSetariCategoriesAction(input: unknown): Promise<Act
   const res = await reorderSetariCategories(salonId, parsed.data)
   if (!res.ok) return fail(res.error)
   revalidatePath("/app/setari")
+  return { ok: true }
+}
+
+// ─── Notificări (P12) ────────────────────────────────────────────────────────
+
+export async function saveSetariNotificariAction(input: unknown): Promise<ActionResult> {
+  const parsed = notificationSettingsSchema.safeParse(input)
+  if (!parsed.success) return fail(zodToActionError(parsed.error).error)
+  const salonId = await currentSalonId()
+  if (!salonId) return fail("Nu am găsit salonul. Reîncarcă pagina.")
+  const res = await saveSetariNotifications(salonId, parsed.data)
+  if (!res.ok) return fail(res.error)
+  revalidatePath("/app/setari")
+  return { ok: true }
+}
+
+// Test send to the owner's own address, with sample data and the real salon
+// branding. Deliberately bypasses the notification toggles (it is a test) and
+// is still logged in message_log like any other send.
+export async function sendTestEmailAction(kind: string): Promise<ActionResult> {
+  const session = await requireRole(["owner"])
+  const salon = session.salon
+  if (!salon) return fail("Nu am găsit salonul. Reîncarcă pagina.")
+
+  const to = session.user.email ?? ""
+  if (!to) return fail("Contul tău nu are o adresă de email setată.")
+
+  const branding = (salon.branding ?? {}) as Record<string, unknown>
+  const data = sampleWithSalon(kind as MessageKind, {
+    name: salon.name,
+    accentColor: typeof branding.primary_color === "string" ? branding.primary_color : null,
+    logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
+    address: salon.address,
+    city: salon.city,
+    phone: salon.phone,
+  })
+  if (!data) return fail("Tip de email necunoscut.")
+
+  const result = await sendMessage({
+    salonId: salon.id,
+    kind: kind as MessageKind,
+    to,
+    data,
+  })
+  if (!result.ok) return fail("Trimiterea a eșuat. Încearcă din nou.")
+  if (result.status === "skipped") {
+    if (result.reason === "no_provider") {
+      return fail("RESEND_API_KEY nu este setat — emailul a fost doar înregistrat în jurnal (message_log).")
+    }
+    return fail("Trimiterea a fost omisă (dezactivată sau deja trimisă).")
+  }
   return { ok: true }
 }

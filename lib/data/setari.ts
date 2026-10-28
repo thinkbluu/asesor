@@ -404,3 +404,22 @@ export async function getSalonRow(salonId: string): Promise<Database["public"]["
   }
   return (data as Database["public"]["Tables"]["salons"]["Row"] | null) ?? null
 }
+
+// ─── Notificări (P12) ────────────────────────────────────────────────────────
+
+export async function saveSetariNotifications(
+  salonId: string,
+  notifications: Record<string, boolean>,
+): Promise<DataResult> {
+  const supabase = await createSupabaseServerClient()
+  const { data: row, error: readErr } = await supabase
+    .from("salons")
+    .select("booking_settings")
+    .eq("id", salonId)
+    .single()
+  if (readErr || !row) return dbError("saveSetariNotifications/read", readErr ?? new Error("not found"))
+  const patched = withBookingSettingsPatch(row.booking_settings, { notifications })
+  const { error } = await supabase.from("salons").update({ booking_settings: patched }).eq("id", salonId)
+  if (error) return dbError("saveSetariNotifications", error)
+  return { ok: true }
+}
