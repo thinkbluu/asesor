@@ -95,3 +95,15 @@ export async function requireRole(roles: AppRole[]): Promise<Session> {
 
 /** Roles that manage the business: owner and manager. */
 export const MANAGEMENT_ROLES: AppRole[] = ["owner", "manager"]
+
+/**
+ * Guard for onboarding server actions. Unlike requireRole, having no salon
+ * yet is the expected state here (step 1 creates it), so this only enforces
+ * authentication and role — it never redirects back to onboarding itself.
+ */
+export async function requireOnboardingSession(): Promise<Session> {
+  const session = await getSession()
+  if (!session) redirect("/login")
+  if (session.role && !MANAGEMENT_ROLES.includes(session.role)) redirect("/app?error=forbidden")
+  return session
+}

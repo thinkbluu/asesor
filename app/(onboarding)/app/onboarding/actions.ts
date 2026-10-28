@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
-import { requireRole, getSession } from "@/lib/auth/session"
+import { requireRole, requireOnboardingSession } from "@/lib/auth/session"
 import { SALON_COOKIE } from "@/lib/auth/constants"
 import {
   onboardingSalonStepSchema,
@@ -42,8 +42,9 @@ export async function saveOnboardingSalonStep(input: unknown): Promise<ActionRes
   const parsed = onboardingSalonStepSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
 
-  const session = await getSession()
-  if (!session) return fail("Sesiunea a expirat. Autentifică-te din nou.")
+  // requireRole ar face redirect înapoi la /app/onboarding (încă nu există
+  // salon) — aici folosim varianta fără redirect la onboarding.
+  const session = await requireOnboardingSession()
 
   if (session.salon) {
     const res = await updateSalonBasics(session.salon.id, parsed.data)

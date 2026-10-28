@@ -51,6 +51,10 @@ interface Props {
   onDirty?: () => void
 }
 
+// Integrarea WhatsApp Business API nu este activă încă — tabul rămâne
+// consultativ (note „în curând”, conectare dezactivată) până la P5+.
+const COMING_SOON = true
+
 export function SettingsWhatsApp({ onDirty }: Props) {
   // Connection state
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -147,12 +151,23 @@ export function SettingsWhatsApp({ onDirty }: Props) {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
+          {COMING_SOON && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-600">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                <strong className="font-medium">În curând.</strong> Integrarea WhatsApp Business
+                nu este încă activă — poți consulta șabloanele, dar conectarea rămâne dezactivată.
+              </span>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Număr WhatsApp Business</Label>
               <Input
                 placeholder="+40 722 123 456"
                 value={phoneNumber}
+                disabled={COMING_SOON}
                 onChange={(e) => { setPhoneNumber(e.target.value); markDirty() }}
               />
               <p className="text-xs text-muted-foreground">
@@ -164,6 +179,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
               <Input
                 placeholder="1234567890"
                 value={phoneNumberId}
+                disabled={COMING_SOON}
                 onChange={(e) => { setPhoneNumberId(e.target.value); markDirty() }}
               />
               <p className="text-xs text-muted-foreground">Din Meta → WhatsApp → API Setup</p>
@@ -175,6 +191,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             <Input
               placeholder="987654321"
               value={wabaId}
+              disabled={COMING_SOON}
               onChange={(e) => { setWabaId(e.target.value); markDirty() }}
             />
           </div>
@@ -190,7 +207,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             {status !== "connected" ? (
               <Button
                 onClick={handleVerify}
-                disabled={verifying || !phoneNumberId}
+                disabled={COMING_SOON || verifying || !phoneNumberId}
                 className="bg-[#25D366] text-white hover:bg-[#1fb355]"
               >
                 {verifying ? (
