@@ -42,6 +42,7 @@ async function buildInviteUrl(token: string): Promise<string> {
 export async function inviteMember(
   email: string,
   role: string,
+  staffId?: string,
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   const guard = await requireManagerSession()
   if (!guard.session) return { ok: false, error: guard.error }
@@ -56,6 +57,21 @@ export async function inviteMember(
 
   const supabase = await createSupabaseServerClient()
   const salonId = guard.session.salon!.id
+
+  // "Invită în aplicație" from /app/echipa: the invite is tied to the staff
+  // record so accept_invite links the new member to that specialist.
+  let verifiedStaffId: string | null = null
+  if (staffId) {
+    const { data: staffRow } = await supabase
+      .from("staff")
+      .select("id")
+      .eq("id", staffId)
+      .eq("salon_id", salonId)
+      .is("deleted_at", null)
+      .maybeSingle()
+    if (!staffRow) return { ok: false, error: "Specialistul nu a fost găsit." }
+    verifiedStaffId = staffRow.id
+  }
 
   // One pending invite per email per salon; accept_invite() itself rejects
   // users who are already members when they redeem the link.
@@ -80,6 +96,7 @@ export async function inviteMember(
     salon_id: salonId,
     email: normalizedEmail,
     role,
+    staff_id: verifiedStaffId,
     token_hash: sha256(token),
     expires_at: expiresAt,
     invited_by: guard.session.user.id,
@@ -87,6 +104,7 @@ export async function inviteMember(
   if (error) return { ok: false, error: "Invitația nu a putut fi creată. Încearcă din nou." }
 
   revalidatePath("/app/setari")
+  revalidatePath("/app/echipa")
   return { ok: true, url: await buildInviteUrl(token) }
 }
 
