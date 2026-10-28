@@ -11,6 +11,7 @@ import {
   dayReopenSchema,
 } from "@/lib/validation/financiar"
 import { writeAudit } from "@/lib/audit"
+import { internalActionError } from "@/lib/action-errors"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import * as db from "@/lib/data/financiar"
 import type { PaymentMethod, TransactionView, ExpenseView, DayCloseView, FinReport } from "@/lib/mappers/financiar"
@@ -48,7 +49,7 @@ export async function checkoutAction(input: unknown): Promise<ActionResult<{ tot
     p_amount2: d.split ? d.amount2 : null,
     p_redeem_points: d.redeemPoints,
   })
-  if (error) return { ok: false, error: error.message }
+  if (error) return internalActionError("checkoutAction", error)
 
   const result = data as { total?: number }
   refresh()

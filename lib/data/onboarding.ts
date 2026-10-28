@@ -99,7 +99,7 @@ export async function createSalonForOnboarding(
   })
   if (error) {
     console.error("[v0] createSalonForOnboarding/rpc:", error)
-    return { ok: false, error: error.message || "Nu am putut crea salonul. Încearcă din nou." }
+    return { ok: false, error: "Nu am putut crea salonul. Încearcă din nou." }
   }
   if (!salonId) return { ok: false, error: "Nu am putut crea salonul. Încearcă din nou." }
 
