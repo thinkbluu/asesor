@@ -181,39 +181,42 @@ export function mapDayClose(row: DayCloseRow): DayCloseView {
   }
 }
 
-/** Report JSON from the fin_report RPC → typed view. */
+/** Report JSON from the fin_report RPC (snake_case keys) → typed view. */
 export function mapFinReport(raw: unknown): FinReport {
   const r = (raw ?? {}) as Record<string, unknown>
-  const arr = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : [])
+  const arr = (v: unknown): Record<string, unknown>[] =>
+    Array.isArray(v) ? (v as Record<string, unknown>[]) : []
+  const str = (v: unknown, fallback = "") => (v == null ? fallback : String(v))
+  const num = (v: unknown) => Number(v ?? 0)
   return {
-    byDay: arr<FinReport["byDay"][number]>(r.byDay).map((d) => ({
-      day: String(d.day),
-      revenue: Number(d.revenue),
-      tips: Number(d.tips),
-      count: Number(d.count),
+    byDay: arr(r.byDay).map((d) => ({
+      day: str(d.day),
+      revenue: num(d.revenue),
+      tips: num(d.tips),
+      count: num(d.count),
     })),
-    byStaff: arr<FinReport["byStaff"][number]>(r.byStaff).map((d) => ({
-      staffId: d.staffId ?? null,
-      staffName: String(d.staffName ?? "—"),
-      revenue: Number(d.revenue),
-      tips: Number(d.tips),
-      count: Number(d.count),
+    byStaff: arr(r.byStaff).map((d) => ({
+      staffId: d.staff_id == null ? null : String(d.staff_id),
+      staffName: str(d.staff_name, "—"),
+      revenue: num(d.revenue),
+      tips: num(d.tips),
+      count: num(d.count),
     })),
-    byService: arr<FinReport["byService"][number]>(r.byService).map((d) => ({
-      serviceName: String(d.service_name ?? d.serviceName ?? ""),
-      revenue: Number(d.revenue),
-      count: Number(d.count),
+    byService: arr(r.byService).map((d) => ({
+      serviceName: str(d.service_name),
+      revenue: num(d.revenue),
+      count: num(d.count),
     })),
-    paymentMix: arr<FinReport["paymentMix"][number]>(r.paymentMix).map((d) => ({
-      paymentMethod: d.payment_method as PaymentMethod,
-      revenue: Number(d.revenue),
-      count: Number(d.count),
+    paymentMix: arr(r.paymentMix).map((d) => ({
+      paymentMethod: str(d.payment_method) as PaymentMethod,
+      revenue: num(d.revenue),
+      count: num(d.count),
     })),
-    avgTicket: Number(r.avgTicket ?? 0),
-    refunds: arr<FinReport["refunds"][number]>(r.refunds).map((d) => ({
-      day: String(d.day),
-      amount: Number(d.amount),
-      count: Number(d.count),
+    avgTicket: num(r.avgTicket),
+    refunds: arr(r.refunds).map((d) => ({
+      day: str(d.day),
+      amount: num(d.amount),
+      count: num(d.count),
     })),
   }
 }

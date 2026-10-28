@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import useSWR from "swr"
 import { toast } from "sonner"
+import { CheckoutDialog } from "@/components/app/programari/checkout-dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -181,7 +182,7 @@ function AppointmentBlock({
 // ─── Detail Panel ────────────────────────────────────────────────────────────
 
 function AppointmentDetail({
-  apt, onClose, onStatusChange, onEdit, canEdit, canStatus, clientInfo,
+  apt, onClose, onStatusChange, onEdit, canEdit, canStatus, clientInfo, onCheckout,
 }: {
   apt: Appointment
   onClose: () => void
@@ -190,6 +191,7 @@ function AppointmentDetail({
   canEdit: boolean
   canStatus: boolean
   clientInfo: ClientSearchResult | null
+  onCheckout?: (apt: Appointment) => void
 }) {
   const cfg = STATUS_CONFIG[apt.status]
   const staff = apt.staffName
@@ -281,7 +283,6 @@ function AppointmentDetail({
           </div>
         )}
 
-        {/* Cancel reason */}
         {apt.status === "anulat" && apt.cancelReason && (
           <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
             <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">Motiv anulare</p>
@@ -350,13 +351,23 @@ function AppointmentDetail({
             </Button>
           </div>
           {apt.status !== "finalizat" && (
-            <Button
-              size="sm"
-              className="w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-              onClick={() => onStatusChange(apt.id, "finalizat")}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Marchează finalizat
-            </Button>
+            onCheckout ? (
+              <Button
+                size="sm"
+                className="w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => onCheckout(apt)}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Încasează
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                className="w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => onStatusChange(apt.id, "finalizat")}
+              >
+                <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Marchează finalizat
+              </Button>
+            )
           )}
           {apt.status === "in_asteptare" && (
             <Button
@@ -373,7 +384,7 @@ function AppointmentDetail({
   )
 }
 
-// ─── Day View ─────────────────────────────────────────────────────────────────
+// ─── Day View ──────────────────────────────────────────────────────────────��──
 
 function DayView({
   date, appointments, staff, onSelectApt, onNewApt, canEditApt, onReschedule, onResize,
@@ -1435,7 +1446,7 @@ function AppointmentModal({
   )
 }
 
-// ─── Cancel reason dialog ────────────────────────────────────────────────────
+// ─── Cancel reason dialog ─────────────────────────────────��──────────────────
 
 function CancelReasonDialog({
   open, aptName, onClose, onConfirm,
@@ -1633,6 +1644,8 @@ export function ProgramariView({
     setAppointments(prev => prev.map(a => a.id === updated.id ? updated : a))
     setSelectedApt(prev => prev?.id === updated.id ? updated : prev)
   }
+
+  const [checkoutApt, setCheckoutApt] = useState<Appointment | null>(null)
 
   const handleStatusChange = async (id: string, status: AppointmentStatus) => {
     const apt = appointments.find(a => a.id === id)
@@ -1947,6 +1960,7 @@ export function ProgramariView({
               canEdit={canEditApt(selectedApt)}
               canStatus={canStatusApt(selectedApt)}
               clientInfo={clientInfo}
+              onCheckout={role !== "staff" ? setCheckoutApt : undefined}
             />
           </div>
         )}
@@ -1965,6 +1979,19 @@ export function ProgramariView({
         staffServices={staffServices}
         canCreate={canCreate}
         onSaved={() => void revalidateRange()}
+      />
+
+      {/* Checkout (Încasează) — o/m/r; the RPC sets status finalizat */}
+      <CheckoutDialog
+        apt={checkoutApt}
+        onClose={() => setCheckoutApt(null)}
+        onDone={() => {
+          if (checkoutApt) {
+            applyLocalUpdate({ ...checkoutApt, status: "finalizat" })
+            void revalidateRange()
+          }
+          setCheckoutApt(null)
+        }}
       />
 
       {/* Cancel reason */}

@@ -2,8 +2,17 @@ import "server-only"
 
 import { randomUUID } from "crypto"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
-import type { DataResult } from "@/lib/data/echipa"
-import { dbError } from "@/lib/data/echipa"
+// Same result shape as the other data modules (echipa, setari, stocuri) —
+// each defines it locally since it is not exported from a shared module.
+type DataResult<T = void> =
+  | (T extends void ? { ok: true } : { ok: true; data: T })
+  | { ok: false; error: string }
+
+function dbError(scope: string, error: unknown): { ok: false; error: string } {
+  const message = error instanceof Error ? error.message : String(error)
+  console.error(`[v0] financiar.${scope}:`, message)
+  return { ok: false, error: "A apărut o eroare. Încearcă din nou." }
+}
 import {
   mapTransaction,
   mapExpense,
@@ -154,15 +163,15 @@ export async function closeDay(
     return { ok: false, error: "Ziua a fost închisă. Redeschiderea se face doar de proprietar." }
   }
 
+  // day_closes has no notes column — notes ride inside the totals jsonb.
   const payload = {
     salon_id: salonId,
     day,
-    totals: totals.data,
+    totals: { ...totals.data, notes: notes || null },
     cash_counted: cashCounted,
     difference: Math.round((cashCounted - totals.data.numerar) * 100) / 100,
     closed_by: userId,
     closed_at: new Date().toISOString(),
-    notes: notes || null,
   }
 
   const { error } = existing
