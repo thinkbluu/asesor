@@ -21,6 +21,9 @@ export interface Appointment {
   clientId: string
   clientName: string
   clientPhone: string
+  // Safety signal from client_safety_flags (boolean only — never the
+  // decrypted allergy text, which stays behind the sensitive-data RLS).
+  clientHasAllergies: boolean
   staffId: string
   staffName: string
   services: AppointmentServiceView[]
@@ -81,7 +84,7 @@ export interface AppointmentJoin {
   staff: StaffRow | null
 }
 
-export function mapAppointmentJoin(join: AppointmentJoin): Appointment {
+export function mapAppointmentJoin(join: AppointmentJoin, clientHasAllergies = false): Appointment {
   const { appointment: a, services, client, staff } = join
   const start = utcIsoToCivil(a.starts_at)
   const end = utcIsoToCivil(a.ends_at)
@@ -94,6 +97,7 @@ export function mapAppointmentJoin(join: AppointmentJoin): Appointment {
     clientId: a.client_id,
     clientName: client ? `${client.first_name} ${client.last_name}` : "Client șters",
     clientPhone: client?.phone ?? "",
+    clientHasAllergies,
     staffId: a.staff_id,
     staffName: staff ? `${staff.first_name} ${staff.last_name}` : "—",
     services: services

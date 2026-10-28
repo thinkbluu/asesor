@@ -146,6 +146,13 @@ function AppointmentBlock({
     >
       <div className="px-1.5 py-1 h-full flex flex-col justify-start pointer-events-none">
         <p className={cn("font-semibold leading-tight truncate", isShort ? "text-[10px]" : "text-xs")}>
+          {apt.clientHasAllergies && (
+            <span
+              className="mr-1 inline-block h-2 w-2 rounded-full bg-red-600 align-middle"
+              title="Clienta are alergii înregistrate"
+              aria-label="Clienta are alergii înregistrate"
+            />
+          )}
           {apt.clientName}
         </p>
         {!isShort && (
@@ -208,6 +215,22 @@ function AppointmentDetail({
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Allergy safety warning — boolean flag only; the details live in the
+            client's protected file (owner/manager/staff) */}
+        {apt.clientHasAllergies && (
+          <div className="flex items-start gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-3" role="alert">
+            <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-red-700 dark:text-red-400">
+                Clienta are alergii înregistrate
+              </p>
+              <p className="text-xs text-red-700/80 dark:text-red-400/80">
+                Verifică fișa protejată a clientei înainte de serviciu.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Time & Staff */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg bg-muted/50 p-3">
@@ -774,7 +797,7 @@ function MonthView({
   )
 }
 
-// ─── List View ────────────────────────────────────────────────────────────────
+// ─── List View ────────────────────────────────────────────────────────────��───
 
 function ListView({
   appointments, onSelectApt,
@@ -859,6 +882,7 @@ interface SelectedClient {
   firstName: string
   lastName: string
   phone: string
+  hasAllergies?: boolean
 }
 
 function AppointmentModal({
@@ -1129,7 +1153,7 @@ function AppointmentModal({
                       type="button"
                       className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted transition-colors text-left first:rounded-t-lg last:rounded-b-lg"
                       onClick={() => {
-                        setSelectedClient({ id: c.id, firstName: c.firstName, lastName: c.lastName, phone: c.phone })
+                        setSelectedClient({ id: c.id, firstName: c.firstName, lastName: c.lastName, phone: c.phone, hasAllergies: c.hasAllergies })
                         setShowClientDropdown(false)
                       }}
                     >
@@ -1155,6 +1179,16 @@ function AppointmentModal({
                 </div>
               )}
             </div>
+            {/* Allergy safety warning — boolean flag only; details in the
+                client's protected file */}
+            {(selectedClient?.hasAllergies || (editing && selectedClient?.id === editing.clientId && editing.clientHasAllergies)) && (
+              <div className="flex items-start gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-2.5" role="alert">
+                <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-red-700 dark:text-red-400">
+                  Clienta are alergii înregistrate — verifică fișa protejată înainte de serviciu.
+                </p>
+              </div>
+            )}
             {showNewClient && (
               <div className="p-3 rounded-lg border border-border space-y-2">
                 <div className="grid grid-cols-2 gap-2">

@@ -55,7 +55,26 @@ export async function loadProgramariRange(
   if (error) return dbError("loadProgramariRange", error)
 
   const rows = (data ?? []) as unknown as AppointmentJoin[]
-  return { ok: true, data: rows.map(mapAppointmentJoin) }
+
+  // Allergy safety flags (boolean only) for the clients in this range.
+  const clientIds = [...new Set(rows.map((r) => r.appointment.client_id).filter(Boolean))] as string[]
+  const allergyIds = new Set<string>()
+  if (clientIds.length > 0) {
+    const { data: flags, error: flagsError } = await supabase
+      .from("client_safety_flags")
+      .select("client_id, has_allergies")
+      .eq("salon_id", salonId)
+      .in("client_id", clientIds)
+    if (flagsError) return dbError("loadProgramariRange.flags", flagsError)
+    for (const f of flags ?? []) {
+      if (f.has_allergies) allergyIds.add(f.client_id)
+    }
+  }
+
+  return {
+    ok: true,
+    data: rows.map((r) => mapAppointmentJoin(r, allergyIds.has(r.appointment.client_id))),
+  }
 }
 
 // ─── Bootstrap (staff + catalog + overrides) ─────────────────────────────────
@@ -111,6 +130,8 @@ export interface ClientSearchResult {
   birthDate: string | null
   loyaltyPoints: number
   totalVisits: number
+  // Boolean safety flag from client_safety_flags — never the allergy text.
+  hasAllergies: boolean
 }
 
 export async function searchClients(
@@ -133,6 +154,20 @@ export async function searchClients(
 
   if (error) return dbError("searchClients", error)
 
+  const ids = (data ?? []).map((c) => c.id)
+  const allergyIds = new Set<string>()
+  if (ids.length > 0) {
+    const { data: flags, error: flagsError } = await supabase
+      .from("client_safety_flags")
+      .select("client_id, has_allergies")
+      .eq("salon_id", salonId)
+      .in("client_id", ids)
+    if (flagsError) return dbError("searchClients.flags", flagsError)
+    for (const f of flags ?? []) {
+      if (f.has_allergies) allergyIds.add(f.client_id)
+    }
+  }
+
   return {
     ok: true,
     data: (data ?? []).map((c) => ({
@@ -144,6 +179,7 @@ export async function searchClients(
       birthDate: c.birth_date,
       loyaltyPoints: c.loyalty_points,
       totalVisits: c.lifetime_points,
+      hasAllergies: allergyIds.has(c.id),
     })),
   }
 }
@@ -181,6 +217,7 @@ export async function createClientInline(
         birthDate: c.birth_date,
         loyaltyPoints: c.loyalty_points,
         totalVisits: c.lifetime_points,
+        hasAllergies: false,
       },
     }
   }
@@ -211,6 +248,7 @@ export async function createClientInline(
       birthDate: c.birth_date,
       loyaltyPoints: c.loyalty_points,
       totalVisits: c.lifetime_points,
+      hasAllergies: false,
     },
   }
 }
