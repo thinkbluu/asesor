@@ -1,25 +1,26 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
 import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react"
 import { SITE } from "@/lib/site"
+import { ContactForm } from "@/components/marketing/contact-form"
+import { CONTACT_SUBJECTS, type ContactSubject } from "@/lib/validation/contact"
 
-export default function ContactPage() {
-  const [gdprChecked, setGdprChecked] = useState(false)
+export const metadata = {
+  title: "Contact · ASESOR",
+  description: "Contactează echipa ASESOR. Îți răspundem în maxim 24 de ore.",
+}
+
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ subiect?: string }>
+}) {
+  const { subiect } = await searchParams
+  const initialSubject = CONTACT_SUBJECTS.includes(subiect as ContactSubject)
+    ? (subiect as ContactSubject)
+    : null
 
   return (
     <MarketingLayout>
@@ -51,85 +52,7 @@ export default function ContactPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-4">
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">Prenume</Label>
-                        <Input id="firstName" placeholder="Maria" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">Nume</Label>
-                        <Input id="lastName" placeholder="Popescu" required />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="email@exemplu.com" required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefon</Label>
-                      <Input id="phone" placeholder="07XX XXX XXX" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="salonName">Numele salonului</Label>
-                      <Input id="salonName" placeholder="Ex: Beauty Studio" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subiect</Label>
-                      <Select>
-                        <SelectTrigger id="subject">
-                          <SelectValue placeholder="Selectează subiectul" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="demo">Solicit un demo</SelectItem>
-                          <SelectItem value="pricing">Întrebări despre prețuri</SelectItem>
-                          <SelectItem value="features">Întrebări despre funcționalități</SelectItem>
-                          <SelectItem value="support">Suport tehnic</SelectItem>
-                          <SelectItem value="partnership">Parteneriat</SelectItem>
-                          <SelectItem value="other">Altele</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Mesaj</Label>
-                      <textarea
-                        id="message"
-                        className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                        placeholder="Spune-ne cum te putem ajuta..."
-                        required
-                      />
-                    </div>
-
-                    <div className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3">
-                      <Checkbox
-                        id="gdpr"
-                        checked={gdprChecked}
-                        onCheckedChange={(checked) => setGdprChecked(checked === true)}
-                        className="mt-0.5"
-                      />
-                      <Label
-                        htmlFor="gdpr"
-                        className="text-sm font-normal leading-relaxed text-muted-foreground"
-                      >
-                        Sunt de acord cu prelucrarea datelor personale conform{" "}
-                        <Link
-                          href="/privacy"
-                          className="font-medium text-foreground underline underline-offset-4 hover:text-accent"
-                        >
-                          Politicii de confidențialitate
-                        </Link>{" "}
-                        în scopul de a primi răspuns la solicitarea mea.
-                      </Label>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={!gdprChecked}
-                      className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                    >
-                      Trimite mesajul
-                    </Button>
-                  </form>
+                  <ContactForm initialSubject={initialSubject} />
                 </CardContent>
               </Card>
 
