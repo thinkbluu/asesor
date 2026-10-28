@@ -13,10 +13,12 @@ export function StepDetails({
   state,
   update,
   salonSlug,
+  salonName,
 }: {
   state: BookingState
   update: (patch: Partial<BookingState>) => void
   salonSlug: string
+  salonName: string
 }) {
   const setClient = (patch: Partial<BookingState["client"]>) => {
     update({ client: { ...state.client, ...patch } })
@@ -158,6 +160,20 @@ export function StepDetails({
             </Label>
           </div>
         </div>
+
+        {/* Privacy note — ASESOR processes booking data on behalf of the salon */}
+        <p className="text-xs leading-relaxed text-zinc-500">
+          Datele tale sunt folosite de {salonName} pentru programare și reamintiri. ASESOR le prelucrează în numele
+          salonului.{" "}
+          <Link
+            href="/privacy"
+            target="_blank"
+            className="font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-800"
+          >
+            Află mai multe
+          </Link>
+          .
+        </p>
 
         {/* Marketing consent — optional */}
         <div className="flex items-start gap-3">

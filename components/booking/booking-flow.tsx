@@ -186,7 +186,7 @@ export function BookingFlow({
           />
         )}
         {state.step === 4 && (
-          <StepDetails state={state} update={update} salonSlug={salon.slug} />
+          <StepDetails state={state} update={update} salonSlug={salon.slug} salonName={salon.name} />
         )}
         {state.step === 5 && (
           <StepConfirm.Review
