@@ -76,7 +76,10 @@ export function ClientDetailView({
   history: ClientHistoryItem[]
   loyalty: LoyaltyEntry[]
   consents: ConsentRecord[]
-  sensitive: { ok: true; data: SensitiveData; restricted: boolean } | null
+  sensitive:
+    | { data: SensitiveData; restricted: false }
+    | { data: null; restricted: true }
+    | null
   sensitiveError: string | null
   photos: ClientPhoto[] | null
 }) {
@@ -399,7 +402,10 @@ function SensitiveTab({
 }: {
   clientId: string
   role: string
-  sensitive: { ok: true; data: SensitiveData; restricted: boolean } | null
+  sensitive:
+    | { data: SensitiveData; restricted: false }
+    | { data: null; restricted: true }
+    | null
   sensitiveError: string | null
   consents: ConsentRecord[]
 }) {

@@ -2,7 +2,6 @@ import "server-only"
 
 import { randomUUID } from "node:crypto"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
-import { dbError, type DataResult } from "@/lib/data/programari"
 import { encryptField, decryptField } from "@/lib/crypto"
 import { writeAudit } from "@/lib/audit"
 import {
@@ -28,6 +27,15 @@ import { PAGE_SIZE } from "@/lib/validation/clienti"
 // Sensitive fields are encrypted at rest (lib/crypto.ts) and decrypted only
 // here, on the server, for owner/manager/staff — every decrypt writes an
 // audit_log entry.
+
+type DataResult<T = void> =
+  | (T extends void ? { ok: true } : { ok: true; data: T })
+  | { ok: false; error: string }
+
+function dbError(scope: string, error: unknown): { ok: false; error: string } {
+  console.error(`[v0] ${scope} failed:`, error)
+  return { ok: false, error: "S-a produs o eroare. Încearcă din nou." }
+}
 
 // ─── List ────────────────────────────────────────────────────────────────────
 
@@ -712,3 +720,5 @@ export async function importClients(
     data: { imported: toInsert.length, skipped: rows.length - toInsert.length },
   }
 }
+
+// sync-kick

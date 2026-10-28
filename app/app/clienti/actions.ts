@@ -24,7 +24,7 @@ const SENSITIVE_ROLES = ["owner", "manager", "staff"] as const
 const GDPR_ROLES = ["owner", "manager"] as const
 
 export type ClientListResult =
-  | { ok: true; data: Awaited<ReturnType<typeof db.listClients>> extends { ok: true; data: infer T } ? T : never }
+  | { ok: true; data: db.ClientListPage }
   | { ok: false; error: string }
 
 export async function listClientsAction(input: unknown): Promise<ClientListResult> {
