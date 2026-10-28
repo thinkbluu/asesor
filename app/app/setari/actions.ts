@@ -180,7 +180,7 @@ export async function deleteSetariServiceAction(input: unknown): Promise<ActionR
   return { ok: true }
 }
 
-// ─── Reordonare ──────────────────────────────────────────────────────────────
+// ��── Reordonare ──────────────────────────────────────────────────────────────
 
 export async function reorderSetariServicesAction(input: unknown): Promise<ActionResult> {
   const parsed = setariReorderSchema.safeParse(input)
@@ -235,7 +235,7 @@ export async function sendTestEmailAction(kind: string): Promise<ActionResult> {
     logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
     address: salon.address,
     city: salon.city,
-    phone: salon.phone,
+    phone: salon.phone ?? "",
   })
   if (!data) return fail("Tip de email necunoscut.")
 

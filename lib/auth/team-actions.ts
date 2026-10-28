@@ -144,7 +144,7 @@ export async function inviteMember(
             logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
             address: salon.address,
             city: salon.city,
-            phone: salon.phone,
+            phone: salon.phone ?? "",
           },
           inviteUrl,
           roleLabel: ROLE_LABELS[role],

@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
     address: salon.address,
     city: salon.city,
-    phone: salon.phone,
+    phone: salon.phone ?? "",
   })
   if (!data) return new Response("Unknown kind", { status: 404 })
 

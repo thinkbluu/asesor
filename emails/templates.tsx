@@ -10,6 +10,19 @@ import ProgramareNouaOnline, { type ProgramareNouaOnlineData } from "./programar
 import Reamintire24h, { type Reamintire24hData } from "./reamintire-24h"
 import StocScazutZilnic, { type StocScazutZilnicData } from "./stoc-scazut-zilnic"
 
+// Re-exported so callers (sample data, messaging, cron) can type their data
+// against the registry without importing each template file.
+export type {
+  AnulareData,
+  CerereFeedbackData,
+  ConfirmareProgramareData,
+  ContactNouData,
+  InvitatieEchipaData,
+  ProgramareNouaOnlineData,
+  Reamintire24hData,
+  StocScazutZilnicData,
+}
+
 // Kinds stored in message_log. Client-facing and salon-facing copies of the
 // same event get distinct kinds because message_log enforces
 // unique(appointment_id, kind) — two recipients must not collide.

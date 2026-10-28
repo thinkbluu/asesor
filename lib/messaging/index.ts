@@ -1,6 +1,7 @@
 import "server-only"
 
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
+import type { Json } from "@/lib/supabase/types"
 import { serverEnv } from "@/lib/env.server"
 import { SITE } from "@/lib/site"
 import {
@@ -54,6 +55,7 @@ interface SalonEmailIdentity {
   address: string | null
   city: string | null
   phone: string
+  bookingSettings: Json | null
 }
 
 async function loadSalonIdentity(salonId: string): Promise<SalonEmailIdentity | null> {
@@ -75,7 +77,8 @@ async function loadSalonIdentity(salonId: string): Promise<SalonEmailIdentity | 
     logoUrl: typeof branding.logo_url === "string" ? branding.logo_url : null,
     address: data.address ?? null,
     city: data.city ?? null,
-    phone: data.phone,
+    phone: data.phone ?? "",
+    bookingSettings: data.booking_settings ?? null,
   }
 }
 
@@ -143,7 +146,7 @@ export async function sendMessage<K extends MessageKind>(input: {
     // 2. Salon-level toggle (transactional emails still go out by default).
     const toggleKey = TOGGLE_MAP[input.kind]
     if (salon && toggleKey) {
-      const settings = readNotificationSettings(salon.booking_settings)
+      const settings = readNotificationSettings(salon.bookingSettings)
       if (!settings[toggleKey]) {
         await finish("skipped_disabled")
         return { ok: true, status: "skipped", reason: "disabled" }

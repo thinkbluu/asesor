@@ -1,5 +1,6 @@
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto"
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
+import type { Json } from "@/lib/supabase/types"
 import { sendMessage } from "@/lib/messaging"
 import { readNotificationSettings } from "@/lib/messaging/settings"
 import { purgeDeletedSalons } from "@/lib/server/purge"
@@ -41,19 +42,19 @@ function authorized(request: Request): boolean {
 
 function brandingOf(salon: {
   name: string
-  branding: Record<string, unknown> | null
+  branding: Json | null
   address: string | null
   city: string | null
-  phone: string
+  phone: string | null
 }): SalonBranding {
-  const b = salon.branding ?? {}
+  const b = (salon.branding ?? {}) as Record<string, unknown>
   return {
     name: salon.name,
     accentColor: typeof b.primary_color === "string" ? b.primary_color : null,
     logoUrl: typeof b.logo_url === "string" ? b.logo_url : null,
     address: salon.address,
     city: salon.city,
-    phone: salon.phone,
+    phone: salon.phone ?? "",
   }
 }
 
@@ -125,11 +126,11 @@ async function runReminders(): Promise<JobSummary> {
       id: string
       name: string
       email: string | null
-      branding: Record<string, unknown> | null
+      branding: Json | null
       address: string | null
       city: string | null
-      phone: string
-      booking_settings: Record<string, unknown> | null
+      phone: string | null
+      booking_settings: Json | null
     } | null
     const client = row.clients as unknown as { first_name: string | null; email: string | null } | null
     const staff = row.staff as unknown as { first_name: string | null; last_name: string | null } | null
@@ -221,11 +222,11 @@ async function runFeedback(): Promise<JobSummary> {
       id: string
       name: string
       email: string | null
-      branding: Record<string, unknown> | null
+      branding: Json | null
       address: string | null
       city: string | null
-      phone: string
-      booking_settings: Record<string, unknown> | null
+      phone: string | null
+      booking_settings: Json | null
     } | null
     const client = row.clients as unknown as { first_name: string | null; email: string | null } | null
 
@@ -371,7 +372,7 @@ async function runDaily(): Promise<JobSummary> {
   }
 
   // 2. DB maintenance RPCs (revoked from public — service role only).
-  for (const fn of ["expire_loyalty_points", "retention_cleanup", "purge_demo_bookings"]) {
+  for (const fn of ["expire_loyalty_points", "retention_cleanup", "purge_demo_bookings"] as const) {
     const { error } = await admin.rpc(fn)
     rpcResults[fn] = error ? `error: ${error.message}` : "ok"
     if (error) {
