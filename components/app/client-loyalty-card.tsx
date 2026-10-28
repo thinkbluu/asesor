@@ -26,8 +26,20 @@ const TYPE_BADGES: Record<LoyaltyTransaction["type"], { label: string; className
   adjustment: { label: "Ajustare", className: "bg-muted text-muted-foreground border-border", icon: TrendingUp },
 }
 
-export function ClientLoyaltyCard({ clientId: _clientId, balance }: { clientId: string; balance: number }) {
-  const history: LoyaltyTransaction[] = []
+export function ClientLoyaltyCard({
+  balance,
+  entries,
+}: {
+  balance: number
+  entries: { id: string; type: LoyaltyTransaction["type"]; points: number; note: string | null; createdAt: string }[]
+}) {
+  const history: LoyaltyTransaction[] = entries.map((e) => ({
+    id: e.id,
+    type: e.type,
+    points: e.points,
+    reason: e.note ?? "Puncte loialitate",
+    date: e.createdAt,
+  }))
   const lifetime = history
     .filter((transaction) => transaction.type === "earned" || transaction.type === "bonus")
     .reduce((total, transaction) => total + transaction.points, 0)
