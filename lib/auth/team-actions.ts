@@ -4,6 +4,8 @@
 // remove member. All actions re-verify the caller's role server-side and rely
 // on RLS as the backstop.
 
+import "server-only"
+
 import { createHash, randomBytes } from "node:crypto"
 import { headers } from "next/headers"
 import { revalidatePath } from "next/cache"
