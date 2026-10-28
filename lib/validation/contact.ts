@@ -20,10 +20,10 @@ export const contactSchema = z.object({
     .regex(/^[\d\s()+-]{6,20}$/, "Numărul de telefon nu este valid."),
   salonName: z.string().trim().max(120).optional().or(z.literal("")),
   subject: z.enum(CONTACT_SUBJECTS, {
-    errorMap: () => ({ message: "Alege un subiect." }),
+    error: "Alege un subiect.",
   }),
   message: z.string().trim().min(10, "Scrie un mesaj de cel puțin 10 caractere.").max(2000),
-  gdpr: z.literal(true, { errorMap: () => ({ message: "Ai nevoie de acordul GDPR." }) }),
+  gdpr: z.literal(true, { error: "Ai nevoie de acordul GDPR." }),
   // Honeypot + Turnstile travel outside the schema (raw strings).
 })
 

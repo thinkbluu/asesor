@@ -55,12 +55,12 @@ export type SetariProgramInput = z.infer<typeof setariProgramSchema>
 
 export const setariReguliSchema = z.object({
   minNoticeMin: z.coerce
-    .number({ invalid_type_error: "Anticiparea minimă este obligatorie." })
+    .number({ error: "Anticiparea minimă este obligatorie." })
     .int()
     .min(0, "Anticiparea minimă nu poate fi negativă.")
     .max(4320, "Anticiparea minimă poate fi de maxim 3 zile."),
   maxDaysAhead: z.coerce
-    .number({ invalid_type_error: "Numărul de zile este obligatoriu." })
+    .number({ error: "Numărul de zile este obligatoriu." })
     .int()
     .min(1, "Minim 1 zi în avans.")
     .max(365, "Maximum 365 de zile în avans."),
@@ -169,7 +169,7 @@ export type SetariCategoryInput = z.infer<typeof setariCategorySchema>
 export const setariServiceProductSchema = z.object({
   productId: z.string().uuid("Produs invalid."),
   quantityPerUse: z.coerce
-    .number({ invalid_type_error: "Cantitatea este obligatorie." })
+    .number({ error: "Cantitatea este obligatorie." })
     .min(0.001, "Cantitatea trebuie să fie pozitivă.")
     .max(10000),
 })
@@ -180,13 +180,13 @@ export const setariServiceSchema = z.object({
   name: z.string().trim().min(1, "Numele serviciului este obligatoriu.").max(80, "Numele serviciului este prea lung."),
   description: z.string().trim().max(600, "Descrierea este prea lungă.").default(""),
   durationMin: z.coerce
-    .number({ invalid_type_error: "Durata este obligatorie." })
+    .number({ error: "Durata este obligatorie." })
     .int()
     .min(5, "Durata minimă este de 5 minute.")
     .max(480, "Durata maximă este de 480 de minute."),
   bufferMin: z.coerce.number().int().min(0).max(120).default(0),
   price: z.coerce
-    .number({ invalid_type_error: "Prețul este obligatoriu." })
+    .number({ error: "Prețul este obligatoriu." })
     .min(0, "Prețul nu poate fi negativ.")
     .max(100000, "Prețul este prea mare."),
   priceFrom: z.boolean().default(false),

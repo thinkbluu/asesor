@@ -4,12 +4,12 @@ import { z } from "zod"
 
 const positiveNumber = (label: string) =>
   z.coerce
-    .number({ invalid_type_error: `${label} trebuie să fie un număr.` })
+    .number({ error: `${label} trebuie să fie un număr.` })
     .positive(`${label} trebuie să fie mai mare decât 0.`)
 
 const nonNegativeNumber = (label: string) =>
   z.coerce
-    .number({ invalid_type_error: `${label} trebuie să fie un număr.` })
+    .number({ error: `${label} trebuie să fie un număr.` })
     .min(0, `${label} nu poate fi negativ.`)
 
 export const productSchema = z.object({
@@ -42,7 +42,7 @@ export type UserMovementType = (typeof USER_MOVEMENT_TYPES)[number]
 
 export const movementSchema = z
   .object({
-    type: z.enum(USER_MOVEMENT_TYPES, { errorMap: () => ({ message: "Tipul mișcării nu este valid." }) }),
+    type: z.enum(USER_MOVEMENT_TYPES, { error: "Tipul mișcării nu este valid." }),
     productId: z.string().uuid("Produsul selectat nu este valid."),
     // Recepție / pierdere / retur: quantity in product units (> 0). The sign
     // is applied by the data layer (receptie positive, the rest negative).

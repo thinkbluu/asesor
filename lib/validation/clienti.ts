@@ -52,10 +52,10 @@ export const sensitiveSaveSchema = z.object({
   colorFormulas: z.string().trim().max(5000, "Textul este prea lung.").default(""),
   // Saving allergies REQUIRES a recorded health-data consent.
   healthConsent: z.literal(true, {
-    errorMap: () => ({ message: "Bifează acordul pentru datele de sănătate." }),
+    error: "Bifează acordul pentru datele de sănătate.",
   }),
   consentSource: z.enum(["in_salon", "online"], {
-    errorMap: () => ({ message: "Alege sursa acordului." }),
+    error: "Alege sursa acordului.",
   }),
 })
 export type SensitiveSaveInput = z.infer<typeof sensitiveSaveSchema>

@@ -65,12 +65,12 @@ export const onboardingServiceItemSchema = z.object({
   id: z.string().uuid("Serviciu invalid.").optional(),
   name: z.string().trim().min(1, "Numele serviciului este obligatoriu.").max(80, "Numele serviciului este prea lung."),
   durationMin: z.coerce
-    .number({ invalid_type_error: "Durata este obligatorie." })
+    .number({ error: "Durata este obligatorie." })
     .int("Durata trebuie să fie un număr întreg.")
     .min(5, "Durata minimă este de 5 minute.")
     .max(480, "Durata maximă este de 480 de minute."),
   price: z.coerce
-    .number({ invalid_type_error: "Prețul este obligatoriu." })
+    .number({ error: "Prețul este obligatoriu." })
     .min(0, "Prețul nu poate fi negativ.")
     .max(100000, "Prețul este prea mare."),
 })
