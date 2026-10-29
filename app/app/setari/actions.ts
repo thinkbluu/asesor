@@ -34,6 +34,7 @@ import {
 import { sendMessage } from "@/lib/messaging"
 import { sampleWithSalon } from "@/lib/messaging/test-sample"
 import type { MessageKind } from "@/emails/templates"
+import { billingGuard } from "@/lib/billing/guard"
 
 // Setări: doar owner/manager pot modifica. `salon_id` vine din sesiune.
 
@@ -51,6 +52,9 @@ async function currentSalonId(): Promise<string | null> {
 // ─── Profil ──────────────────────────────────────────────────────────────────
 
 export async function saveSetariProfilAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariProfilSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -65,6 +69,9 @@ export async function saveSetariProfilAction(input: unknown): Promise<ActionResu
 // ─── Program ─────────────────────────────────────────────────────────────────
 
 export async function saveSetariProgramAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariProgramSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -80,6 +87,9 @@ export async function saveSetariProgramAction(input: unknown): Promise<ActionRes
 // ─── Politici (booking rules) ────────────────────────────────────────────────
 
 export async function saveSetariReguliAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariReguliSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -94,6 +104,9 @@ export async function saveSetariReguliAction(input: unknown): Promise<ActionResu
 // ─── Branding (pagina publică de programare) ─────────────────────────────────
 
 export async function saveSetariBrandingAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariBrandingSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -108,6 +121,9 @@ export async function saveSetariBrandingAction(input: unknown): Promise<ActionRe
 // ─── Loialitate / Recenzii ───────────────────────────────────────────────────
 
 export async function saveSetariLoyaltyAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "loialitate" })
+  if (blocked) return blocked
+
   const parsed = loyaltyConfigSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -120,6 +136,9 @@ export async function saveSetariLoyaltyAction(input: unknown): Promise<ActionRes
 }
 
 export async function saveSetariReviewsAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "loialitate" })
+  if (blocked) return blocked
+
   const parsed = reviewsConfigSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -133,6 +152,9 @@ export async function saveSetariReviewsAction(input: unknown): Promise<ActionRes
 // ─── Servicii: categorii ─────────────────────────────────────────────────────
 
 export async function upsertSetariCategoryAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariCategorySchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -144,6 +166,9 @@ export async function upsertSetariCategoryAction(input: unknown): Promise<Action
 }
 
 export async function deleteSetariCategoryAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = idSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -157,6 +182,9 @@ export async function deleteSetariCategoryAction(input: unknown): Promise<Action
 // ─── Servicii: servicii ──────────────────────────────────────────────────────
 
 export async function upsertSetariServiceAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariServiceSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -169,6 +197,9 @@ export async function upsertSetariServiceAction(input: unknown): Promise<ActionR
 }
 
 export async function deleteSetariServiceAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = idSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -183,6 +214,9 @@ export async function deleteSetariServiceAction(input: unknown): Promise<ActionR
 // ��── Reordonare ──────────────────────────────────────────────────────────────
 
 export async function reorderSetariServicesAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariReorderSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -194,6 +228,9 @@ export async function reorderSetariServicesAction(input: unknown): Promise<Actio
 }
 
 export async function reorderSetariCategoriesAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = setariReorderSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()
@@ -207,6 +244,9 @@ export async function reorderSetariCategoriesAction(input: unknown): Promise<Act
 // ─── Notificări (P12) ────────────────────────────────────────────────────────
 
 export async function saveSetariNotificariAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const parsed = notificationSettingsSchema.safeParse(input)
   if (!parsed.success) return fail(zodToActionError(parsed.error).error)
   const salonId = await currentSalonId()

@@ -22,6 +22,7 @@ import {
   setProductServiceLinks as dbSetProductServiceLinks,
   type StockRole,
 } from "@/lib/data/stocuri"
+import { billingGuard } from "@/lib/billing/guard"
 
 // Server actions for the Stocuri page (P8 part 1).
 //
@@ -54,6 +55,9 @@ async function requireStockRole(roles: StockRole[]) {
 // ------------------------------------------------------------
 
 export async function listProductsAction(): Promise<ActionResult<{ items: ProductView[] }>> {
+  const blocked = await billingGuard({ write: false, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(["owner", "manager", "receptionist", "staff"])
   if (!guard) return { ok: false, error: "Nu ai un salon activ." }
   const result = await dbListProducts(guard.salon.id, guard.role)
@@ -62,6 +66,9 @@ export async function listProductsAction(): Promise<ActionResult<{ items: Produc
 }
 
 export async function listMovementsAction(): Promise<ActionResult<{ items: MovementView[] }>> {
+  const blocked = await billingGuard({ write: false, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(["owner", "manager", "receptionist", "staff"])
   if (!guard) return { ok: false, error: "Nu ai un salon activ." }
   const result = await dbListMovements(guard.salon.id)
@@ -72,6 +79,9 @@ export async function listMovementsAction(): Promise<ActionResult<{ items: Movem
 export async function listLinkableServicesAction(): Promise<
   ActionResult<{ items: { id: string; name: string }[] }>
 > {
+  const blocked = await billingGuard({ write: false, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(["owner", "manager"])
   if (!guard) return { ok: false, error: "Nu ai un salon activ." }
   const result = await dbListLinkableServices(guard.salon.id)
@@ -84,6 +94,9 @@ export async function listLinkableServicesAction(): Promise<
 // ------------------------------------------------------------
 
 export async function createProductAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(MANAGE_ROLES)
   if (!guard) return { ok: false, error: "Nu ai permisiunea să gestionezi produsele." }
 
@@ -97,6 +110,9 @@ export async function createProductAction(input: unknown): Promise<ActionResult<
 }
 
 export async function updateProductAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(MANAGE_ROLES)
   if (!guard) return { ok: false, error: "Nu ai permisiunea să gestionezi produsele." }
 
@@ -114,6 +130,9 @@ export async function updateProductAction(input: unknown): Promise<ActionResult>
 }
 
 export async function deactivateProductAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(MANAGE_ROLES)
   if (!guard) return { ok: false, error: "Nu ai permisiunea să gestionezi produsele." }
 
@@ -131,6 +150,9 @@ export async function deactivateProductAction(input: unknown): Promise<ActionRes
 // ------------------------------------------------------------
 
 export async function createMovementAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(MOVEMENT_ROLES)
   if (!guard) return { ok: false, error: "Nu ai permisiunea să înregistrezi mișcări de stoc." }
 
@@ -153,6 +175,9 @@ export async function createMovementAction(input: unknown): Promise<ActionResult
 // ------------------------------------------------------------
 
 export async function setProductServiceLinksAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "stocuri" })
+  if (blocked) return blocked
+
   const guard = await requireStockRole(MANAGE_ROLES)
   if (!guard) return { ok: false, error: "Nu ai permisiunea să gestionezi produsele." }
 

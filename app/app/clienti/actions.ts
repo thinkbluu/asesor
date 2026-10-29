@@ -14,6 +14,7 @@ import {
   importPayloadSchema,
   photoMetaSchema,
 } from "@/lib/validation/clienti"
+import { billingGuard } from "@/lib/billing/guard"
 
 // Server actions for Clienti. Reads: every salon role. Profile CRUD:
 // owner/manager/receptionist. Protected health data (read + write) and photos:
@@ -86,6 +87,9 @@ export async function getSensitiveAction(clientId: string) {
 }
 
 export async function saveSensitiveAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...SENSITIVE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -101,6 +105,9 @@ export async function saveSensitiveAction(input: unknown): Promise<ActionResult>
 // ─── Profile CRUD ────────────────────────────────────────────────────────────
 
 export async function updateClientAction(clientId: string, input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...PROFILE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -115,6 +122,9 @@ export async function updateClientAction(clientId: string, input: unknown): Prom
 }
 
 export async function createClientAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...PROFILE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -143,6 +153,9 @@ export async function listPhotosAction(clientId: string) {
  * is a convenience, never the security boundary.
  */
 export async function uploadPhotoAction(clientId: string, formData: FormData): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...SENSITIVE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -169,6 +182,9 @@ export async function uploadPhotoAction(clientId: string, formData: FormData): P
 }
 
 export async function deletePhotoAction(clientId: string, photoId: string): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...GDPR_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -190,6 +206,9 @@ export async function exportClientAction(clientId: string) {
 }
 
 export async function deleteClientAction(input: unknown): Promise<ActionResult | MfaRequired> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...GDPR_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -208,6 +227,9 @@ export async function deleteClientAction(input: unknown): Promise<ActionResult |
 // ─── CSV import ──────────────────────────────────────────────────────────────
 
 export async function importClientsAction(input: unknown): Promise<ActionResult<{ imported: number; skipped: number }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...PROFILE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 

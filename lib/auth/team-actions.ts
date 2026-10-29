@@ -15,6 +15,7 @@ import { sendMessage } from "@/lib/messaging"
 import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { getSession, MANAGEMENT_ROLES } from "./session"
 import type { AppRole } from "./session"
+import { billingGuard } from "@/lib/billing/guard"
 
 export type ActionResult =
   | { ok: true }
@@ -163,6 +164,9 @@ export async function inviteMember(
 }
 
 export async function changeMemberRole(memberId: string, role: string): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const guard = await requireManagerSession()
   if (!guard.session) return { ok: false, error: guard.error }
   if (!isRole(role)) return { ok: false, error: "Rolul selectat nu este valid." }
@@ -208,6 +212,9 @@ export async function changeMemberRole(memberId: string, role: string): Promise<
 }
 
 export async function removeMember(memberId: string): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const guard = await requireManagerSession()
   if (!guard.session) return { ok: false, error: guard.error }
 

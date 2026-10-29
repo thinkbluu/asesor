@@ -16,6 +16,7 @@ import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import * as db from "@/lib/data/financiar"
 import type { PaymentMethod, TransactionView, ExpenseView, DayCloseView, FinReport } from "@/lib/mappers/financiar"
+import { billingGuard } from "@/lib/billing/guard"
 type DayTotals = { numerar: number; card: number; transfer: number; tips: number; discounts: number }
 
 // Financiar is owner/manager only — the layout guard blocks the page, and
@@ -30,6 +31,9 @@ function refresh() {
 // ─── Checkout (also callable from Programări by receptionist) ────────────────
 
 export async function checkoutAction(input: unknown): Promise<ActionResult<{ total: number }>> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   // Receptionist runs checkout from Programări, so the role gate here is
   // o/m/r — NOT the financiar page gate.
   const session = await requireRole(["owner", "manager", "receptionist"])
@@ -87,6 +91,9 @@ export async function getClientLoyaltyAction(
 export async function listTransactionsAction(
   filters: { from?: string; to?: string; staffId?: string; method?: PaymentMethod } = {},
 ): Promise<ActionResult<{ items: TransactionView[] }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
   const result = await db.listTransactions(session.salon.id, filters)
@@ -95,6 +102,9 @@ export async function listTransactionsAction(
 }
 
 export async function refundTransactionAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -116,6 +126,9 @@ export async function refundTransactionAction(input: unknown): Promise<ActionRes
 export async function listExpensesAction(
   filters: { from?: string; to?: string } = {},
 ): Promise<ActionResult<{ items: ExpenseView[] }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
   const result = await db.listExpenses(session.salon.id, filters)
@@ -124,6 +137,9 @@ export async function listExpensesAction(
 }
 
 export async function saveExpenseAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -137,6 +153,9 @@ export async function saveExpenseAction(input: unknown): Promise<ActionResult<{ 
 }
 
 export async function deleteExpenseAction(id: string): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -147,6 +166,9 @@ export async function deleteExpenseAction(id: string): Promise<ActionResult> {
 }
 
 export async function uploadReceiptAction(expenseId: string, formData: FormData): Promise<ActionResult<{ path: string }>> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -160,6 +182,9 @@ export async function uploadReceiptAction(expenseId: string, formData: FormData)
 }
 
 export async function getReceiptUrlAction(path: string): Promise<ActionResult<{ url: string }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
   const result = await db.getReceiptUrl(session.salon.id, path)
@@ -172,6 +197,9 @@ export async function getReceiptUrlAction(path: string): Promise<ActionResult<{ 
 export async function getDayTotalsAction(
   day: string,
 ): Promise<ActionResult<{ totals: DayTotals; closed: boolean }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -183,6 +211,9 @@ export async function getDayTotalsAction(
 }
 
 export async function closeDayAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -204,6 +235,9 @@ export async function closeDayAction(input: unknown): Promise<ActionResult> {
 }
 
 export async function reopenDayAction(input: unknown): Promise<ActionResult | MfaRequired> {
+  const blocked = await billingGuard({ write: true, feature: "financiar" })
+  if (blocked) return blocked
+
   // Reopen is owner-only.
   const session = await requireRole(["owner"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
@@ -225,6 +259,9 @@ export async function reopenDayAction(input: unknown): Promise<ActionResult | Mf
 export async function listDayClosesAction(): Promise<
   ActionResult<{ items: DayCloseView[] }>
 > {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
   const result = await db.listDayCloses(session.salon.id)
@@ -238,6 +275,9 @@ export async function getReportAction(
   from: string,
   to: string,
 ): Promise<ActionResult<{ report: FinReport }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
   const result = await db.getReport(session.salon.id, from, to)
@@ -262,6 +302,9 @@ export async function exportCsvAction(
   from: string,
   to: string,
 ): Promise<ActionResult<{ csv: string; filename: string }>> {
+  const blocked = await billingGuard({ write: false, feature: "financiar" })
+  if (blocked) return blocked
+
   const session = await requireRole([...FIN_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 

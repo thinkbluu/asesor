@@ -42,6 +42,7 @@ import {
   setStaffServiceSchema,
   updateStaffSchema,
 } from "@/lib/validation/echipa"
+import { billingGuard } from "@/lib/billing/guard"
 
 const TEAM_ROLES = ["owner", "manager", "receptionist"] as const
 const MANAGEMENT = [...MANAGEMENT_ROLES] as const
@@ -57,6 +58,9 @@ function refresh(staffId?: string) {
 // ------------------------------------------------------------
 
 export async function createStaffAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -70,6 +74,9 @@ export async function createStaffAction(input: unknown): Promise<ActionResult<{ 
 }
 
 export async function updateStaffAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -92,6 +99,9 @@ export async function updateStaffAction(input: unknown): Promise<ActionResult> {
 // ------------------------------------------------------------
 
 export async function saveScheduleAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -129,6 +139,9 @@ export async function getSalonHoursAction(): Promise<
 // ------------------------------------------------------------
 
 export async function requestTimeOffAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES, "staff"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -153,6 +166,9 @@ export async function requestTimeOffAction(input: unknown): Promise<ActionResult
 }
 
 export async function decideTimeOffAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...MANAGEMENT])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -166,6 +182,9 @@ export async function decideTimeOffAction(input: unknown): Promise<ActionResult>
 }
 
 export async function deleteTimeOffAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES, "staff"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -208,6 +227,9 @@ export async function listTimeOffAction(): Promise<
 // ------------------------------------------------------------
 
 export async function createBlockedSlotAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES, "staff"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -232,6 +254,9 @@ export async function createBlockedSlotAction(input: unknown): Promise<ActionRes
 }
 
 export async function deleteBlockedSlotAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES, "staff"])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -274,6 +299,9 @@ export async function listSalonServicesAction(): Promise<
 }
 
 export async function setStaffServiceAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...TEAM_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -291,6 +319,9 @@ export async function setStaffServiceAction(input: unknown): Promise<ActionResul
 // ------------------------------------------------------------
 
 export async function inviteStaffAction(input: unknown): Promise<ActionResult<{ url: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...MANAGEMENT])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 

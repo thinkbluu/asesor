@@ -5,6 +5,8 @@ export const PLANS = [
   {
     id: "basic",
     name: "Basic",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_BASIC_MONTHLY,
+    stripePriceIdYearly: process.env.STRIPE_PRICE_BASIC_YEARLY,
     monthly: 49,
     yearly: 39,
     maxUsers: 2,
@@ -21,6 +23,8 @@ export const PLANS = [
   {
     id: "pro",
     name: "Pro",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_PRO_MONTHLY,
+    stripePriceIdYearly: process.env.STRIPE_PRICE_PRO_YEARLY,
     monthly: 99,
     yearly: 79,
     maxUsers: 10,
@@ -40,6 +44,8 @@ export const PLANS = [
   {
     id: "premium",
     name: "Premium",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_PREMIUM_MONTHLY,
+    stripePriceIdYearly: process.env.STRIPE_PRICE_PREMIUM_YEARLY,
     monthly: 199,
     yearly: 159,
     maxUsers: null,
@@ -57,6 +63,55 @@ export const PLANS = [
 ] as const
 
 export type PlanId = (typeof PLANS)[number]["id"]
+
+export type BillingInterval = "month" | "year"
+
+export function isPlanId(value: unknown): value is PlanId {
+  return PLANS.some((p) => p.id === value)
+}
+
+export function getPlan(id: string | null | undefined) {
+  return PLANS.find((p) => p.id === id) ?? PLANS[0]
+}
+
+// Modules that are not part of every plan. The minimum plan per module is the
+// single source for page gates, action gates and the upgrade screen copy.
+export type FeatureKey = "stocuri" | "financiar" | "loialitate"
+
+export const FEATURE_MIN_PLAN: Record<FeatureKey, PlanId> = {
+  stocuri: "pro",
+  financiar: "pro",
+  loialitate: "pro",
+}
+
+export const FEATURE_LABEL: Record<FeatureKey, string> = {
+  stocuri: "Stocuri",
+  financiar: "Financiar",
+  loialitate: "Loialitate și recenzii",
+}
+
+const PLAN_RANK: Record<PlanId, number> = { basic: 0, pro: 1, premium: 2 }
+
+export function planAllows(plan: string | null | undefined, feature: FeatureKey): boolean {
+  return PLAN_RANK[getPlan(plan).id] >= PLAN_RANK[FEATURE_MIN_PLAN[feature]]
+}
+
+/** Stripe price id for a plan/interval, read from env at call time. */
+export function getStripePriceId(plan: PlanId, interval: BillingInterval): string | null {
+  const p = getPlan(plan)
+  const id = interval === "year" ? p.stripePriceIdYearly : p.stripePriceIdMonthly
+  return id && id.trim().length > 0 ? id : null
+}
+
+/** Reverse lookup used by the webhook: price id → plan + interval. */
+export function planFromStripePriceId(priceId: string | null | undefined): { plan: PlanId; interval: BillingInterval } | null {
+  if (!priceId) return null
+  for (const p of PLANS) {
+    if (p.stripePriceIdMonthly === priceId) return { plan: p.id, interval: "month" }
+    if (p.stripePriceIdYearly === priceId) return { plan: p.id, interval: "year" }
+  }
+  return null
+}
 
 export const TRIAL_DAYS = 14
 export const TRIAL_REQUIRES_CARD = true

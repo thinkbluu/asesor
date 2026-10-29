@@ -8,6 +8,8 @@ import { redirect } from "next/navigation"
 import type { User } from "@supabase/supabase-js"
 import { createSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase/server"
 import type { Database } from "@/lib/supabase/types"
+import { loadBillingState } from "@/lib/billing/state"
+import type { BillingState } from "@/lib/billing/access"
 import { SALON_COOKIE } from "./constants"
 
 export type AppRole = Database["public"]["Enums"]["member_role"]
@@ -23,6 +25,8 @@ export type Session = {
   role: AppRole | null
   staffId: string | null
   memberships: Pick<MemberRow, "salon_id" | "role" | "staff_id">[]
+  /** Access state derived from pilot / subscription (null without a salon). */
+  billing: BillingState | null
 }
 
 /**
@@ -51,7 +55,7 @@ export async function getSession(): Promise<Session | null> {
   const rows = (memberships ?? []) as Pick<MemberRow, "salon_id" | "role" | "staff_id">[]
 
   if (rows.length === 0) {
-    return { user, profile: (profile as ProfileRow | null) ?? null, salon: null, role: null, staffId: null, memberships: [] }
+    return { user, profile: (profile as ProfileRow | null) ?? null, salon: null, role: null, staffId: null, memberships: [], billing: null }
   }
 
   const cookieStore = await cookies()
@@ -69,6 +73,8 @@ export async function getSession(): Promise<Session | null> {
     salon = (data as SalonRow | null) ?? null
   }
 
+  const billing = salon ? await loadBillingState(salon) : null
+
   return {
     user,
     profile: (profile as ProfileRow | null) ?? null,
@@ -76,6 +82,7 @@ export async function getSession(): Promise<Session | null> {
     role: chosen?.role ?? null,
     staffId: chosen?.staff_id ?? null,
     memberships: rows,
+    billing,
   }
 }
 

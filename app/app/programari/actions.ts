@@ -22,6 +22,7 @@ import {
 import { zodToActionError, type ActionResult } from "@/lib/validation/onboarding"
 import { sendAppointmentCancellation, sendAppointmentConfirmation } from "@/lib/messaging/appointment-emails"
 import type { Appointment } from "@/lib/mappers/programari"
+import { billingGuard } from "@/lib/billing/guard"
 
 // Server actions for the Programări calendar. Reads are available to every
 // salon role; mutations are restricted to owner/manager/receptionist (staff
@@ -68,6 +69,9 @@ export async function searchClientsAction(query: string): Promise<ActionResult<u
 export async function createClientInlineAction(
   input: unknown,
 ): Promise<ActionResult<{ id: string; firstName: string; lastName: string; phone: string }>> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...MUTATION_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -81,6 +85,9 @@ export async function createClientInlineAction(
 }
 
 export async function createAppointmentAction(input: unknown): Promise<AppointmentMutationResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...MUTATION_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -123,6 +130,9 @@ export async function createAppointmentAction(input: unknown): Promise<Appointme
 }
 
 export async function updateAppointmentAction(input: unknown): Promise<AppointmentMutationResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...MUTATION_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
@@ -152,6 +162,9 @@ export async function updateAppointmentAction(input: unknown): Promise<Appointme
 }
 
 export async function updateAppointmentStatusAction(input: unknown): Promise<ActionResult> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const session = await requireRole([...READ_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
