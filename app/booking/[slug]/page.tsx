@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { cache } from "react"
 import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
+import { loadBillingStateBySlug } from "@/lib/billing/state"
 import { BookingFlow } from "@/components/booking/booking-flow"
 import type { SalonInfo, BookingService } from "@/lib/booking-logic"
 import { getDayNameRO } from "@/lib/booking-logic"
@@ -98,6 +99,19 @@ export default async function BookingPage({
   const { slug } = await params
   const data = await loadPublicSalon(slug)
   if (!data) notFound()
+
+  const billing = await loadBillingStateBySlug(slug)
+  if (billing?.readOnly) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 p-6 text-center">
+        <h1 className="text-balance text-2xl font-bold">{data.salon.name}</h1>
+        <p role="status" className="text-pretty text-muted-foreground">
+          Programarea online este temporar indisponibilă.
+          {data.salon.phone ? ` Sună la salon: ${data.salon.phone}` : ""}
+        </p>
+      </main>
+    )
+  }
 
   return <BookingFlow salon={data.salon} services={data.services} />
 }

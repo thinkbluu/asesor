@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js"
 import crypto from "node:crypto"
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
 import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from "@/lib/supabase/config"
+import { loadBillingStateBySlug } from "@/lib/billing/state"
 import { serverEnv } from "@/lib/env.server"
 import { sendAppointmentConfirmation } from "@/lib/messaging/appointment-emails"
 import { absoluteUrl } from "@/lib/messaging/urls"
@@ -170,6 +171,10 @@ export async function createPublicBooking(
   // 4–8. rate limits, slot re-check, client find-or-create, insert — one RPC
   if (!isSupabaseAdminConfigured()) {
     return { ok: false, code: "unavailable", message: "Programările online nu sunt disponibile momentan." }
+  }
+  const billing = await loadBillingStateBySlug(d.slug)
+  if (billing?.readOnly) {
+    return { ok: false, code: "unavailable", message: "Programarea online este temporar indisponibilă. Sună la salon." }
   }
   const manageToken = crypto.randomBytes(32).toString("base64url")
   const ipHash = crypto.createHash("sha256").update(ip).digest("hex")
