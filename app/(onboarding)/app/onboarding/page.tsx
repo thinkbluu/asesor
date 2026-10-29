@@ -63,6 +63,7 @@ export default async function OnboardingPage() {
       initialStaff={mapStaffRowsToStep4(state.staff, state.staffServices)}
       initialRules={mapToStep5(state.salon)}
       initialSlug={state.salon.slug}
+      hasPilot={Boolean(session.billing?.pilotUntil)}
     />
   )
 }

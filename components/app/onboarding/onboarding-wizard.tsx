@@ -72,6 +72,7 @@ export interface OnboardingWizardProps {
   initialStaff: OnboardingStaff[]
   initialRules: OnboardingRules
   initialSlug: string | null
+  hasPilot?: boolean
 }
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
@@ -620,7 +621,15 @@ function Step5({
 
 // ─── Done: public booking link ───────────────────────────────────────────────
 
-function DoneCard({ bookingUrl, onOpenCalendar }: { bookingUrl: string; onOpenCalendar: () => void }) {
+function DoneCard({
+  bookingUrl,
+  onOpenCalendar,
+  onActivateTrial,
+}: {
+  bookingUrl: string
+  onOpenCalendar: () => void
+  onActivateTrial: (() => void) | null
+}) {
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(bookingUrl)
@@ -646,6 +655,20 @@ function DoneCard({ bookingUrl, onOpenCalendar }: { bookingUrl: string; onOpenCa
         <p className="text-xs font-medium text-[#0A0A0A]/40 uppercase tracking-wide">Link programare online</p>
         <p className="mt-1 truncate font-mono text-sm text-[#0A0A0A]">{bookingUrl}</p>
       </div>
+
+      {onActivateTrial && (
+        <div className="rounded-xl border border-[#2D8C3C]/30 bg-[#2D8C3C]/5 p-4">
+          <p className="text-sm text-[#0A0A0A]/70">
+            Alege un plan și începe cele 14 zile de probă. Cardul este necesar, dar nu plătești nimic în perioada de probă.
+          </p>
+          <Button
+            onClick={onActivateTrial}
+            className="mt-3 h-11 bg-[#2D8C3C] px-6 font-semibold text-white hover:bg-[#256b30]"
+          >
+            Activează perioada de probă de 14 zile
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
         <Button
@@ -685,6 +708,7 @@ export function OnboardingWizard({
   initialStaff,
   initialRules,
   initialSlug,
+  hasPilot = false,
 }: OnboardingWizardProps) {
   const router = useRouter()
   const [step, setStep] = useState(initialStep)
@@ -839,7 +863,11 @@ export function OnboardingWizard({
 
         {done ? (
           <div className="rounded-2xl border border-[#0A0A0A]/8 bg-white p-8 shadow-sm sm:p-10">
-            <DoneCard bookingUrl={bookingUrl} onOpenCalendar={() => router.push("/app/programari")} />
+            <DoneCard
+              bookingUrl={bookingUrl}
+              onOpenCalendar={() => router.push("/app/programari")}
+              onActivateTrial={hasPilot ? null : () => router.push("/app/setari?tab=abonament&start=1")}
+            />
           </div>
         ) : (
           <>
