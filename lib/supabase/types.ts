@@ -1230,6 +1230,81 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          id: string
+          salon_id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          plan: string
+          interval: string
+          status: string
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          trial_end: string | null
+          past_due_since: string | null
+          last_event_created: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          salon_id: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan: string
+          interval?: string
+          status: string
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          trial_end?: string | null
+          past_due_since?: string | null
+          last_event_created?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          salon_id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          plan?: string
+          interval?: string
+          status?: string
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          trial_end?: string | null
+          past_due_since?: string | null
+          last_event_created?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stripe_events: {
+        Row: {
+          id: string
+          type: string
+          received_at: string
+          processed_at: string | null
+          error: string | null
+        }
+        Insert: {
+          id: string
+          type: string
+          received_at?: string
+          processed_at?: string | null
+          error?: string | null
+        }
+        Update: {
+          id?: string
+          type?: string
+          received_at?: string
+          processed_at?: string | null
+          error?: string | null
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           id: string
