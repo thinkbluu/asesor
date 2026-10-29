@@ -15,6 +15,7 @@ import {
   photoMetaSchema,
 } from "@/lib/validation/clienti"
 import { billingGuard } from "@/lib/billing/guard"
+import { checkClientLimit } from "@/lib/billing/limits"
 
 // Server actions for Clienti. Reads: every salon role. Profile CRUD:
 // owner/manager/receptionist. Protected health data (read + write) and photos:
@@ -128,6 +129,9 @@ export async function createClientAction(input: unknown): Promise<ActionResult<{
   const session = await requireRole([...PROFILE_ROLES])
   if (!session.salon) return { ok: false, error: "Nu ai un salon activ." }
 
+  const limitBlock = await checkClientLimit(session.salon.id, session.billing)
+  if (limitBlock) return limitBlock
+
   const parsed = clientUpdateSchema.safeParse(input)
   if (!parsed.success) return { ok: false, ...zodToActionError(parsed.error) }
 
@@ -235,6 +239,9 @@ export async function importClientsAction(input: unknown): Promise<ActionResult<
 
   const parsed = importPayloadSchema.safeParse(input)
   if (!parsed.success) return { ok: false, ...zodToActionError(parsed.error) }
+
+  const limitBlock = await checkClientLimit(session.salon.id, session.billing, parsed.data.rows.length)
+  if (limitBlock) return limitBlock
 
   const result = await db.importClients(session.salon.id, parsed.data.rows)
   if (!result.ok) return { ok: false, error: result.error }

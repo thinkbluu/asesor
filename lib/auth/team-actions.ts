@@ -16,6 +16,7 @@ import { aal2Required, MFA_REQUIRED, type MfaRequired } from "@/lib/auth/mfa"
 import { getSession, MANAGEMENT_ROLES } from "./session"
 import type { AppRole } from "./session"
 import { billingGuard } from "@/lib/billing/guard"
+import { checkUserLimit } from "@/lib/billing/limits"
 
 export type ActionResult =
   | { ok: true }
@@ -60,8 +61,14 @@ export async function inviteMember(
   role: string,
   staffId?: string,
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  const blocked = await billingGuard({ write: true })
+  if (blocked) return blocked
+
   const guard = await requireManagerSession()
   if (!guard.session) return { ok: false, error: guard.error }
+
+  const seatBlock = await checkUserLimit(guard.session.salon!.id, guard.session.billing)
+  if (seatBlock) return seatBlock
 
   const normalizedEmail = email.trim().toLowerCase()
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
