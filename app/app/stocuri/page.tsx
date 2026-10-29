@@ -1,5 +1,7 @@
 import { requireRole } from "@/lib/auth/session"
 import { listProducts, listMovements, listLinkableServices, type StockRole } from "@/lib/data/stocuri"
+import { planAllows } from "@/lib/plans"
+import { UpgradeScreen } from "@/components/app/upgrade-screen"
 import { StocuriView } from "@/components/app/stocuri/stocuri-view"
 
 // P8 part 1: stock management wired to Supabase.
@@ -8,6 +10,9 @@ import { StocuriView } from "@/components/app/stocuri/stocuri-view"
 // lib/data/stocuri.ts.
 export default async function StocuriPage() {
   const session = await requireRole(["owner", "manager", "receptionist", "staff"])
+  if (!planAllows(session.billing?.plan, "stocuri")) {
+    return <UpgradeScreen feature="stocuri" isOwner={session.role === "owner"} />
+  }
   const salonId = session.salon!.id
   const role = session.role as StockRole
 

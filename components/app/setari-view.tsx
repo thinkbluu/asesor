@@ -50,6 +50,8 @@ import { SettingsSecurity } from "@/components/app/settings-security"
 import { SettingsPrivacy } from "@/components/app/settings-privacy"
 import { SettingsNotificari } from "@/components/app/settings-notificari"
 import { SettingsAbonament } from "@/components/app/settings-abonament"
+import { UpgradeScreen } from "@/components/app/upgrade-screen"
+import { planAllows } from "@/lib/plans"
 import type { BillingState } from "@/lib/billing/access"
 import type { NotificationSettings } from "@/lib/messaging/settings"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
@@ -774,9 +776,12 @@ export function SetariView({
           )}
 
           {/* ── LOIALITATE ── */}
-          {activeTab === "loialitate" && (
-            <SettingsLoialitate initialConfig={loyalty} />
-          )}
+          {activeTab === "loialitate" &&
+            (planAllows(billing.plan, "loialitate") ? (
+              <SettingsLoialitate initialConfig={loyalty} />
+            ) : (
+              <UpgradeScreen feature="loialitate" isOwner={isOwner} />
+            ))}
 
           {/* ── RECENZII GOOGLE ── */}
           {activeTab === "recenzii" && (
