@@ -49,6 +49,8 @@ import { SettingsEchipa } from "@/components/app/settings-echipa"
 import { SettingsSecurity } from "@/components/app/settings-security"
 import { SettingsPrivacy } from "@/components/app/settings-privacy"
 import { SettingsNotificari } from "@/components/app/settings-notificari"
+import { SettingsAbonament } from "@/components/app/settings-abonament"
+import type { BillingState } from "@/lib/billing/access"
 import type { NotificationSettings } from "@/lib/messaging/settings"
 import type { SetariProfil, SetariDaySchedule, SetariPolitici, SetariCategory, SetariService } from "@/lib/mappers/setari"
 import type { LoyaltyConfig } from "@/lib/loyalty"
@@ -86,6 +88,9 @@ interface SetariViewProps {
   products: { id: string; name: string }[]
   deletedAt: string | null
   notifications: NotificationSettings
+  billing: BillingState
+  usage: { users: number; clients: number }
+  isOwner: boolean
 }
 
 // --- Initial state ---
@@ -147,6 +152,9 @@ export function SetariView({
   products,
   deletedAt,
   notifications,
+  billing,
+  usage,
+  isOwner,
 }: SetariViewProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -776,117 +784,7 @@ export function SetariView({
           )}
 
           {/* ── ABONAMENT ── */}
-          {activeTab === "abonament" && (
-            <div className="max-w-3xl space-y-6">
-              {/* Current plan */}
-              <Card className="border-accent/40 bg-accent/5">
-                <CardContent className="pt-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-lg font-bold">Plan Pro</p>
-                        <Badge className="bg-accent text-accent-foreground">Activ</Badge>
-                      </div>
-                      <p className="text-muted-foreground">349 RON / lună</p>
-                      <p className="mt-1 text-xs text-muted-foreground">Următoarea facturare: 1 Martie 2025 · Visa **** 4242</p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-accent" />
-                  </div>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-background/60 p-4">
-                      <p className="text-xs text-muted-foreground">Programări luna aceasta</p>
-                      <p className="mt-1 text-2xl font-bold">87 <span className="text-sm font-normal text-muted-foreground">/ 500</span></p>
-                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div className="h-full w-[17%] rounded-full bg-accent" />
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-background/60 p-4">
-                      <p className="text-xs text-muted-foreground">Membri echipă</p>
-                      <p className="mt-1 text-2xl font-bold">4 <span className="text-sm font-normal text-muted-foreground">/ 15</span></p>
-                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div className="h-full w-[27%] rounded-full bg-accent" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex gap-3">
-                    <Button variant="outline" size="sm">Schimbă planul</Button>
-                    <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">Anulează abonamentul</Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Plan comparison */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Comparație planuri</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="pb-3 text-left font-medium text-muted-foreground">Funcționalitate</th>
-                          <th className="pb-3 text-center font-medium">Starter</th>
-                          <th className="pb-3 text-center font-medium text-accent">Pro</th>
-                          <th className="pb-3 text-center font-medium">Enterprise</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {[
-                          ["Programări/lună", "100", "500", "Nelimitat"],
-                          ["Membri echipă", "3", "15", "Nelimitat"],
-                          ["Notificări SMS", "—", "✓", "✓"],
-                          ["Rapoarte financiare", "Bază", "Avansat", "Complet"],
-                          ["Module marketing", "—", "✓", "✓"],
-                          ["Suport prioritar", "—", "—", "✓"],
-                          ["Preț / lună", "149 RON", "349 RON", "Custom"],
-                        ].map(([feat, s, p, e]) => (
-                          <tr key={feat} className="text-center">
-                            <td className="py-2.5 text-left text-muted-foreground">{feat}</td>
-                            <td className="py-2.5">{s}</td>
-                            <td className="py-2.5 font-medium text-accent">{p}</td>
-                            <td className="py-2.5">{e}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Billing history */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Istoric facturi</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {[
-                      { date: "1 Feb 2025", amount: "349 RON", status: "Plătită" },
-                      { date: "1 Ian 2025", amount: "349 RON", status: "Plătită" },
-                      { date: "1 Dec 2024", amount: "349 RON", status: "Plătită" },
-                      { date: "1 Nov 2024", amount: "149 RON", status: "Plătită" },
-                    ].map((inv, i) => (
-                      <div key={i} className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
-                        <div>
-                          <p className="text-sm font-medium">{inv.date}</p>
-                          <p className="text-xs text-muted-foreground">{inv.amount}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline" className="text-xs text-accent border-accent/30">
-                            {inv.status}
-                          </Badge>
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-muted-foreground">
-                            <Download className="h-3 w-3" /> PDF
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+          {activeTab === "abonament" && <SettingsAbonament billing={billing} usage={usage} isOwner={isOwner} />}
 
           {/* ── SECURITATE ── */}
           {activeTab === "securitate" && <SettingsSecurity />}

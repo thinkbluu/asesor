@@ -13,6 +13,8 @@ import {
 } from "@/lib/mappers/setari"
 import { SetariView } from "@/components/app/setari-view"
 import { readNotificationSettings } from "@/lib/messaging/settings"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { loadBillingState } from "@/lib/billing/state"
 
 export const metadata: Metadata = {
   title: "Setări | ASESOR",
@@ -33,6 +35,13 @@ export default async function SetariPage() {
     getReviewsStatsForSalon(salon.id),
   ])
 
+  const supabase = await createSupabaseServerClient()
+  const [{ count: userCount }, { count: clientCount }] = await Promise.all([
+    supabase.from("salon_members").select("user_id", { count: "exact", head: true }).eq("salon_id", salon.id),
+    supabase.from("clients").select("id", { count: "exact", head: true }).eq("salon_id", salon.id).is("deleted_at", null),
+  ])
+  const billing = session.billing ?? (await loadBillingState(salon))
+
   return (
     <SetariView
       profil={mapSalonToProfil(salonRow ?? salon)}
@@ -47,6 +56,9 @@ export default async function SetariPage() {
       products={products}
       deletedAt={salon.deleted_at}
       notifications={readNotificationSettings((salonRow ?? salon).booking_settings)}
+      billing={billing}
+      usage={{ users: userCount ?? 0, clients: clientCount ?? 0 }}
+      isOwner={session.role === "owner"}
     />
   )
 }
