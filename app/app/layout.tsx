@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth/session"
 import { pendingLegalDocs } from "@/lib/legal"
 import { AppSidebar } from "@/components/app/app-sidebar"
+import { BillingBanner } from "@/components/app/billing-banner"
 import { LegalAcceptanceModal } from "@/components/app/legal-acceptance-modal"
 import { Toaster } from "@/components/ui/sonner"
 
@@ -33,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         role={session.role}
       />
       <div className="lg:pl-64 transition-all duration-300">
+        <BillingBanner banner={session.billing?.banner ?? null} isOwner={session.role === "owner"} />
         <main className="min-h-screen">{children}</main>
       </div>
       {session.role === "owner" ? (

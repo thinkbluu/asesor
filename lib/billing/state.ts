@@ -43,6 +43,18 @@ export async function loadBillingState(salon: SalonBillingInput & { id: string }
   return computeBillingState({ salon, subscription, enforced: isStripeConfigured() })
 }
 
+/** Billing state for a salon slug without a session (public booking page + RPC guard). */
+export async function loadBillingStateBySlug(slug: string): Promise<BillingState | null> {
+  if (!isSupabaseAdminConfigured()) return null
+  try {
+    const { data } = await createSupabaseAdminClient().from("salons").select("id").eq("slug", slug).maybeSingle()
+    return data ? await loadBillingStateBySalonId(data.id) : null
+  } catch (err) {
+    console.error("[v0] billing: state by slug failed:", err)
+    return null
+  }
+}
+
 /** Billing state for a salon id without a session (public booking page). */
 export async function loadBillingStateBySalonId(salonId: string): Promise<BillingState | null> {
   if (!isSupabaseAdminConfigured()) return null
