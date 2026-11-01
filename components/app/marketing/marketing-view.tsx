@@ -80,7 +80,7 @@ interface Promotion {
 
 function StatusBadge({ status }: { status: Campaign["status"] }) {
   const map: Record<string, string> = {
-    Activ:      "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+    Activ:      "bg-primary/10 text-primary border-primary/30",
     Trimis:     "bg-blue-500/15 text-blue-600 border-blue-500/30",
     Programat:  "bg-amber-500/15 text-amber-600 border-amber-500/30",
     Draft:      "bg-muted text-muted-foreground",
@@ -829,7 +829,7 @@ export default function MarketingView({
                     </td>
                     <td className="px-4 py-3">
                       {p.active
-                        ? <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30 border text-xs">Activ</Badge>
+                        ? <Badge className="bg-primary/10 text-primary border-primary/30 border text-xs">Activ</Badge>
                         : <Badge variant="secondary" className="text-xs">Expirat</Badge>}
                     </td>
                   </tr>

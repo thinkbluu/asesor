@@ -15,7 +15,7 @@ import type { SetariBranding } from "@/lib/mappers/setari"
 import { saveSetariBrandingAction } from "@/app/app/setari/actions"
 
 const PRESET_COLORS = [
-  "#2D8C3C", // default ASESOR
+  "#00704F", // default ASESOR
   "#0A0A0A", // black
   "#1A1A2E", // navy
   "#D4A853", // gold
@@ -331,7 +331,7 @@ export function BrandingTab({ initial }: Props) {
             </span>
           )}
           {saved && (
-            <span className="flex items-center gap-1 text-xs text-emerald-600">
+            <span className="flex items-center gap-1 text-xs text-primary">
               <Check className="h-3 w-3" />
               Salvat
             </span>

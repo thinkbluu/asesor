@@ -71,15 +71,15 @@ const EMPTY_PRODUCT: ProductFormState = {
 }
 
 const STATUS_META: Record<StockStatus, { label: string; className: string }> = {
-  ok: { label: "În stoc", className: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
+  ok: { label: "În stoc", className: "bg-primary/10 text-primary border-primary/30" },
   low: { label: "Stoc minim", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
   out: { label: "Epuizat", className: "bg-red-500/15 text-red-500 border-red-500/30" },
 }
 
 const MOVEMENT_BADGE: Record<MovementType, string> = {
-  receptie: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+  receptie: "bg-primary/10 text-primary border-primary/30",
   consum: "bg-blue-500/15 text-blue-600 border-blue-500/30",
-  ajustare: "bg-slate-500/15 text-slate-600 border-slate-500/30",
+  ajustare: "bg-muted text-muted-foreground border-border",
   pierdere: "bg-red-500/15 text-red-500 border-red-500/30",
   retur: "bg-amber-500/15 text-amber-600 border-amber-500/30",
 }
@@ -422,11 +422,11 @@ function ProductsTab(props: {
                     </Badge>
                   </TableCell>
                   {canManage && (
-                    <TableCell className="text-right tabular-nums">
+                    <TableCell className="text-right font-mono tabular-nums">
                       {p.costPrice != null ? lei(p.costPrice) : "—"}
                     </TableCell>
                   )}
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell className="text-right font-mono tabular-nums">
                     {p.retailPrice != null ? lei(p.retailPrice) : "—"}
                   </TableCell>
                   <TableCell className="text-sm">{p.supplierName || "—"}</TableCell>
@@ -490,8 +490,8 @@ function MovementsTab(props: {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm">{product?.name || m.productName || "Produs șters"}</TableCell>
-                <TableCell className="whitespace-nowrap text-right tabular-nums">
-                  <span className={cn("inline-flex items-center gap-1", m.quantity >= 0 ? "text-emerald-600" : "text-red-500")}>
+                <TableCell className="whitespace-nowrap text-right font-mono tabular-nums">
+                  <span className={cn("inline-flex items-center gap-1", m.quantity >= 0 ? "text-primary" : "text-red-500")}>
                     {m.quantity >= 0 ? <ArrowUpCircle className="size-3.5" /> : <ArrowDownCircle className="size-3.5" />}
                     {m.quantity > 0 ? "+" : ""}{m.quantity} {m.unit}
                   </span>

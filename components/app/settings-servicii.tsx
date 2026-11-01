@@ -71,7 +71,7 @@ const CATEGORY_ICONS = {
 }
 
 const COLOR_OPTIONS = [
-  "#10b981", // emerald
+  "#00704F", // emerald
   "#3b82f6", // blue
   "#f59e0b", // amber
   "#ec4899", // pink

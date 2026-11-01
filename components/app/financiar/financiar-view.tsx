@@ -562,7 +562,7 @@ function TransactionRow(props: {
   const { t, dayClosed, pending, onRefund } = props
   return (
     <TableRow className={t.status === "rambursata" ? "opacity-60" : undefined}>
-      <TableCell className="text-sm whitespace-nowrap">
+      <TableCell className="text-sm whitespace-nowrap font-mono tabular-nums">
         {t.day.slice(8)}.{t.day.slice(5, 7)}.{t.day.slice(0, 4)}
         <span className="text-muted-foreground ml-1">{t.paidAt.slice(11, 16)}</span>
       </TableCell>
@@ -571,7 +571,7 @@ function TransactionRow(props: {
         {t.services.join(", ") || "—"}
       </TableCell>
       <TableCell className="hidden lg:table-cell text-sm">{t.staffName}</TableCell>
-      <TableCell className="text-right text-sm font-medium">
+      <TableCell className="text-right text-sm font-medium font-mono tabular-nums">
         {formatRON(t.amount)}
         {t.tip > 0 && <span className="block text-xs text-muted-foreground">+ {formatRON(t.tip)} bacșiș</span>}
       </TableCell>
@@ -617,7 +617,7 @@ function ExpenseRow(props: {
       <TableCell className="hidden md:table-cell text-sm text-muted-foreground max-w-56 truncate">
         {e.description || "—"}
       </TableCell>
-      <TableCell className="text-right text-sm font-medium">{formatRON(e.amount)}</TableCell>
+      <TableCell className="text-right text-sm font-medium font-mono tabular-nums">{formatRON(e.amount)}</TableCell>
       <TableCell className="hidden md:table-cell text-sm">{FREQUENCY_LABELS[e.frequency]}</TableCell>
       <TableCell>
         {e.receiptPath ? (
@@ -728,7 +728,7 @@ function DayCloseTab(props: {
                 <Input type="number" step="0.01" min="0" value={counted}
                   onChange={(e) => setCounted(e.target.value)} disabled={closed} />
               </div>
-              <p className={cn("text-sm", effectiveDiff === 0 ? "text-muted-foreground" : effectiveDiff > 0 ? "text-emerald-600" : "text-red-600")}>
+              <p className={cn("text-sm", effectiveDiff === 0 ? "text-muted-foreground" : effectiveDiff > 0 ? "text-primary" : "text-red-600")}>
                 Diferență: {formatRON(effectiveDiff)}
               </p>
               <div className="space-y-1">
@@ -788,7 +788,7 @@ function DayCloseTab(props: {
               <span className="text-muted-foreground">
                 Numerar {formatRON(c.totals.numerar)}
                 {c.difference != null && (
-                  <span className={cn("ml-2", c.difference === 0 ? "" : c.difference > 0 ? "text-emerald-600" : "text-red-600")}>
+                  <span className={cn("ml-2", c.difference === 0 ? "" : c.difference > 0 ? "text-primary" : "text-red-600")}>
                     ({c.difference > 0 ? "+" : ""}{c.difference.toFixed(2)})
                   </span>
                 )}

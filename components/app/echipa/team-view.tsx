@@ -23,7 +23,7 @@ import { createStaffAction, decideTimeOffAction } from "@/app/app/echipa/actions
 import { COMMISSION_TYPES, STAFF_STATUSES } from "@/lib/validation/echipa"
 
 const STATUS_STYLES: Record<string, string> = {
-  activ: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30",
+  activ: "bg-primary/10 text-primary border-primary/30",
   concediu: "bg-amber-500/15 text-amber-600 border-amber-500/30",
   inactiv: "bg-zinc-500/15 text-zinc-500 border-zinc-500/30",
 }
@@ -189,9 +189,9 @@ export function TeamView({
                   </TableCell>
                   {canSeeFinancials && (
                     <>
-                      <TableCell className="text-right tabular-nums">{s.month?.appointmentsCount ?? 0}</TableCell>
-                      <TableCell className="text-right tabular-nums">{lei(s.month?.revenue ?? 0)}</TableCell>
-                      <TableCell className="text-right tabular-nums">{lei(s.month?.commissionAmount ?? 0)}</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums">{s.month?.appointmentsCount ?? 0}</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums">{lei(s.month?.revenue ?? 0)}</TableCell>
+                      <TableCell className="text-right font-mono tabular-nums">{lei(s.month?.commissionAmount ?? 0)}</TableCell>
                     </>
                   )}
                   <TableCell>

@@ -17,7 +17,7 @@ function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) 
           key={i}
           className={cn(
             size === "sm" ? "h-3 w-3" : "h-4 w-4",
-            i <= Math.round(rating) ? "fill-emerald-500 text-emerald-500" : "text-muted-foreground/30"
+            i <= Math.round(rating) ? "fill-primary text-primary" : "text-muted-foreground/30"
           )}
         />
       ))}
@@ -31,12 +31,12 @@ export function ReviewsWidget({ stats }: { stats: ReviewsStats }) {
   const maxBar = Math.max(dist[1], dist[2], dist[3], dist[4], dist[5], 1)
 
   return (
-    <Card className="border-emerald-500/20">
+    <Card className="border-primary/20">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
-              <Star className="h-4 w-4 text-emerald-600" />
+              <Star className="h-4 w-4 text-primary" />
               Feedback clienți
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
@@ -66,7 +66,7 @@ export function ReviewsWidget({ stats }: { stats: ReviewsStats }) {
                   <span className="w-8 text-muted-foreground">{star}★</span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
                     <div
-                      className="h-full rounded-full bg-emerald-500"
+                      className="h-full rounded-full bg-primary"
                       style={{ width: `${(dist[star] / maxBar) * 100}%` }}
                     />
                   </div>

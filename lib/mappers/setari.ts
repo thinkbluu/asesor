@@ -86,7 +86,7 @@ export interface SetariService {
 }
 
 export const CATEGORY_DEFAULT_ICON = "Star"
-export const CATEGORY_DEFAULT_COLOR = "#10b981"
+export const CATEGORY_DEFAULT_COLOR = "#00704F"
 
 export function mapCategoryRowsToSetariCategories(rows: ServiceCategoryRow[]): SetariCategory[] {
   return rows.map((row) => ({
@@ -183,7 +183,7 @@ export function mapSalonToBranding(salon: SalonRow): SetariBranding {
   return {
     slug: salon.slug,
     logoUrl: str(raw.logo_url, ""),
-    primaryColor: str(raw.primary_color, "#2D8C3C"),
+    primaryColor: str(raw.primary_color, "#00704F"),
     welcomeTitle: str(raw.welcome_title, `Bine ai venit la ${salon.name}`),
     welcomeSubtitle: str(raw.welcome_subtitle, "Programează-te rapid și ușor, 24/7"),
     coverImageUrl: str(raw.cover_image_url, ""),

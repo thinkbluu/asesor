@@ -223,7 +223,7 @@ export function AppointmentWhatsApp({
                   className={cn(
                     "flex items-center gap-2 rounded-lg border p-2.5 text-xs",
                     feedback.ok
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                      ? "border-primary/30 bg-primary/10 text-primary"
                       : "border-red-500/30 bg-red-500/10 text-red-600"
                   )}
                 >

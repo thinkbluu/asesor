@@ -103,9 +103,9 @@ export function SettingsLoialitate({ initialConfig }: Props) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Award className="h-4 w-4 text-emerald-600" />
+            <Award className="h-4 w-4 text-primary" />
             Program de loialitate
-            {cfg.enabled && <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30">Activ</Badge>}
+            {cfg.enabled && <Badge className="bg-primary/10 text-primary border-primary/30">Activ</Badge>}
           </CardTitle>
           <CardDescription>
             Acordă puncte automat clienților pentru fiecare vizită și oferă-le recompense pentru fidelitate.
@@ -176,8 +176,8 @@ export function SettingsLoialitate({ initialConfig }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Cake className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Cake className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Aniversare client</p>
@@ -224,8 +224,8 @@ export function SettingsLoialitate({ initialConfig }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Users className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Users className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Bonus recomandare</p>
@@ -258,8 +258,8 @@ export function SettingsLoialitate({ initialConfig }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Sparkles className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Sparkles className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Bonus primă vizită</p>

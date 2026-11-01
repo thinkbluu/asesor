@@ -89,7 +89,7 @@ function ProgressBar({ current }: { current: number }) {
               <div
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition-all",
-                  done   && "bg-[#2D8C3C] text-white",
+                  done   && "bg-[#00704F] text-white",
                   active && "bg-[#0A0A0A] text-white ring-4 ring-[#0A0A0A]/10",
                   !done && !active && "bg-[#0A0A0A]/8 text-[#0A0A0A]/40",
                 )}
@@ -106,7 +106,7 @@ function ProgressBar({ current }: { current: number }) {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={cn("h-px flex-1 transition-colors", done ? "bg-[#2D8C3C]" : "bg-[#0A0A0A]/10")} />
+              <div className={cn("h-px flex-1 transition-colors", done ? "bg-[#00704F]" : "bg-[#0A0A0A]/10")} />
             )}
           </div>
         )
@@ -133,8 +133,8 @@ function Step1({
 
       {/* Logo upload */}
       <div className="flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-[#0A0A0A]/15 bg-white cursor-pointer hover:border-[#2D8C3C]/50 transition-colors group">
-          <Upload className="h-5 w-5 text-[#0A0A0A]/25 group-hover:text-[#2D8C3C]/50 transition-colors" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-[#0A0A0A]/15 bg-white cursor-pointer hover:border-[#00704F]/50 transition-colors group">
+          <Upload className="h-5 w-5 text-[#0A0A0A]/25 group-hover:text-[#00704F]/50 transition-colors" />
         </div>
         <div>
           <p className="text-sm font-medium text-[#0A0A0A]">Logo salon</p>
@@ -148,7 +148,7 @@ function Step1({
           placeholder="Beauty Studio"
           value={data.name}
           onChange={(e) => onChange("name", e.target.value)}
-          className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] focus-visible:border-[#2D8C3C]"
+          className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] focus-visible:border-[#00704F]"
         />
       </div>
 
@@ -158,7 +158,7 @@ function Step1({
           placeholder="Str. Exemplu nr. 10, ap. 2"
           value={data.address}
           onChange={(e) => onChange("address", e.target.value)}
-          className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] focus-visible:border-[#2D8C3C]"
+          className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] focus-visible:border-[#00704F]"
         />
       </div>
 
@@ -169,7 +169,7 @@ function Step1({
             placeholder="București"
             value={data.city}
             onChange={(e) => onChange("city", e.target.value)}
-            className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] focus-visible:border-[#2D8C3C]"
+            className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] focus-visible:border-[#00704F]"
           />
         </div>
         <div className="space-y-1.5">
@@ -178,7 +178,7 @@ function Step1({
             placeholder="07XX XXX XXX"
             value={data.phone}
             onChange={(e) => onChange("phone", e.target.value)}
-            className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] focus-visible:border-[#2D8C3C]"
+            className="h-11 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] focus-visible:border-[#00704F]"
           />
         </div>
       </div>
@@ -234,13 +234,13 @@ function Step2({
                 placeholder="Numele serviciului"
                 value={service.name}
                 onChange={(e) => updateService(service.id, "name", e.target.value)}
-                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm flex-1 sm:flex-none"
+                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] text-sm flex-1 sm:flex-none"
               />
               <Select
                 value={service.duration}
                 onValueChange={(v) => updateService(service.id, "duration", v)}
               >
-                <SelectTrigger className="hidden sm:flex h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#2D8C3C]">
+                <SelectTrigger className="hidden sm:flex h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#00704F]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -256,7 +256,7 @@ function Step2({
                 type="number"
                 value={service.price}
                 onChange={(e) => updateService(service.id, "price", e.target.value)}
-                className="hidden sm:block h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
+                className="hidden sm:block h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] text-sm"
               />
               <button
                 type="button"
@@ -273,7 +273,7 @@ function Step2({
                 value={service.duration}
                 onValueChange={(v) => updateService(service.id, "duration", v)}
               >
-                <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#2D8C3C]">
+                <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-white text-sm focus:ring-[#00704F]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,7 +289,7 @@ function Step2({
                 type="number"
                 value={service.price}
                 onChange={(e) => updateService(service.id, "price", e.target.value)}
-                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#2D8C3C] text-sm"
+                className="h-10 border-[#0A0A0A]/15 bg-white focus-visible:ring-[#00704F] text-sm"
               />
             </div>
           </div>
@@ -299,7 +299,7 @@ function Step2({
       <button
         type="button"
         onClick={addService}
-        className="flex items-center gap-2 text-sm font-medium text-[#2D8C3C] hover:text-[#256b30] transition-colors"
+        className="flex items-center gap-2 text-sm font-medium text-[#00704F] hover:text-[#256b30] transition-colors"
       >
         <Plus className="h-4 w-4" /> Adaugă serviciu
       </button>
@@ -345,7 +345,7 @@ function Step3({
                   onClick={() => toggle(key, "open", !day.open)}
                   className={cn(
                     "relative h-5 w-9 rounded-full transition-colors shrink-0",
-                    day.open ? "bg-[#2D8C3C]" : "bg-[#0A0A0A]/15",
+                    day.open ? "bg-[#00704F]" : "bg-[#0A0A0A]/15",
                   )}
                 >
                   <div
@@ -371,14 +371,14 @@ function Step3({
                     type="time"
                     value={day.start}
                     onChange={(e) => toggle(key, "start", e.target.value)}
-                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
+                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#00704F]"
                   />
                   <span className="text-[#0A0A0A]/30 text-sm">—</span>
                   <Input
                     type="time"
                     value={day.end}
                     onChange={(e) => toggle(key, "end", e.target.value)}
-                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#2D8C3C]"
+                    className="h-9 flex-1 min-w-0 sm:w-28 sm:flex-none border-[#0A0A0A]/15 bg-white text-sm focus-visible:ring-[#00704F]"
                   />
                 </div>
               ) : (
@@ -456,7 +456,7 @@ function Step4({
                   placeholder="Ana Ionescu"
                   value={member.name}
                   onChange={(e) => updateMember(member.id, "name", e.target.value)}
-                  className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus-visible:ring-[#2D8C3C]"
+                  className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus-visible:ring-[#00704F]"
                 />
               </div>
               <div className="space-y-1.5">
@@ -465,7 +465,7 @@ function Step4({
                   value={member.role}
                   onValueChange={(v) => updateMember(member.id, "role", v)}
                 >
-                  <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus:ring-[#2D8C3C]">
+                  <SelectTrigger className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus:ring-[#00704F]">
                     <SelectValue placeholder="Selectează" />
                   </SelectTrigger>
                   <SelectContent>
@@ -483,7 +483,7 @@ function Step4({
                 placeholder="07XX XXX XXX"
                 value={member.phone}
                 onChange={(e) => updateMember(member.id, "phone", e.target.value)}
-                className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus-visible:ring-[#2D8C3C]"
+                className="h-10 border-[#0A0A0A]/15 bg-[#F7F5F2] text-sm focus-visible:ring-[#00704F]"
               />
             </div>
 
@@ -500,7 +500,7 @@ function Step4({
                       className={cn(
                         "flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-colors",
                         checked
-                          ? "bg-[#2D8C3C]/10 border-[#2D8C3C]/30 text-[#2D8C3C]"
+                          ? "bg-[#00704F]/10 border-[#00704F]/30 text-[#00704F]"
                           : "bg-white border-[#0A0A0A]/12 text-[#0A0A0A]/50 hover:border-[#0A0A0A]/25",
                       )}
                     >
@@ -518,7 +518,7 @@ function Step4({
       <button
         type="button"
         onClick={addMember}
-        className="flex items-center gap-2 text-sm font-medium text-[#2D8C3C] hover:text-[#256b30] transition-colors"
+        className="flex items-center gap-2 text-sm font-medium text-[#00704F] hover:text-[#256b30] transition-colors"
       >
         <Plus className="h-4 w-4" /> Adaugă angajat
       </button>
@@ -547,7 +547,7 @@ function Step5({
           <Label className="text-sm font-medium text-[#0A0A0A]">Pauză între programări</Label>
           <p className="text-xs text-[#0A0A0A]/40">Timp de buffer după fiecare programare</p>
           <Select value={rules.buffer} onValueChange={(v) => onChange("buffer", v)}>
-            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#2D8C3C]">
+            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#00704F]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -563,7 +563,7 @@ function Step5({
           <Label className="text-sm font-medium text-[#0A0A0A]">Programare minimă în avans</Label>
           <p className="text-xs text-[#0A0A0A]/40">Cu cât timp înainte poate fi făcută o programare</p>
           <Select value={rules.minAdvance} onValueChange={(v) => onChange("minAdvance", v)}>
-            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#2D8C3C]">
+            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#00704F]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -579,7 +579,7 @@ function Step5({
           <Label className="text-sm font-medium text-[#0A0A0A]">Fereastră de anulare</Label>
           <p className="text-xs text-[#0A0A0A]/40">Cu cât timp înainte poate fi anulată o programare</p>
           <Select value={rules.cancelWindow} onValueChange={(v) => onChange("cancelWindow", v)}>
-            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#2D8C3C]">
+            <SelectTrigger className="h-11 border-[#0A0A0A]/15 bg-white focus:ring-[#00704F]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -603,7 +603,7 @@ function Step5({
             onClick={() => onChange("onlineBooking", !rules.onlineBooking)}
             className={cn(
               "relative h-6 w-11 rounded-full transition-colors shrink-0",
-              rules.onlineBooking ? "bg-[#2D8C3C]" : "bg-[#0A0A0A]/15",
+              rules.onlineBooking ? "bg-[#00704F]" : "bg-[#0A0A0A]/15",
             )}
           >
             <div
@@ -641,8 +641,8 @@ function DoneCard({
 
   return (
     <div className="space-y-6 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#2D8C3C]/10">
-        <Check className="h-7 w-7 text-[#2D8C3C]" />
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#00704F]/10">
+        <Check className="h-7 w-7 text-[#00704F]" />
       </div>
       <div>
         <h2 className="text-xl font-bold text-[#0A0A0A]">Totul e gata!</h2>
@@ -657,13 +657,13 @@ function DoneCard({
       </div>
 
       {onActivateTrial && (
-        <div className="rounded-xl border border-[#2D8C3C]/30 bg-[#2D8C3C]/5 p-4">
+        <div className="rounded-xl border border-[#00704F]/30 bg-[#00704F]/5 p-4">
           <p className="text-sm text-[#0A0A0A]/70">
             Alege un plan și începe cele 14 zile de probă. Cardul este necesar, dar nu plătești nimic în perioada de probă.
           </p>
           <Button
             onClick={onActivateTrial}
-            className="mt-3 h-11 bg-[#2D8C3C] px-6 font-semibold text-white hover:bg-[#256b30]"
+            className="mt-3 h-11 bg-[#00704F] px-6 font-semibold text-white hover:bg-[#256b30]"
           >
             Activează perioada de probă de 14 zile
           </Button>
@@ -690,7 +690,7 @@ function DoneCard({
         href={bookingUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-sm text-[#2D8C3C] hover:text-[#256b30] transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-[#00704F] hover:text-[#256b30] transition-colors"
       >
         <ExternalLink className="h-3.5 w-3.5" /> Vezi pagina publică
       </a>
@@ -942,7 +942,7 @@ export function OnboardingWizard({
                   key={s.number}
                   className={cn(
                     "h-1.5 rounded-full transition-all",
-                    s.number === step ? "w-5 bg-[#0A0A0A]" : s.number < step ? "w-1.5 bg-[#2D8C3C]" : "w-1.5 bg-[#0A0A0A]/15",
+                    s.number === step ? "w-5 bg-[#0A0A0A]" : s.number < step ? "w-1.5 bg-[#00704F]" : "w-1.5 bg-[#0A0A0A]/15",
                   )}
                 />
               ))}

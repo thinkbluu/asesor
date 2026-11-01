@@ -30,7 +30,7 @@ import {
 const STATUS_CONFIG: Record<WhatsAppChannelStatus, { label: string; cls: string }> = {
   disconnected: { label: "Neconectat", cls: "bg-muted text-muted-foreground border-border" },
   pending: { label: "În verificare", cls: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
-  connected: { label: "Conectat", cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
+  connected: { label: "Conectat", cls: "bg-primary/10 text-primary border-primary/30" },
   error: { label: "Eroare", cls: "bg-red-500/15 text-red-500 border-red-500/30" },
 }
 
@@ -297,7 +297,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
                     variant="outline"
                     className={cn(
                       "text-xs",
-                      t.status === "approved" && "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
+                      t.status === "approved" && "bg-primary/10 text-primary border-primary/30",
                       t.status === "pending" && "bg-amber-500/10 text-amber-600 border-amber-500/30",
                       t.status === "draft" && "bg-muted text-muted-foreground"
                     )}

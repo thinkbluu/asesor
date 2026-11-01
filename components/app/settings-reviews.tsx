@@ -53,7 +53,7 @@ export function SettingsReviews({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <MessageSquare className="h-4 w-4 text-emerald-600" />
+            <MessageSquare className="h-4 w-4 text-primary" />
             Feedback primit
           </CardTitle>
           <CardDescription>
@@ -92,9 +92,9 @@ export function SettingsReviews({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Star className="h-4 w-4 text-emerald-600" />
+            <Star className="h-4 w-4 text-primary" />
             Automatizare recenzii Google
-            {cfg.enabled && <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30">Activ</Badge>}
+            {cfg.enabled && <Badge className="bg-primary/10 text-primary border-primary/30">Activ</Badge>}
           </CardTitle>
           <CardDescription>
             Trimite automat clienților un sondaj de satisfacție după programare și direcționează
@@ -191,8 +191,8 @@ export function SettingsReviews({
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs transition-colors disabled:opacity-50",
                   cfg.hoursAfterAppointment === h
-                    ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                    : "border-border bg-background hover:border-emerald-500/40"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background hover:border-primary/40"
                 )}
               >
                 {h}h
@@ -256,7 +256,7 @@ export function SettingsReviews({
               <span className="text-muted-foreground">Client primește sondaj · 1-5 stele</span>
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                 <div className="flex items-center gap-1 mb-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -264,12 +264,12 @@ export function SettingsReviews({
                       className={cn(
                         "h-3 w-3",
                         i >= cfg.minStarsForGoogle - 1
-                          ? "fill-emerald-500 text-emerald-500"
+                          ? "fill-primary text-primary"
                           : "text-muted-foreground/40"
                       )}
                     />
                   ))}
-                  <span className="ml-1 text-[10px] font-semibold text-emerald-600">
+                  <span className="ml-1 text-[10px] font-semibold text-primary">
                     {cfg.minStarsForGoogle}+
                   </span>
                 </div>
