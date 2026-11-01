@@ -49,3 +49,12 @@ fără modificări.
   îi șterge programările mai vechi de 1 zi.
 - Testul `rls_isolation.sql` creează și șterge doi useri fake în `auth.users`
   și două saloane de test — nu atinge datele demo.
+
+## 020_availability_taken.sql (P17)
+- Rescrie `public_availability` ca să raporteze și sloturile OCUPATE din grila
+  de candidate (`taken: true`, adăugate după cele libere). Logica de sloturi
+  libere e identică cu 015/005 — schimbarea e aditivă; clienții care ignoră
+  flagul se comportă exact ca înainte.
+- UI-ul de booking afișează ca tăiate (line-through) orele pentru care NU
+  există niciun specialist liber. Fără script aplicat, lista rămâne doar cu
+  sloturi libere (comportamentul P9).
