@@ -1,0 +1,107 @@
+/* ASESOR — auth surfaces (P17). Split layout: powder panel with the hero
+   object (desktop only) + porcelain side with a paper form panel. Shares the
+   P14 tokens via tokens.css; fonts are injected by (auth)/layout.tsx. */
+@import '../tokens.css';
+
+.au{
+  min-height:100dvh;display:flex;background:var(--porcelain);color:var(--ink);
+  font:400 16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;
+}
+.au *,.au *::before,.au *::after{box-sizing:border-box}
+.au h1,.au h2,.au p,.au ul,.au li{margin:0;padding:0}
+.au ul{list-style:none}
+.au img{display:block}
+
+/* ── left panel (desktop only) ─────────────────────────────────────────── */
+.au-side{display:none}
+@media (min-width:1024px){
+  .au-side{
+    position:relative;display:flex;flex-direction:column;justify-content:space-between;
+    width:50%;min-height:100dvh;background:var(--powder);padding:44px 48px 40px;overflow:hidden;
+  }
+  .au-hero{
+    position:absolute;right:-48px;bottom:-36px;width:min(58%,500px);height:auto;
+    -webkit-mask-image:linear-gradient(200deg,#000 55%,transparent 96%);
+    mask-image:linear-gradient(200deg,#000 55%,transparent 96%);
+  }
+  .au-side-mid{position:relative;max-width:11em}
+  .au-side-foot{position:relative;font:500 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+}
+.au-mark{display:flex;align-items:center;gap:11px;text-decoration:none}
+.au-mark span{font:600 15px/1 var(--sans);letter-spacing:.24em}
+.au-mark-img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.au-tag{
+  position:relative;font:400 clamp(34px,3.4vw,54px)/1.06 var(--serif);
+  letter-spacing:-.02em;font-variation-settings:"opsz" 96;
+}
+.au-tag em{font-style:italic}
+
+/* ── right side ────────────────────────────────────────────────────────── */
+.au-main{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;padding:32px 20px 52px;
+}
+.au-top{display:flex;align-items:center;gap:10px}
+.au-top span{font:600 15px/1 var(--sans);letter-spacing:.24em}
+@media (min-width:1024px){.au-top{display:none}}
+
+.au-panel{
+  width:100%;max-width:432px;background:var(--paper);
+  border:1px solid var(--rule);border-radius:3px;padding:28px 24px 26px;
+}
+@media (min-width:640px){.au-panel{padding:36px 34px 30px}}
+.au-title{font:400 30px/1.08 var(--serif);letter-spacing:-.015em;font-variation-settings:"opsz" 96}
+.au-sub{margin-top:9px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+
+.au-form{margin-top:24px;display:flex;flex-direction:column;gap:18px}
+.au-field{display:flex;flex-direction:column;gap:7px}
+.au-labelrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.au-label{font:500 11px/1.2 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-2)}
+.au-input{
+  width:100%;min-height:46px;padding:10px 12px;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule);border-radius:2px;font:400 15px/1.3 var(--sans);outline:none;
+  transition:border-color .2s;
+}
+.au-input:focus{border-color:var(--ink)}
+.au-input::placeholder{color:var(--ink-3)}
+.au-input:disabled{opacity:.5}
+.au-ferr{font-size:12.5px;line-height:1.45;color:var(--err)}
+.au-hint{font-size:12.5px;line-height:1.45;color:var(--ink-3)}
+
+.au-alert{
+  border:1px solid var(--rule);border-radius:3px;padding:11px 13px;
+  font-size:13.5px;line-height:1.5;color:var(--ink);
+}
+.au-alert.err{color:var(--err)}
+.au-alert a,.au-alt a,.au-check a,.au-inline{color:var(--em);text-decoration:underline;text-underline-offset:3px}
+
+.au-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6em;width:100%;min-height:48px;
+  padding:0 20px;background:var(--em);color:#fff;border:0;border-radius:3px;
+  font:500 15px/1 var(--sans);cursor:pointer;transition:filter .2s,opacity .2s;
+}
+.au-btn:hover{filter:brightness(1.1)}
+.au-btn:disabled{opacity:.45;cursor:default;filter:none}
+.au-btn2{
+  display:inline-flex;align-items:center;justify-content:center;gap:.6em;width:100%;min-height:48px;
+  padding:0 20px;background:transparent;color:var(--ink);border:0;border-radius:3px;
+  box-shadow:inset 0 0 0 1px var(--ink);font:500 15px/1 var(--sans);cursor:pointer;transition:background .2s,opacity .2s;
+}
+.au-btn2:hover{background:rgba(19,21,22,.05)}
+.au-btn2:disabled{opacity:.45;cursor:default}
+
+.au-hr{display:flex;align-items:center;gap:12px;margin:2px 0;color:var(--ink-3);font-size:12px}
+.au-hr::before,.au-hr::after{content:"";height:1px;flex:1;background:var(--rule)}
+
+.au-legal{
+  border:1px solid var(--rule);border-radius:3px;padding:14px 14px 4px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.au-check{display:flex;align-items:flex-start;gap:10px;padding-bottom:8px;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+
+.au-alt{margin-top:22px;text-align:center;font-size:14px;color:var(--ink-2)}
+.au-center{text-align:center}
+.au-mono{font-family:var(--mono)}
+.au-ok{color:var(--em)}
+.au-cbx{margin-top:2px;width:16px;height:16px;border-radius:2px;border-color:var(--rule);background:transparent}
+.au-cbx[data-state="checked"]{background:var(--em);border-color:var(--em);color:#fff}

@@ -1,0 +1,15 @@
+/* ASESOR — shared design tokens (P14 machetă «Recepția»).
+   Imported by marketing.css, (auth)/auth.css and booking/booking.css so the
+   auth + booking surfaces share the mockup's look without loading the
+   marketing CSS. Layouts override --serif/--sans/--mono with next/font
+   families via inline style on their wrapper. */
+:root {
+  --porcelain:#F2EDE7; --powder:#ECDCCE; --satin:#D3D3D0; --lacquer:#0E1011; --graphite:#1A1D1F;
+  --ink:#131516; --ink-2:#4B4F52; --ink-3:#5F6366; --paper:#FBF9F6;
+  --em:#00704F; --em-l:#3DCB97;           /* smarald ASESOR — semnalul unic */
+  --rule:rgba(19,21,22,.16); --rule-d:rgba(242,237,231,.16);
+  --err:#A03123;                          /* funcțional — doar text, niciodată doar culoare */
+  --serif:"Bodoni Moda",ui-serif,Georgia,serif;
+  --sans:"Geist",ui-sans-serif,system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,monospace;
+}

@@ -1,10 +1,6 @@
 /* asesor.ro · machetă v1 «Recepția» · MAST studio · draft intern */
+@import '../tokens.css';
 .mkt{
-  --porcelain:#F2EDE7; --powder:#ECDCCE; --satin:#D3D3D0; --lacquer:#0E1011; --graphite:#1A1D1F;
-  --ink:#131516; --ink-2:#4B4F52; --ink-3:#5F6366; --paper:#FBF9F6;
-  --em:#00704F; --em-l:#3DCB97;           /* smarald ASESOR — semnalul unic */
-  --rule:rgba(19,21,22,.16); --rule-d:rgba(242,237,231,.16);
-  --serif:"Bodoni Moda",ui-serif,Georgia,serif; --sans:"Geist",ui-sans-serif,system-ui,sans-serif; --mono:"Geist Mono",ui-monospace,monospace;
   --pad:clamp(20px,4.4vw,72px); --max:1320px;
   /* textură: pudră fină + fir de satin + pată largă (SVG feTurbulence, gri neutru, overlay) */
   --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0.02 1 0 0 0 0.02 1 0 0 0 0.02 0 0 0 0 .5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
