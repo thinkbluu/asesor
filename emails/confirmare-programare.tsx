@@ -6,6 +6,7 @@ import {
   EmailLayout,
   type SalonBranding,
 } from "./layout"
+import { emailStyles, emailAccent, accentLinkColor } from "./layout"
 
 export interface ConfirmareProgramareData {
   clientFirstName: string
@@ -21,7 +22,7 @@ export interface ConfirmareProgramareData {
 }
 
 export function ConfirmareProgramare({ data }: { data: ConfirmareProgramareData }) {
-  const accent = data.salon.accentColor || "#7C3AED"
+  const accent = emailAccent(data.salon.accentColor)
   const total = data.services.reduce((sum, s) => sum + s.price, 0)
   return (
     <EmailLayout
@@ -48,7 +49,7 @@ export function ConfirmareProgramare({ data }: { data: ConfirmareProgramareData 
         <strong>Cine:</strong> {data.staffFirstName}
         <br />
         <strong>Unde:</strong>{" "}
-        <a href={data.mapsUrl} style={{ color: accent }}>
+        <a href={data.mapsUrl} style={{ color: accentLinkColor(data.salon.accentColor) }}>
           {data.salon.address}
           {data.salon.city ? `, ${data.salon.city}` : ""} (deschide în hărți)
         </a>
@@ -74,30 +75,4 @@ export function ConfirmareProgramare({ data }: { data: ConfirmareProgramareData 
 
 export default ConfirmareProgramare
 
-const styles: Record<string, React.CSSProperties> = {
-  text: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "22px",
-    margin: "0 0 12px",
-  },
-  box: {
-    backgroundColor: "#fafaf9",
-    border: "1px solid #e7e5e4",
-    borderRadius: 6,
-    padding: "12px 16px",
-    margin: "0 0 16px",
-  },
-  listItem: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "24px",
-    margin: 0,
-  },
-  small: {
-    color: "#78716c",
-    fontSize: 12,
-    lineHeight: "18px",
-    margin: 0,
-  },
-}
+const styles = emailStyles

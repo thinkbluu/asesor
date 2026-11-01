@@ -1,5 +1,6 @@
 import { Section, Text } from "@react-email/components"
 import { EmailHr, EmailHeading, EmailLayout, type SalonBranding } from "./layout"
+import { emailStyles } from "./layout"
 
 export interface StocScazutZilnicData {
   salon: SalonBranding
@@ -58,30 +59,4 @@ export function StocScazutZilnic({ data }: { data: StocScazutZilnicData }) {
 
 export default StocScazutZilnic
 
-const styles: Record<string, React.CSSProperties> = {
-  text: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "22px",
-    margin: "0 0 12px",
-  },
-  box: {
-    backgroundColor: "#fafaf9",
-    border: "1px solid #e7e5e4",
-    borderRadius: 6,
-    padding: "12px 16px",
-    margin: "0 0 16px",
-  },
-  listItem: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "24px",
-    margin: 0,
-  },
-  small: {
-    color: "#78716c",
-    fontSize: 12,
-    lineHeight: "18px",
-    margin: 0,
-  },
-}
+const styles = emailStyles

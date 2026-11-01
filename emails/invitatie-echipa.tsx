@@ -1,5 +1,6 @@
 import { Section, Text } from "@react-email/components"
 import { EmailButton, EmailHr, EmailHeading, EmailLayout, type SalonBranding } from "./layout"
+import { emailStyles, emailAccent, accentLinkColor } from "./layout"
 
 export interface InvitatieEchipaData {
   salon: SalonBranding
@@ -10,7 +11,7 @@ export interface InvitatieEchipaData {
 }
 
 export function InvitatieEchipa({ data }: { data: InvitatieEchipaData }) {
-  const accent = data.salon.accentColor || "#7C3AED"
+  const accent = emailAccent(data.salon.accentColor)
   return (
     <EmailLayout
       branding={data.salon}
@@ -31,7 +32,7 @@ export function InvitatieEchipa({ data }: { data: InvitatieEchipaData }) {
       <Text style={styles.text}>
         Dacă butonul nu funcționează, copiază acest link în browser:
         <br />
-        <a href={data.inviteUrl} style={{ color: accent, wordBreak: "break-all" }}>
+        <a href={data.inviteUrl} style={{ color: accentLinkColor(data.salon.accentColor), wordBreak: "break-all" }}>
           {data.inviteUrl}
         </a>
       </Text>
@@ -46,17 +47,4 @@ export function InvitatieEchipa({ data }: { data: InvitatieEchipaData }) {
 
 export default InvitatieEchipa
 
-const styles: Record<string, React.CSSProperties> = {
-  text: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "22px",
-    margin: "0 0 12px",
-  },
-  small: {
-    color: "#78716c",
-    fontSize: 12,
-    lineHeight: "18px",
-    margin: 0,
-  },
-}
+const styles = emailStyles

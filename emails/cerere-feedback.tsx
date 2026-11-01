@@ -1,5 +1,6 @@
 import { Section, Text } from "@react-email/components"
 import { EmailButton, EmailHr, EmailHeading, EmailLayout, type SalonBranding } from "./layout"
+import { emailStyles, emailAccent } from "./layout"
 
 export interface CerereFeedbackData {
   clientFirstName: string
@@ -8,7 +9,7 @@ export interface CerereFeedbackData {
 }
 
 export function CerereFeedback({ data }: { data: CerereFeedbackData }) {
-  const accent = data.salon.accentColor || "#7C3AED"
+  const accent = emailAccent(data.salon.accentColor)
   return (
     <EmailLayout
       branding={data.salon}
@@ -34,17 +35,4 @@ export function CerereFeedback({ data }: { data: CerereFeedbackData }) {
 
 export default CerereFeedback
 
-const styles: Record<string, React.CSSProperties> = {
-  text: {
-    color: "#292524",
-    fontSize: 14,
-    lineHeight: "22px",
-    margin: "0 0 12px",
-  },
-  small: {
-    color: "#78716c",
-    fontSize: 12,
-    lineHeight: "18px",
-    margin: 0,
-  },
-}
+const styles = emailStyles
