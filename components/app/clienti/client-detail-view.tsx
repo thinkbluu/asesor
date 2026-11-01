@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Aal2Dialog } from "@/components/app/aal2-dialog"
+import { StatusBadge } from "@/components/app/status-badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   AlertTriangle,
@@ -53,14 +54,7 @@ import {
 } from "@/app/app/clienti/actions"
 import { ClientLoyaltyCard } from "@/components/app/client-loyalty-card"
 import { ClientPhotoGallery } from "@/components/app/clienti/client-photo-gallery"
-
-const STATUS_LABELS: Record<string, string> = {
-  in_asteptare: "În așteptare",
-  confirmat: "Confirmat",
-  finalizat: "Finalizat",
-  anulat: "Anulat",
-  no_show: "No-show",
-}
+import type { AppointmentStatus } from "@/lib/mappers/programari"
 
 export function ClientDetailView({
   role,
@@ -97,7 +91,7 @@ export function ClientDetailView({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+        <span className="flex size-12 items-center justify-center rounded-full bg-[#E8E3DD] text-[13px] font-semibold text-ink2 dark:bg-white/10 dark:text-foreground">
           {getInitials(client.firstName, client.lastName)}
         </span>
         <div className="min-w-0">
@@ -107,7 +101,7 @@ export function ClientDetailView({
             </h1>
             {client.hasAllergies && (
               <span
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500/15 text-red-600"
+                className="flex size-6 items-center justify-center rounded-full bg-[var(--err)]/10 text-[var(--err)]"
                 title="Clienta are alergii înregistrate"
                 aria-label="Are alergii înregistrate"
               >
@@ -115,24 +109,24 @@ export function ClientDetailView({
               </span>
             )}
             {client.tags.map((t) => (
-              <Badge key={t} variant="outline" className={`text-[10px] px-1.5 ${TAG_COLORS[t] ?? ""}`}>{t}</Badge>
+              <Badge key={t} variant="outline" className={`text-[10.5px] px-1.5 rounded-[4px] font-normal ${TAG_COLORS[t] ?? ""}`}>{t}</Badge>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">{client.phone}</p>
+          <p className="text-sm text-muted-foreground font-mono tabular-nums">{client.phone}</p>
         </div>
         <div className="ml-auto flex gap-6 text-right">
           <div>
-            <p className="text-lg font-semibold text-foreground">{client.totalVisits}</p>
+            <p className="text-lg font-semibold text-foreground tabular-nums">{client.totalVisits}</p>
             <p className="text-xs text-muted-foreground">vizite</p>
           </div>
           <div>
-            <p className="text-lg font-semibold text-foreground">
+            <p className="text-lg font-semibold text-foreground tabular-nums font-mono">
               {client.totalSpent.toLocaleString("ro-RO", { style: "currency", currency: "RON", maximumFractionDigits: 0 })}
             </p>
             <p className="text-xs text-muted-foreground">total cheltuit</p>
           </div>
           <div>
-            <p className="text-lg font-semibold text-foreground">
+            <p className="text-lg font-semibold text-foreground tabular-nums">
               {client.lastVisitAt ? formatDate(client.lastVisitAt) : "—"}
             </p>
             <p className="text-xs text-muted-foreground">ultima vizită</p>
@@ -369,20 +363,15 @@ function HistoryTab({ history }: { history: ClientHistoryItem[] }) {
       <CardContent className="p-0">
         <ul className="divide-y divide-border">
           {history.map((h) => (
-            <li key={h.id} className="px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <p className="text-sm font-medium text-foreground">{formatDate(h.date)}</p>
-                  <Badge variant="outline" className="text-[10px]">{STATUS_LABELS[h.status] ?? h.status}</Badge>
-                </div>
-                <p className="text-sm font-semibold text-foreground shrink-0">
-                  {h.total.toLocaleString("ro-RO", { style: "currency", currency: "RON" })}
-                </p>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 truncate">
+            <li key={h.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 min-h-12 py-2">
+              <p className="text-sm font-medium text-foreground w-28 shrink-0">{formatDate(h.date)}</p>
+              <p className="text-xs text-muted-foreground truncate flex-1 min-w-40">
                 {h.services.map((s) => s.name).join(", ") || "—"}
                 {h.staffName ? ` · ${h.staffName}` : ""}
+              </p>
+              <StatusBadge status={h.status as AppointmentStatus} />
+              <p className="text-sm font-semibold text-foreground shrink-0 font-mono tabular-nums sm:w-28 sm:text-right">
+                {h.total.toLocaleString("ro-RO", { style: "currency", currency: "RON" })}
               </p>
             </li>
           ))}
@@ -471,7 +460,7 @@ function SensitiveTab({
     <Card>
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" /> Date protejate (criptate)
+          <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" /> Date protejate (criptate)
         </CardTitle>
         <p className="text-xs text-muted-foreground">
           Alergiile și formulele coloristice sunt criptate în baza de date (AES-256-GCM).
@@ -499,8 +488,10 @@ function SensitiveTab({
               defaultValue={data?.colorFormulas ?? ""}
               rows={3}
               maxLength={5000}
-              placeholder="ex: 6.34 + 6% oxidant…"
+              placeholder="ex: 7.3 + 7.0 (1:1) · oxidant 6% · 35 min"
+              className="font-mono text-[12.5px]"
             />
+            <p className="text-xs text-ink3">Proporții, oxidant, timpi — ca pe fișa din machetă.</p>
           </div>
 
           {/* Health-data consent — required to save allergies */}
@@ -528,7 +519,7 @@ function SensitiveTab({
           </div>
 
           {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
-          {saved && !pending && <p className="text-sm text-emerald-600">Salvat.</p>}
+          {saved && !pending && <p className="text-sm text-primary">Salvat.</p>}
           <Button type="submit" disabled={pending}>
             {pending ? "Se salvează…" : "Salvează datele protejate"}
           </Button>

@@ -98,8 +98,8 @@ export function ClientsView({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Clienti</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">Clienți</h1>
+          <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground tabular-nums">
             {summary.total} clienți înregistrați
           </p>
         </div>
@@ -240,9 +240,9 @@ function ClientRow({ c }: { c: ClientListItem }) {
     <li>
       <Link
         href={`/app/clienti/${c.id}`}
-        className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
+        className="flex items-center gap-3 px-4 min-h-12 py-2 hover:bg-muted/50 transition-colors"
       >
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#E8E3DD] text-xs font-semibold text-ink2 dark:bg-white/10 dark:text-foreground">
           {getInitials(c.firstName, c.lastName)}
         </span>
         <div className="min-w-0 flex-1">
@@ -252,7 +252,7 @@ function ClientRow({ c }: { c: ClientListItem }) {
             </p>
             {c.hasAllergies && (
               <span
-                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500/15 text-red-600"
+                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--err)]/10 text-[var(--err)]"
                 title="Clienta are alergii înregistrate — vezi fișa protejată"
                 aria-label="Are alergii înregistrate"
               >
@@ -260,22 +260,22 @@ function ClientRow({ c }: { c: ClientListItem }) {
               </span>
             )}
             {c.tags.map((t) => (
-              <Badge key={t} variant="outline" className={`text-[10px] px-1.5 ${TAG_COLORS[t] ?? ""}`}>
+              <Badge key={t} variant="outline" className={`text-[10.5px] px-1.5 rounded-[4px] font-normal ${TAG_COLORS[t] ?? ""}`}>
                 {t}
               </Badge>
             ))}
           </div>
-          <p className="truncate text-xs text-muted-foreground">{c.phone}</p>
+          <p className="truncate text-xs text-muted-foreground font-mono tabular-nums">{c.phone}</p>
         </div>
-        <div className="hidden sm:block text-right text-xs text-muted-foreground shrink-0">
+        <div className="hidden sm:block text-right text-xs text-muted-foreground shrink-0 tabular-nums">
           <p>{c.totalVisits} vizite</p>
           <p>{c.lastVisitAt ? formatDate(c.lastVisitAt) : "fără vizite"}</p>
         </div>
         <div className="hidden md:block text-right text-xs shrink-0 w-24">
-          <p className="font-medium text-foreground">
+          <p className="font-medium text-foreground font-mono tabular-nums">
             {c.totalSpent.toLocaleString("ro-RO", { style: "currency", currency: "RON", maximumFractionDigits: 0 })}
           </p>
-          {c.balanceDue > 0 && <p className="text-red-600">restanță</p>}
+          {c.balanceDue > 0 && <p className="text-[var(--err)]">restanță</p>}
         </div>
       </Link>
     </li>
