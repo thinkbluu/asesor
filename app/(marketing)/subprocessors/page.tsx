@@ -1,4 +1,4 @@
-import { LegalDocHeader } from "@/components/legal/legal-doc-header"
+import { LegalDoc } from "@/components/marketing/legal-doc"
 import { SITE } from "@/lib/site"
 
 export const metadata = {
@@ -66,12 +66,11 @@ const subprocessors: Subprocessor[] = [
 
 export default function SubprocessorsPage() {
   return (
-      <main className="mx-auto max-w-4xl px-6 py-16 text-foreground">
-        <LegalDocHeader
-          doc="subprocessors"
-          title="Împuterniciți (subprocessors)"
-          lead="ASESOR folosește următorii împuterniciți pentru furnizarea serviciului. Orice adăugare la această listă este notificată salonelor înainte de intrarea în vigoare, conform Acordului de prelucrare a datelor (/dpa)."
-        />
+      <LegalDoc
+        doc="subprocessors"
+        title="Împuterniciți (subprocessors)"
+        lead="ASESOR folosește următorii împuterniciți pentru furnizarea serviciului. Orice adăugare la această listă este notificată salonelor înainte de intrarea în vigoare, conform Acordului de prelucrare a datelor (/dpa)."
+      >
 
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
@@ -114,6 +113,6 @@ export default function SubprocessorsPage() {
           întrebări:{" "}
           <a href={`mailto:${SITE.emails.legal}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.legal}</a>
         </p>
-      </main>
+      </LegalDoc>
   )
 }

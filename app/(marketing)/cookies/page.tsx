@@ -1,4 +1,4 @@
-import { LegalDocHeader } from "@/components/legal/legal-doc-header"
+import { LegalDoc } from "@/components/marketing/legal-doc"
 import { SITE } from "@/lib/site"
 
 export const metadata = {
@@ -53,12 +53,11 @@ const categoryColors: Record<string, string> = {
 
 export default function CookiesPage() {
   return (
-      <main className="mx-auto max-w-4xl px-6 py-16 text-foreground">
-        <LegalDocHeader
-          doc="cookies"
-          title="Politica cookies"
-          lead="Folosim un număr minim de cookie-uri, strict necesare funcționării platformei. Cookie-urile de analytics se încarcă doar după consimțământul exprimat în bannerul de cookie-uri. Nu utilizăm cookie-uri de tracking terț sau publicitate comportamentală. Prelucrarea datelor prin cookie-uri este reglementată de Legea nr. 506/2004 privind prelucrarea datelor cu caracter personal și protecția vieții private în sectorul comunicațiilor electronice."
-        />
+      <LegalDoc
+        doc="cookies"
+        title="Politica cookies"
+        lead="Folosim un număr minim de cookie-uri, strict necesare funcționării platformei. Cookie-urile de analytics se încarcă doar după consimțământul exprimat în bannerul de cookie-uri. Nu utilizăm cookie-uri de tracking terț sau publicitate comportamentală. Prelucrarea datelor prin cookie-uri este reglementată de Legea nr. 506/2004 privind prelucrarea datelor cu caracter personal și protecția vieții private în sectorul comunicațiilor electronice."
+      >
 
         <h2 className="mb-3 mt-6 text-xl font-semibold">Ce sunt cookie-urile?</h2>
         <p className="mb-6 leading-relaxed text-muted-foreground">
@@ -117,6 +116,6 @@ export default function CookiesPage() {
             {SITE.emails.dpo}
           </a>
         </p>
-      </main>
+      </LegalDoc>
   )
 }

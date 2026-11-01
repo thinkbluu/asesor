@@ -17,17 +17,15 @@ export function LegalDocHeader({
   const isDev = process.env.NODE_ENV === "development"
 
   return (
-    <>
+    <header className="lhead-in">
       {isDev ? (
-        <div className="mb-8 rounded-lg border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-400">
-          <strong>Text de revizuit de un jurist înainte de lansare.</strong>
-        </div>
+        <p className="ldev">Text de revizuit de un jurist înainte de lansare.</p>
       ) : null}
-      <h1 className="mb-2 text-3xl font-bold tracking-tight">{title}</h1>
-      <p className="mb-10 text-sm text-muted-foreground">
+      <h1 className="ltitle">{title}</h1>
+      <p className="lmeta">
         Ultima actualizare: {meta.updated} · Versiunea {meta.version}
       </p>
-      {lead ? <p className="-mt-6 mb-10 leading-relaxed text-muted-foreground">{lead}</p> : null}
-    </>
+      {lead ? <p className="llede">{lead}</p> : null}
+    </header>
   )
 }

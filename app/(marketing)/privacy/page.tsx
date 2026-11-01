@@ -1,4 +1,4 @@
-import { LegalDocHeader } from "@/components/legal/legal-doc-header"
+import { LegalDoc } from "@/components/marketing/legal-doc"
 import { SITE } from "@/lib/site"
 
 export const metadata = {
@@ -8,12 +8,11 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-foreground">
-        <LegalDocHeader
-          doc="privacy"
-          title="Politica de confidențialitate"
-          lead="Această politică descrie datele personale prelucrate de ASESOR în calitate de operator, precum și modul în care sunt protejate datele clienților saloanelor, prelucrate de ASESOR în calitate de persoană împuternicită."
-        />
+      <LegalDoc
+        doc="privacy"
+        title="Politica de confidențialitate"
+        lead="Această politică descrie datele personale prelucrate de ASESOR în calitate de operator, precum și modul în care sunt protejate datele clienților saloanelor, prelucrate de ASESOR în calitate de persoană împuternicită."
+      >
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Identitatea operatorului</h2>
         <p className="mb-4 leading-relaxed text-muted-foreground">
@@ -123,6 +122,6 @@ export default function PrivacyPage() {
           Întrebări despre prezenta politică:{" "}
           <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.dpo}</a>
         </p>
-      </main>
+      </LegalDoc>
   )
 }

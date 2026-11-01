@@ -1,4 +1,4 @@
-import { LegalDocHeader } from "@/components/legal/legal-doc-header"
+import { LegalDoc } from "@/components/marketing/legal-doc"
 import { SITE } from "@/lib/site"
 import { TRIAL_DAYS, TRIAL_REQUIRES_CARD } from "@/lib/plans"
 
@@ -9,12 +9,11 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-foreground">
-        <LegalDocHeader
-          doc="terms"
-          title="Termeni și condiții"
-          lead="Prezentați termeni reglementează utilizarea platformei ASESOR. Prelucrarea datelor personale este descrisă în Politica de confidențialitate (/privacy), iar prelucrarea datelor clienților salonului în Acordul de prelucrare a datelor (/dpa)."
-        />
+      <LegalDoc
+        doc="terms"
+        title="Termeni și condiții"
+        lead="Prezentați termeni reglementează utilizarea platformei ASESOR. Prelucrarea datelor personale este descrisă în Politica de confidențialitate (/privacy), iar prelucrarea datelor clienților salonului în Acordul de prelucrare a datelor (/dpa)."
+      >
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Definiții</h2>
         <ul className="mb-4 list-disc space-y-2 pl-5 text-muted-foreground">
@@ -78,6 +77,6 @@ export default function TermsPage() {
         <p className="mb-4 leading-relaxed text-muted-foreground">
           <a href={`mailto:${SITE.emails.legal}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.legal}</a>
         </p>
-      </main>
+      </LegalDoc>
   )
 }

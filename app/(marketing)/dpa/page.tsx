@@ -1,4 +1,4 @@
-import { LegalDocHeader } from "@/components/legal/legal-doc-header"
+import { LegalDoc } from "@/components/marketing/legal-doc"
 import { SITE } from "@/lib/site"
 
 export const metadata = {
@@ -8,12 +8,11 @@ export const metadata = {
 
 export default function DpaPage() {
   return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-foreground">
-        <LegalDocHeader
-          doc="dpa"
-          title="Acord de prelucrare a datelor (DPA)"
-          lead="Prezentul acord se aplică în mod automat tuturor abonaților ASESOR și completează Termenii și condiții. Reglementează prelucrarea datelor clienților salonului de către ASESOR, în calitate de persoană împuternicită, conform art. 28 GDPR."
-        />
+      <LegalDoc
+        doc="dpa"
+        title="Acord de prelucrare a datelor (DPA)"
+        lead="Prezentul acord se aplică în mod automat tuturor abonaților ASESOR și completează Termenii și condiții. Reglementează prelucrarea datelor clienților salonului de către ASESOR, în calitate de persoană împuternicită, conform art. 28 GDPR."
+      >
 
         <h2 className="mb-3 mt-10 text-xl font-semibold">1. Părțile și rolurile</h2>
         <ul className="mb-4 list-disc space-y-2 pl-5 text-muted-foreground">
@@ -97,6 +96,6 @@ export default function DpaPage() {
           Pentru orice întrebare legată de prezentul acord:{" "}
           <a href={`mailto:${SITE.emails.legal}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.legal}</a>
         </p>
-      </main>
+      </LegalDoc>
   )
 }
