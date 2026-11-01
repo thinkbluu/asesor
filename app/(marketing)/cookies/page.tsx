@@ -1,4 +1,3 @@
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { LegalDocHeader } from "@/components/legal/legal-doc-header"
 import { SITE } from "@/lib/site"
 
@@ -54,7 +53,6 @@ const categoryColors: Record<string, string> = {
 
 export default function CookiesPage() {
   return (
-    <MarketingLayout>
       <main className="mx-auto max-w-4xl px-6 py-16 text-foreground">
         <LegalDocHeader
           doc="cookies"
@@ -120,6 +118,5 @@ export default function CookiesPage() {
           </a>
         </p>
       </main>
-    </MarketingLayout>
   )
 }

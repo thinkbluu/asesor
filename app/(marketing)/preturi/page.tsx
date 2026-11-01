@@ -1,6 +1,5 @@
 "use client"
 
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { PricingSection, type PricingPlan } from "@/components/ui/pricing"
 import {
   Accordion,
@@ -51,7 +50,6 @@ const faqs = [
 
 export default function PricingPage() {
   return (
-    <MarketingLayout>
       <main className="flex-1">
         <PricingSection
           plans={plans}
@@ -113,6 +111,5 @@ export default function PricingPage() {
           </div>
         </section>
       </main>
-    </MarketingLayout>
   )
 }

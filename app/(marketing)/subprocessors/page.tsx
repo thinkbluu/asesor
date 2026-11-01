@@ -1,4 +1,3 @@
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { LegalDocHeader } from "@/components/legal/legal-doc-header"
 import { SITE } from "@/lib/site"
 
@@ -67,7 +66,6 @@ const subprocessors: Subprocessor[] = [
 
 export default function SubprocessorsPage() {
   return (
-    <MarketingLayout>
       <main className="mx-auto max-w-4xl px-6 py-16 text-foreground">
         <LegalDocHeader
           doc="subprocessors"
@@ -117,6 +115,5 @@ export default function SubprocessorsPage() {
           <a href={`mailto:${SITE.emails.legal}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.legal}</a>
         </p>
       </main>
-    </MarketingLayout>
   )
 }

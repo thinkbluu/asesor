@@ -1,4 +1,3 @@
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { LegalDocHeader } from "@/components/legal/legal-doc-header"
 import { SITE } from "@/lib/site"
 
@@ -9,7 +8,6 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <MarketingLayout>
       <main className="mx-auto max-w-3xl px-6 py-16 text-foreground">
         <LegalDocHeader
           doc="privacy"
@@ -126,6 +124,5 @@ export default function PrivacyPage() {
           <a href={`mailto:${SITE.emails.dpo}`} className="text-emerald-600 underline dark:text-emerald-400">{SITE.emails.dpo}</a>
         </p>
       </main>
-    </MarketingLayout>
   )
 }

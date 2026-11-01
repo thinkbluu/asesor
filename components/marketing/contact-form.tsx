@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Turnstile } from "@/components/auth/turnstile"
-import { submitContactAction, type ContactResult } from "@/app/contact/actions"
+import { submitContactAction, type ContactResult } from "@/app/(marketing)/contact/actions"
 import { CONTACT_SUBJECTS, CONTACT_SUBJECT_LABELS, type ContactSubject } from "@/lib/validation/contact"
 import { SITE } from "@/lib/site"
 

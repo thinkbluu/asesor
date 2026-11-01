@@ -1,4 +1,3 @@
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Calendar, Users, UserCog, Package, PieChart, Megaphone, ArrowRight, Check } from "lucide-react"
@@ -93,7 +92,6 @@ const modules = [
 
 export default function FunctionalitatiPage() {
   return (
-    <MarketingLayout>
       <main className="flex-1">
         {/* Hero */}
         <section className="border-b border-border bg-muted/30 py-24">
@@ -209,6 +207,5 @@ export default function FunctionalitatiPage() {
           </div>
         </section>
       </main>
-    </MarketingLayout>
   )
 }

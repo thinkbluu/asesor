@@ -1,4 +1,3 @@
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Building2, Sparkles, User, Crown, ArrowRight } from "lucide-react"
@@ -36,7 +35,6 @@ const segments = [
 
 export default function PentruCinePage() {
   return (
-    <MarketingLayout>
       <main className="flex-1">
         {/* Hero */}
         <section className="border-b border-border bg-muted/30 py-24">
@@ -115,6 +113,5 @@ export default function PentruCinePage() {
           </div>
         </section>
       </main>
-    </MarketingLayout>
   )
 }

@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { MarketingLayout } from "@/components/marketing/marketing-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react"
@@ -23,7 +22,6 @@ export default async function ContactPage({
     : null
 
   return (
-    <MarketingLayout>
       <main className="flex-1">
         {/* Hero */}
         <section className="bg-background py-24">
@@ -129,6 +127,5 @@ export default async function ContactPage({
           </div>
         </section>
       </main>
-    </MarketingLayout>
   )
 }
