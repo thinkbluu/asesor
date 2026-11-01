@@ -285,7 +285,7 @@ export function SetariView({
         </div>
         <div className="flex items-center gap-3">
           {unsaved && (
-            <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+            <div className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 dark:text-amber-400">
               <AlertCircle className="h-3.5 w-3.5" />
               Modificări nesalvate
             </div>

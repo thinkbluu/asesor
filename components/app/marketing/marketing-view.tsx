@@ -82,7 +82,7 @@ function StatusBadge({ status }: { status: Campaign["status"] }) {
   const map: Record<string, string> = {
     Activ:      "bg-primary/10 text-primary border-primary/30",
     Trimis:     "bg-blue-500/15 text-blue-600 border-blue-500/30",
-    Programat:  "bg-amber-500/15 text-amber-600 border-amber-500/30",
+    Programat:  "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
     Draft:      "bg-muted text-muted-foreground",
   }
   return <Badge variant="outline" className={cn("text-xs", map[status] ?? "")}>{status}</Badge>
@@ -594,7 +594,7 @@ export default function MarketingView({
         className="flex items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm"
         role="status"
       >
-        <Megaphone className="h-4 w-4 shrink-0 text-amber-600" />
+        <Megaphone className="h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400" />
         <p>
           <span className="font-medium">Campaniile vin în curând.</span>{" "}
           <span className="text-muted-foreground">

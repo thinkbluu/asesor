@@ -24,8 +24,8 @@ import { COMMISSION_TYPES, STAFF_STATUSES } from "@/lib/validation/echipa"
 
 const STATUS_STYLES: Record<string, string> = {
   activ: "bg-primary/10 text-primary border-primary/30",
-  concediu: "bg-amber-500/15 text-amber-600 border-amber-500/30",
-  inactiv: "bg-zinc-500/15 text-zinc-500 border-zinc-500/30",
+  concediu: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
+  inactiv: "bg-muted text-muted-foreground border-border",
 }
 const STATUS_LABELS: Record<string, string> = {
   activ: "Activ",

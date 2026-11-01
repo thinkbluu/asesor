@@ -325,7 +325,7 @@ export function BrandingTab({ initial }: Props) {
             Previzualizare
           </Label>
           {unsaved && (
-            <span className="flex items-center gap-1 text-xs text-amber-600">
+            <span className="flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400">
               <AlertCircle className="h-3 w-3" />
               Modificări nesalvate
             </span>

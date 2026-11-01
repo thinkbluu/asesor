@@ -107,7 +107,7 @@ export function SettingsPrivacy({ deletedAt }: { deletedAt: string | null }) {
       <Card className="border-amber-500/40">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-amber-600" />
+            <ShieldAlert className="h-5 w-5 text-amber-700 dark:text-amber-400" />
             Date sensibile (date de sănătate)
           </CardTitle>
           <CardDescription>

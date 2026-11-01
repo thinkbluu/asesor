@@ -51,7 +51,7 @@ function formatRelative(iso: string): string {
 }
 
 function DeliveryIcon({ status }: { status: WhatsAppMessage["status"] }) {
-  if (status === "failed") return <AlertCircle className="h-3 w-3 text-red-500" />
+  if (status === "failed") return <AlertCircle className="h-3 w-3 text-[var(--err)]" />
   if (status === "sent") return <Check className="h-3 w-3 text-muted-foreground" />
   if (status === "delivered") return <CheckCheck className="h-3 w-3 text-muted-foreground" />
   if (status === "read" || status === "replied") return <CheckCheck className="h-3 w-3 text-[#34B7F1]" />
@@ -149,7 +149,7 @@ export function AppointmentWhatsApp({
       </DropdownMenu>
 
       {!e164 && (
-        <p className="flex items-center gap-1.5 text-xs text-amber-600">
+        <p className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
           <AlertCircle className="h-3.5 w-3.5" />
           Număr WhatsApp invalid — verifică profilul clientului
         </p>
@@ -224,7 +224,7 @@ export function AppointmentWhatsApp({
                     "flex items-center gap-2 rounded-lg border p-2.5 text-xs",
                     feedback.ok
                       ? "border-primary/30 bg-primary/10 text-primary"
-                      : "border-red-500/30 bg-red-500/10 text-red-600"
+                      : "border-red-500/30 bg-red-500/10 text-[var(--err)]"
                   )}
                 >
                   {feedback.ok ? <Check className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}

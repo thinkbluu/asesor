@@ -215,7 +215,7 @@ export function AppSidebar({ salonName, userFullName, role }: AppSidebarProps) {
           {!isCollapsed && (
             <>
               <span className="truncate">{item.name}</span>
-              {item.soon && <small className="ml-auto text-[10px] text-[#64686B]">în curând</small>}
+              {item.soon && <small className="ml-auto text-[10px] text-[#7E8285]">în curând</small>}
             </>
           )}
         </Link>
@@ -350,7 +350,7 @@ export function AppSidebar({ salonName, userFullName, role }: AppSidebarProps) {
           {visibleNavigation.map((item) => renderNavItem(item, { collapsed }))}
           {visibleSalonNavigation.length > 0 && (
             <>
-              <div className="mono-label px-2 pb-1.5 pt-4 text-[#64686B]" role="presentation">
+              <div className="mono-label px-2 pb-1.5 pt-4 text-[#7E8285]" role="presentation">
                 Salon
               </div>
               {visibleSalonNavigation.map((item) => renderNavItem(item, { collapsed }))}
@@ -400,6 +400,15 @@ export function AppSidebar({ salonName, userFullName, role }: AppSidebarProps) {
         )}
       </aside>
 
+      {/* Spacer care împinge conținutul lângă sidebar-ul fix (desktop) */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "hidden shrink-0 transition-[width] duration-200 lg:block",
+          collapsed ? "w-14" : "w-[212px]",
+        )}
+      />
+
       {/* ── Mobile: bară de tab-uri jos ── */}
       <nav
         className="fixed inset-x-0 bottom-0 z-40 flex h-14 items-stretch border-t border-white/8 bg-[#0B0C0D] pb-[env(safe-area-inset-bottom)] text-[#A6AAAD] lg:hidden"
@@ -439,7 +448,7 @@ export function AppSidebar({ salonName, userFullName, role }: AppSidebarProps) {
                 {visibleNavigation.map((item) => renderNavItem(item, { collapsed: false }))}
                 {visibleSalonNavigation.length > 0 && (
                   <>
-                    <div className="mono-label px-2 pb-1.5 pt-4 text-[#64686B]" role="presentation">
+                    <div className="mono-label px-2 pb-1.5 pt-4 text-[#7E8285]" role="presentation">
                       Salon
                     </div>
                     {visibleSalonNavigation.map((item) => renderNavItem(item, { collapsed: false }))}

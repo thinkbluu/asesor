@@ -14,7 +14,7 @@ import { ForbiddenBanner } from "@/components/app/forbidden-banner"
 import { StatusBadge } from "@/components/app/status-badge"
 import { KpiStrip } from "@/components/app/kpi-strip"
 import type { AppointmentStatus } from "@/lib/mappers/programari"
-import { formatTimeHM, utcIsoToCivil } from "@/lib/time"
+import { formatTimeHM, utcIsoToCivil, todayBucharest } from "@/lib/time"
 import type {
   DashboardSummary,
   WeeklyRevenueDay,
@@ -40,7 +40,8 @@ function formatRONShort(amount: number): string {
 export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
   const [selectedAppt, setSelectedAppt] = useState<string | null>(null)
 
-  const today = new Date().toLocaleDateString("ro-RO", {
+  // Data afișată e ziua civilă din Bucharest, nu fusul orar al serverului.
+  const today = new Date(`${todayBucharest()}T12:00:00`).toLocaleDateString("ro-RO", {
     weekday: "long", day: "numeric", month: "long",
   })
 
@@ -178,7 +179,7 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
             <CardContent className="space-y-2">
               {(summary?.low_stock_count ?? 0) > 0 && (
                 <Link href="/app/stocuri" className="flex items-start gap-3 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 hover:bg-amber-500/15 transition-colors">
-                  <Package className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
+                  <Package className="h-4 w-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                       {summary?.low_stock_count} produse cu stoc scăzut

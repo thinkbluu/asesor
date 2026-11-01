@@ -151,12 +151,12 @@ export function FinanciarView(props: {
         </div>
         <div className="flex items-end gap-2">
           <div className="space-y-1">
-            <Label className="text-xs">De la</Label>
-            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-36" />
+            <Label className="text-xs" htmlFor="fin-from">De la</Label>
+            <Input id="fin-from" type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-36" />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Până la</Label>
-            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-36" />
+            <Label className="text-xs" htmlFor="fin-to">Până la</Label>
+            <Input id="fin-to" type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-36" />
           </div>
           <Button variant="outline" size="sm" disabled={pending} onClick={() => { reloadTransactions(); reloadExpenses(); reloadReport() }}>
             Actualizează
@@ -176,7 +176,11 @@ export function FinanciarView(props: {
         <TabsContent value="tranzactii" className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <Select value={staffFilter} onValueChange={setStaffFilter}>
-              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-44" aria-label="Filtru specialist">
+                <SelectValue>
+                  {staffFilter === "all" ? "Toți specialiștii" : state.staff.find((s) => s.id === staffFilter)?.name ?? "Toți specialiștii"}
+                </SelectValue>
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toți specialiștii</SelectItem>
                 {state.staff.map((s) => (
@@ -185,7 +189,11 @@ export function FinanciarView(props: {
               </SelectContent>
             </Select>
             <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-40" aria-label="Filtru metodă">
+                <SelectValue>
+                  {methodFilter === "all" ? "Toate metodele" : methodFilter.charAt(0).toUpperCase() + methodFilter.slice(1)}
+                </SelectValue>
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toate metodele</SelectItem>
                 <SelectItem value="numerar">Numerar</SelectItem>
@@ -344,7 +352,7 @@ export function FinanciarView(props: {
                 <Card>
                   <CardHeader className="pb-1"><CardTitle className="text-sm font-medium">Rambursări</CardTitle></CardHeader>
                   <CardContent>
-                    <p className="text-2xl font-semibold text-red-600">
+                    <p className="text-2xl font-semibold text-[var(--err)]">
                       {formatRON(report.refunds.reduce((s, d) => s + d.amount, 0))}
                     </p>
                   </CardContent>
@@ -482,7 +490,7 @@ export function FinanciarView(props: {
                 <Label>Categorie</Label>
                 <Select value={expenseForm.category}
                   onValueChange={(v: ExpenseCategory) => setExpenseForm({ ...expenseForm, category: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger><SelectValue>{EXPENSE_CATEGORY_LABELS[expenseForm.category]}</SelectValue></SelectTrigger>
                   <SelectContent>
                     {(Object.keys(EXPENSE_CATEGORY_LABELS) as ExpenseCategory[]).map((c) => (
                       <SelectItem key={c} value={c}>{EXPENSE_CATEGORY_LABELS[c]}</SelectItem>
@@ -504,7 +512,7 @@ export function FinanciarView(props: {
                 <Label>Frecvență</Label>
                 <Select value={expenseForm.frequency}
                   onValueChange={(v: ExpenseFrequency) => setExpenseForm({ ...expenseForm, frequency: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger><SelectValue>{FREQUENCY_LABELS[expenseForm.frequency]}</SelectValue></SelectTrigger>
                   <SelectContent>
                     {(Object.keys(FREQUENCY_LABELS) as ExpenseFrequency[]).map((f) => (
                       <SelectItem key={f} value={f}>{FREQUENCY_LABELS[f]}</SelectItem>
@@ -643,7 +651,7 @@ function ExpenseRow(props: {
           <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={pending} onClick={onEdit}>
             <FileText className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600" disabled={pending} onClick={onDelete}>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-[var(--err)]" disabled={pending} onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -728,7 +736,7 @@ function DayCloseTab(props: {
                 <Input type="number" step="0.01" min="0" value={counted}
                   onChange={(e) => setCounted(e.target.value)} disabled={closed} />
               </div>
-              <p className={cn("text-sm", effectiveDiff === 0 ? "text-muted-foreground" : effectiveDiff > 0 ? "text-primary" : "text-red-600")}>
+              <p className={cn("text-sm", effectiveDiff === 0 ? "text-muted-foreground" : effectiveDiff > 0 ? "text-primary" : "text-[var(--err)]")}>
                 Diferență: {formatRON(effectiveDiff)}
               </p>
               <div className="space-y-1">
@@ -788,7 +796,7 @@ function DayCloseTab(props: {
               <span className="text-muted-foreground">
                 Numerar {formatRON(c.totals.numerar)}
                 {c.difference != null && (
-                  <span className={cn("ml-2", c.difference === 0 ? "" : c.difference > 0 ? "text-primary" : "text-red-600")}>
+                  <span className={cn("ml-2", c.difference === 0 ? "" : c.difference > 0 ? "text-primary" : "text-[var(--err)]")}>
                     ({c.difference > 0 ? "+" : ""}{c.difference.toFixed(2)})
                   </span>
                 )}

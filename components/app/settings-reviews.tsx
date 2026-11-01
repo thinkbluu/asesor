@@ -129,7 +129,7 @@ export function SettingsReviews({
             <p className="text-xs text-muted-foreground">
               Link-ul direct către pagina de recenzii. Îl găsești în Google Business Profile &rsaquo; Distribuie &rsaquo; Obține mai multe recenzii.
               {cfg.googleBusinessUrl && !isUrlValid && (
-                <span className="text-red-500 ml-1">URL invalid</span>
+                <span className="text-[var(--err)] ml-1">URL invalid</span>
               )}
             </p>
           </div>
@@ -283,7 +283,7 @@ export function SettingsReviews({
                   {Array.from({ length: cfg.minStarsForGoogle - 1 }).map((_, i) => (
                     <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
                   ))}
-                  <span className="ml-1 text-[10px] font-semibold text-amber-600">
+                  <span className="ml-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400">
                     sub {cfg.minStarsForGoogle}
                   </span>
                 </div>

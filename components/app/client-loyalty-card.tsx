@@ -22,7 +22,7 @@ const TYPE_BADGES: Record<LoyaltyTransaction["type"], { label: string; className
   earned: { label: "Acumulate", className: "bg-primary/10 text-primary border-primary/30", icon: PlusIcon },
   bonus: { label: "Bonus", className: "bg-primary/10 text-primary border-primary/30", icon: Award },
   redeemed: { label: "Folosite", className: "bg-muted text-muted-foreground border-border", icon: Minus },
-  expired: { label: "Expirate", className: "bg-red-500/10 text-red-500 border-red-500/30", icon: Clock },
+  expired: { label: "Expirate", className: "bg-red-500/10 text-[var(--err)] border-red-500/30", icon: Clock },
   adjustment: { label: "Ajustare", className: "bg-muted text-muted-foreground border-border", icon: TrendingUp },
 }
 

@@ -72,16 +72,16 @@ const EMPTY_PRODUCT: ProductFormState = {
 
 const STATUS_META: Record<StockStatus, { label: string; className: string }> = {
   ok: { label: "În stoc", className: "bg-primary/10 text-primary border-primary/30" },
-  low: { label: "Stoc minim", className: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
-  out: { label: "Epuizat", className: "bg-red-500/15 text-red-500 border-red-500/30" },
+  low: { label: "Stoc minim", className: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30" },
+  out: { label: "Epuizat", className: "bg-[var(--err)]/10 text-[var(--err)] border-[var(--err)]/30" },
 }
 
 const MOVEMENT_BADGE: Record<MovementType, string> = {
   receptie: "bg-primary/10 text-primary border-primary/30",
   consum: "bg-blue-500/15 text-blue-600 border-blue-500/30",
   ajustare: "bg-muted text-muted-foreground border-border",
-  pierdere: "bg-red-500/15 text-red-500 border-red-500/30",
-  retur: "bg-amber-500/15 text-amber-600 border-amber-500/30",
+  pierdere: "bg-red-500/15 text-[var(--err)] border-red-500/30",
+  retur: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
 }
 
 const lei = (v: number) =>
@@ -224,7 +224,7 @@ export function StocuriView(props: {
   if (loadError) {
     return (
       <div className="p-6">
-        <div className="rounded-md border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-600">
+        <div className="rounded-md border border-red-500/30 bg-red-500/10 p-4 text-sm text-[var(--err)]">
           {loadError}
         </div>
       </div>
@@ -491,7 +491,7 @@ function MovementsTab(props: {
                 </TableCell>
                 <TableCell className="text-sm">{product?.name || m.productName || "Produs șters"}</TableCell>
                 <TableCell className="whitespace-nowrap text-right font-mono tabular-nums">
-                  <span className={cn("inline-flex items-center gap-1", m.quantity >= 0 ? "text-primary" : "text-red-500")}>
+                  <span className={cn("inline-flex items-center gap-1", m.quantity >= 0 ? "text-primary" : "text-[var(--err)]")}>
                     {m.quantity >= 0 ? <ArrowUpCircle className="size-3.5" /> : <ArrowDownCircle className="size-3.5" />}
                     {m.quantity > 0 ? "+" : ""}{m.quantity} {m.unit}
                   </span>

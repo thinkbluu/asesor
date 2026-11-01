@@ -165,12 +165,12 @@ function AppointmentBlock({
           )}
           {apt.services[0]?.name ?? "Programare"}{apt.services.length > 1 ? ` +${apt.services.length - 1}` : ""}
         </p>
-        <p className="truncate text-[11px] leading-tight opacity-80">
+        <p className="truncate text-[11px] leading-tight">
           {apt.clientName}
-          <span className="opacity-80"> · {apt.source}</span>
+          <span> · {apt.source}</span>
         </p>
         {!isShort && (
-          <span className="mono-label mt-1 block opacity-90">{cfg.label}</span>
+          <span className="mono-label mt-1 block">{cfg.label}</span>
         )}
       </div>
       {canDrag && (
@@ -286,7 +286,7 @@ function AppointmentDetail({
         {apt.notes && (
           <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3">
             <div className="flex items-center gap-1.5 mb-1">
-              <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-700 dark:text-amber-400" />
               <span className="text-xs font-medium text-amber-700 dark:text-amber-500">Notă</span>
             </div>
             <p className="text-xs text-amber-800 dark:text-amber-400">{apt.notes}</p>
@@ -295,7 +295,7 @@ function AppointmentDetail({
 
         {apt.status === "anulat" && apt.cancelReason && (
           <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-            <p className="text-xs font-medium text-red-700 dark:text-red-400 mb-1">Motiv anulare</p>
+            <p className="text-xs font-medium text-[var(--err)] mb-1">Motiv anulare</p>
             <p className="text-xs text-red-800 dark:text-red-300">{apt.cancelReason}</p>
           </div>
         )}
@@ -741,7 +741,7 @@ function WeekView({
   )
 }
 
-// ─── Month View ───────────────────────────────────────────────────────────────
+// ─── Month View ────────────────────────────���──────────────────────────────────
 
 function MonthView({
   year, month, allAppointments, onDayClick,
@@ -1202,8 +1202,8 @@ function AppointmentModal({
                 client's protected file */}
             {(selectedClient?.hasAllergies || (editing && selectedClient?.id === editing.clientId && editing.clientHasAllergies)) && (
               <div className="flex items-start gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-2.5" role="alert">
-                <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-                <p className="text-xs text-red-700 dark:text-red-400">
+                <AlertTriangle className="h-4 w-4 text-[var(--err)] shrink-0 mt-0.5" />
+                <p className="text-xs text-[var(--err)]">
                   Clienta are alergii înregistrate — verifică fișa protejată înainte de serviciu.
                 </p>
               </div>
@@ -1295,7 +1295,7 @@ function AppointmentModal({
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">Ora</Label>
               <Select value={startTime} onValueChange={setStartTime}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-label="Ora"><SelectValue>{startTime}</SelectValue></SelectTrigger>
                 <SelectContent className="max-h-48">
                   {TIME_OPTIONS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
@@ -1335,8 +1335,8 @@ function AppointmentModal({
           {conflict && (
             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 space-y-2">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700 dark:text-red-400">{conflict.error}</p>
+                <AlertTriangle className="h-4 w-4 text-[var(--err)] shrink-0 mt-0.5" />
+                <p className="text-sm text-[var(--err)]">{conflict.error}</p>
               </div>
               {conflict.overridable && (
                 <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handleSave(true)} disabled={saving}>
@@ -1361,7 +1361,7 @@ function AppointmentModal({
                   placeholder="0"
                 />
                 <Select value={discountType} onValueChange={(v: "procent" | "fix") => setDiscountType(v)}>
-                  <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="w-24" aria-label="Tip reducere"><SelectValue>{discountType === "procent" ? "%" : "RON"}</SelectValue></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="procent">%</SelectItem>
                     <SelectItem value="fix">RON</SelectItem>
@@ -1379,7 +1379,7 @@ function AppointmentModal({
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">Recurență</Label>
               <Select value={recurrence} onValueChange={(v: RecurrenceType) => setRecurrence(v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-label="Recurență"><SelectValue>{RECURRENCE_LABELS[recurrence]}</SelectValue></SelectTrigger>
                 <SelectContent>
                   {(Object.keys(RECURRENCE_LABELS) as RecurrenceType[]).map(r => (
                     <SelectItem key={r} value={r}>{RECURRENCE_LABELS[r]}</SelectItem>
@@ -1399,7 +1399,7 @@ function AppointmentModal({
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">Aplică modificarea</Label>
               <Select value={scope} onValueChange={(v: "single" | "rest_of_series") => setScope(v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger aria-label="Aplică modificarea"><SelectValue>{scope === "single" ? "Doar aceasta" : "Aceasta și următoarele"}</SelectValue></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="single">Doar aceasta</SelectItem>
                   <SelectItem value="rest_of_series">Aceasta și următoarele</SelectItem>
@@ -1858,13 +1858,13 @@ export function ProgramariView({
               </p>
             </div>
             <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
-              <button type="button" onClick={navigatePrev} className="rounded-[3px] p-1.5 hover:bg-muted" aria-label="Perioada anterioară">
+              <button type="button" onClick={navigatePrev} className="grid size-11 place-items-center rounded-[3px] hover:bg-muted lg:size-9" aria-label="Perioada anterioară">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <button type="button" onClick={() => setCurrentDate(todayBucharest())} className="rounded-[3px] px-2 py-1 text-xs font-medium hover:bg-muted">
+              <button type="button" onClick={() => setCurrentDate(todayBucharest())} className="min-h-11 rounded-[3px] px-3 text-xs font-medium hover:bg-muted lg:min-h-9 lg:px-2">
                 Astăzi
               </button>
-              <button type="button" onClick={navigateNext} className="rounded-[3px] p-1.5 hover:bg-muted" aria-label="Perioada următoare">
+              <button type="button" onClick={navigateNext} className="grid size-11 place-items-center rounded-[3px] hover:bg-muted lg:size-9" aria-label="Perioada următoare">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -1886,7 +1886,7 @@ export function ProgramariView({
                   onClick={() => setView(id)}
                   aria-pressed={view === id}
                   className={cn(
-                    "px-2.5 py-1.5 text-[11.5px] font-medium transition-colors",
+                    "min-h-11 px-2.5 text-[11.5px] font-medium transition-colors lg:min-h-9 lg:py-1.5",
                     view === id
                       ? "bg-foreground text-background"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground",

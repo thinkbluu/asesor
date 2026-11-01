@@ -262,7 +262,7 @@ function Step2({
                 type="button"
                 onClick={() => removeService(service.id)}
                 disabled={services.length <= 1}
-                className="flex h-10 w-8 items-center justify-center rounded-md text-[#0A0A0A]/30 hover:text-red-500 hover:bg-red-50 disabled:opacity-20 transition-colors sm:h-8"
+                className="flex h-10 w-8 items-center justify-center rounded-md text-[#0A0A0A]/30 hover:text-[var(--err)] hover:bg-red-50 disabled:opacity-20 transition-colors sm:h-8"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -442,7 +442,7 @@ function Step4({
                 <button
                   type="button"
                   onClick={() => removeMember(member.id)}
-                  className="text-[#0A0A0A]/30 hover:text-red-500 transition-colors"
+                  className="text-[#0A0A0A]/30 hover:text-[var(--err)] transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

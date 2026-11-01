@@ -136,7 +136,7 @@ export function ClientsView({
             const r = await listClientsAction({ search, tag: v, source, lastVisit, sort, page: 1 })
             if (r.ok) setList(r.data); else setError(r.error)
           }) }}>
-            <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[140px]" aria-label="Filtru etichete"><SelectValue>{tag === "toate" ? "Toate etichetele" : tag}</SelectValue></SelectTrigger>
             <SelectContent>
               <SelectItem value="toate">Toate etichetele</SelectItem>
               {CLIENT_TAGS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
@@ -146,7 +146,7 @@ export function ClientsView({
             const r = await listClientsAction({ search, tag, source: v, lastVisit, sort, page: 1 })
             if (r.ok) setList(r.data); else setError(r.error)
           }) }}>
-            <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[150px]" aria-label="Filtru sursă"><SelectValue>{source === "toate" ? "Toate sursele" : source}</SelectValue></SelectTrigger>
             <SelectContent>
               <SelectItem value="toate">Toate sursele</SelectItem>
               {CLIENT_SOURCES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -156,7 +156,7 @@ export function ClientsView({
             const r = await listClientsAction({ search, tag, source, lastVisit: v, sort, page: 1 })
             if (r.ok) setList(r.data); else setError(r.error)
           }) }}>
-            <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[170px]" aria-label="Filtru ultima vizită"><SelectValue>{LAST_VISIT_OPTIONS.find((o) => o.value === lastVisit)?.label}</SelectValue></SelectTrigger>
             <SelectContent>
               {LAST_VISIT_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
             </SelectContent>
@@ -165,7 +165,7 @@ export function ClientsView({
             const r = await listClientsAction({ search, tag, source, lastVisit, sort: v, page: 1 })
             if (r.ok) setList(r.data); else setError(r.error)
           }) }}>
-            <SelectTrigger className="w-[150px]" aria-label="Sortează"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-[150px]" aria-label="Sortează"><SelectValue>{SORT_OPTIONS.find((o) => o.value === sort)?.label}</SelectValue></SelectTrigger>
             <SelectContent>
               {SORT_OPTIONS.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
             </SelectContent>
@@ -252,11 +252,12 @@ function ClientRow({ c }: { c: ClientListItem }) {
             </p>
             {c.hasAllergies && (
               <span
+                role="img"
                 className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--err)]/10 text-[var(--err)]"
                 title="Clienta are alergii înregistrate — vezi fișa protejată"
                 aria-label="Are alergii înregistrate"
               >
-                <AlertTriangle className="h-3 w-3" />
+                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
               </span>
             )}
             {c.tags.map((t) => (

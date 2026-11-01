@@ -85,6 +85,8 @@
   --sidebar-ring: #3DCB97;
   --ink-2-app: #B9BDBF;
   --ink-3-app: #A6AAAD;
+  /* roșul de semnal trebuie să rămână lizibil pe panourile întunecate */
+  --err: #E8837A;
 }
 
 @theme inline {
@@ -160,6 +162,13 @@
     color: #F2EDE7;
     border-color: #131516;
   }
+  /* eticheta mono a statusului în smarald deschis, ca .ap.prog .st din machetă */
+  .stx-desfasurare .mono-label {
+    color: var(--em-l);
+  }
+  .dark .stx-desfasurare .mono-label {
+    color: var(--em);
+  }
   .stx-finalizat {
     background: color-mix(in srgb, #131516 5%, var(--card));
     color: var(--ink-3-app);
@@ -227,3 +236,5 @@
     text-transform: uppercase;
   }
 }
+/* p18 kick */
+/* p18 kick 2 */

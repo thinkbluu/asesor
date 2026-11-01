@@ -344,7 +344,7 @@ export function SettingsLoialitate({ initialConfig }: Props) {
                 variant="ghost"
                 onClick={() => removeTier(tier.id)}
                 disabled={!cfg.enabled || cfg.tiers.length <= 1}
-                className="text-muted-foreground hover:text-red-500"
+                className="text-muted-foreground hover:text-[var(--err)]"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -413,7 +413,7 @@ export function SettingsLoialitate({ initialConfig }: Props) {
                   variant="ghost"
                   onClick={() => removeReward(r.id)}
                   disabled={!cfg.enabled}
-                  className="text-muted-foreground hover:text-red-500"
+                  className="text-muted-foreground hover:text-[var(--err)]"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>

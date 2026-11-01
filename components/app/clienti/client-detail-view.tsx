@@ -101,11 +101,12 @@ export function ClientDetailView({
             </h1>
             {client.hasAllergies && (
               <span
+                role="img"
                 className="flex size-6 items-center justify-center rounded-full bg-[var(--err)]/10 text-[var(--err)]"
                 title="Clienta are alergii înregistrate"
                 aria-label="Are alergii înregistrate"
               >
-                <AlertTriangle className="h-3.5 w-3.5" />
+                <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
             )}
             {client.tags.map((t) => (
@@ -381,7 +382,7 @@ function HistoryTab({ history }: { history: ClientHistoryItem[] }) {
   )
 }
 
-// ─── Date protejate ───────────────���──────────────────────────────────────────
+// ─── Date protejate ───────────────���────────────────────���─────────────────────
 
 function SensitiveTab({
   clientId,

@@ -29,9 +29,9 @@ import {
 
 const STATUS_CONFIG: Record<WhatsAppChannelStatus, { label: string; cls: string }> = {
   disconnected: { label: "Neconectat", cls: "bg-muted text-muted-foreground border-border" },
-  pending: { label: "În verificare", cls: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
+  pending: { label: "În verificare", cls: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30" },
   connected: { label: "Conectat", cls: "bg-primary/10 text-primary border-primary/30" },
-  error: { label: "Eroare", cls: "bg-red-500/15 text-red-500 border-red-500/30" },
+  error: { label: "Eroare", cls: "bg-red-500/15 text-[var(--err)] border-red-500/30" },
 }
 
 const SAMPLE_VARS: Record<string, string> = {
@@ -152,7 +152,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
         </CardHeader>
         <CardContent className="space-y-5">
           {COMING_SOON && (
-            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-600">
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-800 dark:text-amber-400">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>
                 <strong className="font-medium">În curând.</strong> Integrarea WhatsApp Business
@@ -197,7 +197,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
           </div>
 
           {verifyError && (
-            <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-600">
+            <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-sm text-[var(--err)]">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{verifyError}</span>
             </div>
@@ -298,7 +298,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
                     className={cn(
                       "text-xs",
                       t.status === "approved" && "bg-primary/10 text-primary border-primary/30",
-                      t.status === "pending" && "bg-amber-500/10 text-amber-600 border-amber-500/30",
+                      t.status === "pending" && "bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-500/30",
                       t.status === "draft" && "bg-muted text-muted-foreground"
                     )}
                   >
