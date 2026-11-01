@@ -1,7 +1,8 @@
 import Link from "next/link"
 import { PLANS, TRIAL_REQUIRES_CARD } from "@/lib/plans"
 
-const CTA_BY_PLAN = {
+// Shared with /preturi (full plan cards use the same per-plan CTA).
+export const CTA_BY_PLAN = {
   basic: { label: "Începe gratuit", href: "/register?plan=basic", cls: "btn ghost" },
   pro: { label: "Alege Pro", href: "/register?plan=pro", cls: "btn pri" },
   premium: { label: "Contactează-ne", href: "/contact?subiect=premium", cls: "btn ghost" },

@@ -22,16 +22,20 @@ export function MarketingMotion() {
       return
     }
 
+    // The display reveal also runs on the subpage heroes (.phero); the rest
+    // is homepage-only, guarded so subpages don't log "target not found".
     gsap.from(".mkt .display .l>span", { yPercent: 108, duration: 1.3, ease: "expo.out", stagger: 0.1, delay: 0.15 })
-    gsap.from(".mkt .hero .bg img", { scale: 1.06, duration: 2.4, ease: "power2.out" })
-    gsap.from(".mkt .hero .lede,.mkt .hero .ctas,.mkt .fact", {
-      opacity: 0,
-      y: 16,
-      duration: 1,
-      ease: "power3.out",
-      stagger: 0.06,
-      delay: 0.6,
-    })
+    if (document.querySelector(".mkt .hero")) {
+      gsap.from(".mkt .hero .bg img", { scale: 1.06, duration: 2.4, ease: "power2.out" })
+      gsap.from(".mkt .hero .lede,.mkt .hero .ctas,.mkt .fact", {
+        opacity: 0,
+        y: 16,
+        duration: 1,
+        ease: "power3.out",
+        stagger: 0.06,
+        delay: 0.6,
+      })
+    }
 
     gsap.utils.toArray<HTMLElement>(".mkt .rv").forEach((el) => {
       gsap.to(el, { opacity: 1, y: 0, duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 88%" } })

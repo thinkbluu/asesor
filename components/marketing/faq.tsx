@@ -1,6 +1,7 @@
 import { TRIAL_REQUIRES_CARD } from "@/lib/plans"
 
-const FAQ = [
+// Shared with /preturi, which appends its own data-export question.
+export const HOME_FAQ = [
   {
     q: "Pot testa gratuit?",
     a: TRIAL_REQUIRES_CARD
@@ -31,7 +32,7 @@ export function Faq() {
           <em>frecvente.</em>
         </h2>
         <div className="rv">
-          {FAQ.map((item, i) => (
+          {HOME_FAQ.map((item, i) => (
             <details key={item.q} open={i === 0}>
               <summary>{item.q}</summary>
               <p>{item.a}</p>

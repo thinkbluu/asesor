@@ -1,115 +1,184 @@
-"use client"
+import type { Metadata } from "next"
+import Image from "next/image"
+import Link from "next/link"
+import { FEATURE_MATRIX, PLANS, SHOW_YEARLY, TRIAL_REQUIRES_CARD, getPlan } from "@/lib/plans"
+import { SITE } from "@/lib/site"
+import { PricingPlans, type PlanCard } from "@/components/marketing/pricing-plans"
+import { CTA_BY_PLAN } from "@/components/marketing/pricing-teaser"
+import { HOME_FAQ } from "@/components/marketing/faq"
+import { MarketingMotion } from "@/components/marketing/marketing-motion"
 
-import { PricingSection, type PricingPlan } from "@/components/ui/pricing"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { PLANS, TRIAL_DAYS, TRIAL_REQUIRES_CARD, SHOW_YEARLY } from "@/lib/plans"
+const basic = getPlan("basic")
+const pro = getPlan("pro")
+const premium = getPlan("premium")
 
-const plans: PricingPlan[] = PLANS.map((plan) => ({
+const planCards: PlanCard[] = PLANS.map((plan) => ({
+  id: plan.id,
   name: plan.name,
-  price: String(plan.monthly),
-  yearlyPrice: SHOW_YEARLY ? String(plan.yearly) : String(plan.monthly),
-  period: "lună",
-  features: [...plan.features],
+  monthly: plan.monthly,
+  yearly: plan.yearly,
   description: plan.description,
-  buttonText: plan.id === "premium" ? "Contactează-ne" : "Începe gratuit",
-  href: plan.id === "premium" ? "/contact" : "/register",
-  isPopular: "highlighted" in plan ? plan.highlighted === true : false,
+  features: [...plan.features],
+  highlighted: "highlighted" in plan && plan.highlighted === true,
+  cta: CTA_BY_PLAN[plan.id],
 }))
 
-const faqs = [
+const FAQS = [
+  ...HOME_FAQ,
   {
-    question: "Pot testa gratuit?",
-    answer: `Da. Ai ${TRIAL_DAYS} zile să explorezi platforma. La înregistrare este necesar un card bancar, dar nu se debitează nimic. Dacă anulezi înainte de finalul celor ${TRIAL_DAYS} de zile, nu se percepe nicio sumă.`,
-  },
-  {
-    question: "Ce se întâmplă după perioada de test?",
-    answer:
-      "Alegi un pachet sau contul rămâne inactiv. Datele tale sunt păstrate 30 de zile.",
-  },
-  {
-    question: "Pot schimba pachetul ulterior?",
-    answer:
-      "Oricând. Upgrade instant, downgrade la finalul perioadei de facturare.",
-  },
-  {
-    question: "Există contracte pe termen lung?",
-    answer:
-      "Nu. Plătești lunar. Poți anula oricând.",
-  },
-  {
-    question: "Ce metode de plată acceptați?",
-    answer:
-      "Card bancar (Visa, Mastercard) și transfer bancar pentru plăți anuale.",
+    q: "Ce se întâmplă cu datele dacă renunț?",
+    a: "Le poți exporta complet. După 30 de zile de la închiderea contului sunt șterse definitiv.",
   },
 ]
 
-export default function PricingPage() {
+function cell(value: string) {
+  if (value === "inclus") return <span className="y">inclus</span>
+  if (value === "—") return <span className="no">—</span>
+  return value
+}
+
+export const metadata: Metadata = {
+  title: `Prețuri — ASESOR · de la ${basic.monthly} RON pe lună, 14 zile gratuit`,
+  description: `Pachetele Basic, Pro și Premium: programări, clienți, echipă, stocuri și închiderea zilei. ${
+    TRIAL_REQUIRES_CARD
+      ? "Toate pachetele încep cu 14 zile gratuit. Nu plătești nimic dacă anulezi înainte."
+      : "14 zile gratuit, fără card."
+  }`,
+}
+
+export default function PreturiPage() {
   return (
-      <main className="flex-1">
-        <PricingSection
-          plans={plans}
-          title="Prețuri simple. Fără surprize."
-          description="Alege pachetul potrivit pentru dimensiunea și nevoile salonului tău. Poți schimba oricând."
-        />
+    <main>
+      <section className="phero">
+        <div className="bg">
+          <Image
+            src="/img/obj-preturi.webp"
+            alt="Trei sticluțe de ojă în mărimi crescătoare — nud, argintiu, negru — pe fond porțelan"
+            fill
+            priority
+            sizes="(min-width: 761px) 54vw, 100vw"
+          />
+        </div>
+        <div className="wrap in">
+          <p className="eyebrow">Prețuri · facturare lunară, în RON</p>
+          <h1 className="display">
+            <span className="l">
+              <span>Prețuri simple.</span>
+            </span>
+            <span className="l">
+              <span>
+                <em>Fără surprize.</em>
+              </span>
+            </span>
+          </h1>
+          <p className="lede">
+            Alege pachetul potrivit pentru dimensiunea și nevoile salonului tău. Poți schimba oricând.{" "}
+            {TRIAL_REQUIRES_CARD
+              ? "Toate pachetele încep cu 14 zile gratuit. Nu plătești nimic dacă anulezi înainte."
+              : "Toate încep cu 14 zile gratuit, fără card bancar."}
+          </p>
+        </div>
+      </section>
 
-        {/* FAQ Section */}
-        <section className="py-20 px-4 bg-muted/30">
-          <div className="mx-auto max-w-3xl">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
-                Întrebări frecvente
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Tot ce trebuie să știi despre prețuri și facturare
-              </p>
-            </div>
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left font-semibold">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
+      <section className="sec f-porc prices" style={{ paddingTop: "clamp(56px,6vw,90px)" }}>
+        <div className="wrap">
+          <PricingPlans plans={planCards} showYearly={SHOW_YEARLY} />
+          <div className="foot-n">
+            <span>Trei sticluțe, trei mărimi: alegi după câți oameni lucrează în salon, nu după câte funcții „ar trebui” să ai.</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="sec f-sat prices">
+        <div className="wrap">
+          <div className="top">
+            <h2 className="h2 rv">
+              Ce primești
+              <br />
+              <em>în fiecare pachet.</em>
+            </h2>
+            <p className="lede rv">Tot ce e inclus în fiecare pachet, rând cu rând.</p>
+          </div>
+          <table className="cmp rv">
+            <thead>
+              <tr>
+                <th scope="col" aria-label="Modul" />
+                <th scope="col">Basic · {basic.monthly}</th>
+                <th scope="col">Pro · {pro.monthly}</th>
+                <th scope="col">Premium · {premium.monthly}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FEATURE_MATRIX.map((row) => (
+                <tr key={row.feature}>
+                  <th scope="row">{row.feature}</th>
+                  <td>{cell(row.basic)}</td>
+                  <td>{cell(row.pro)}</td>
+                  <td>{cell(row.premium)}</td>
+                </tr>
               ))}
-            </Accordion>
+            </tbody>
+          </table>
+          <div className="soon rv">
+            <h3>În curând</h3>
+            <ul>
+              <li>Mesaje SMS și WhatsApp</li>
+              <li>Campanii pentru clienți</li>
+              <li>Mai multe locații</li>
+            </ul>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CTA Section */}
-        <section className="py-20 px-4">
-          <div className="mx-auto max-w-4xl text-center">
-            <div className="rounded-2xl bg-accent/10 border border-accent/20 p-12">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
-                Nu ești sigur ce pachet ți se potrivește?
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
-                Hai să vorbim. Îți recomandăm varianta potrivită pentru salonul tău, fără presiune.
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="/register"
-                  className="inline-flex items-center justify-center rounded-md bg-accent px-8 py-3 text-base font-medium text-accent-foreground hover:bg-accent/90 transition-colors"
-                >
-                  Începe gratuit
-                </a>
-                <a
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-md border border-border bg-background px-8 py-3 text-base font-medium text-foreground hover:bg-muted transition-colors"
-                >
-                  Programează un apel
-                </a>
-              </div>
+      <section className="sec f-porc faq">
+        <div className="wrap grid">
+          <h2 className="h2 rv">
+            Întrebări
+            <br />
+            <em>frecvente.</em>
+          </h2>
+          <div className="rv">
+            {FAQS.map((item, i) => (
+              <details key={item.q} open={i === 0}>
+                <summary>{item.q}</summary>
+                <p>{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sec ink cta" id="discutie">
+        <div className="wrap talk">
+          <div>
+            <p className="eyebrow rv" style={{ marginBottom: 26 }}>
+              Nu ești sigur ce pachet ți se potrivește?
+            </p>
+            <h2 className="big rv">
+              Hai să <em>vorbim.</em>
+            </h2>
+            <div className="ctas rv">
+              <Link className="btn pri" href="/register">
+                Începe gratuit <span className="ar">→</span>
+              </Link>
+              <Link className="btn ghost" href="/contact?subiect=demo">
+                Programează un apel
+              </Link>
             </div>
           </div>
-        </section>
-      </main>
+          <div className="side rv">
+            <p>Îți recomandăm varianta potrivită pentru salonul tău, fără presiune.</p>
+            <p style={{ marginTop: 18 }}>
+              <a className="tl" href={`mailto:${SITE.emails.contact}`}>
+                {SITE.emails.contact}
+              </a>
+            </p>
+            <p style={{ marginTop: 8, fontSize: 13.5 }}>Suport: {SITE.supportHours}</p>
+          </div>
+        </div>
+      </section>
+
+      <MarketingMotion />
+    </main>
   )
 }

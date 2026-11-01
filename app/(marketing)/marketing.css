@@ -415,3 +415,44 @@
 .mkt .nav .sheet nav a.btn{font:500 15px/1 var(--sans);border:0;margin-top:28px;justify-content:center;min-height:48px}
 .mkt .nav .sheet nav a.btn.pri{background:var(--em);color:#fff}
 .mkt .foot li .linklike{display:inline-flex;min-height:40px;align-items:center;color:#D7DADB;background:none;border:0;padding:0;font:inherit;cursor:pointer}
+
+/* P15: /preturi, /functionalitati, /pentru-cine */
+.mkt .phero.pow{background:var(--powder)}
+.mkt .phero .eyebrow{margin-bottom:22px}
+/* modul (functionalitati) */
+.mkt .mod .grid{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:32px 72px;align-items:center}
+.mkt .mod .num{font:italic 400 20px/1 var(--serif);color:var(--ink-3)}
+.mkt .mod h2{font:400 clamp(36px,4.6vw,68px)/1.02 var(--serif);letter-spacing:-.02em;font-variation-settings:"opsz" 96;margin-top:12px}
+.mkt .mod ul{margin-top:30px;border-top:1px solid var(--rule)}
+.mkt .mod li{padding:11px 0;border-bottom:1px solid var(--rule);font-size:15px;color:var(--ink-2)}
+.mkt .mobj{position:relative;margin:0;max-width:520px}
+.mkt .mobj img{width:100%;aspect-ratio:1;object-fit:cover;box-shadow:0 1px 0 rgba(0,0,0,.04),0 18px 30px -22px rgba(19,21,22,.55)}
+.mkt .mobj figcaption{font:400 10.5px/1.3 var(--mono);letter-spacing:.06em;color:rgba(19,21,22,.66);margin-top:7px}
+.mkt .mobj figcaption i{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:0;margin-right:.45em}
+.mkt .mobj .twin{left:5%;bottom:calc(5% + 22px);max-width:90%}
+@media (min-width:1101px){.mkt .mod.rev .mcol{order:-1}}
+/* în curând */
+.mkt .soon{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:24px 64px;align-items:start}
+.mkt .soon h3{font:italic 400 22px/1.2 var(--serif);color:var(--ink)}
+.mkt .soon ul{border-top:1px solid var(--rule)}
+.mkt .soon li{padding:12px 0;border-bottom:1px solid var(--rule);font-size:14.5px;color:var(--ink-2)}
+/* pentru-cine */
+.mkt .fit .frows{border-bottom:1px solid var(--rule)}
+.mkt .fit .frow{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:18px 64px;padding:44px 0;border-top:1px solid var(--rule)}
+.mkt .fit h3{font:400 32px/1.1 var(--serif);letter-spacing:-.02em;font-variation-settings:"opsz" 48;margin-bottom:14px}
+.mkt .fit .ptag{font:500 11.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink)}
+.mkt .fit .frow>p{color:var(--ink-2);max-width:34em}
+.mkt .fit .ex{margin-top:18px;border-top:1px solid var(--rule)}
+.mkt .fit .ex li{padding:10px 0;border-bottom:1px solid var(--rule);font-size:15px;color:var(--ink-2)}
+.mkt .fit .sum{margin-top:64px;font:italic 400 clamp(26px,2.6vw,38px)/1.3 var(--serif);max-width:26em}
+.mkt .fit .sum .tl{display:inline;min-height:0;font:inherit;border-bottom:1px solid currentColor}
+@media (max-width:1100px){
+  .mkt .mod .grid{grid-template-columns:1fr;gap:40px}
+  .mkt .soon{grid-template-columns:1fr;gap:16px}
+  .mkt .fit .frow{grid-template-columns:1fr;gap:16px}
+}
+@media (max-width:760px){
+  .mkt .mod h2{font-size:clamp(32px,9vw,44px)}
+  .mkt .mobj{max-width:none}
+  .mkt .fit h3{font-size:27px}
+}
