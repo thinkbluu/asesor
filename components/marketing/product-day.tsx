@@ -55,7 +55,7 @@ export function ProductDay() {
             culoare, câte vizite, cât a cheltuit, cum preferă să fie contactată.
           </p>
         </div>
-        <div className="app rv" aria-label="Interfața ASESOR — Programări, vizualizare pe zi (date demo)">
+        <div className="app rv" aria-label="Interfața ASESOR — Programări, vizualizare pe zi">
           <aside className="side">
             <div className="b">
               <Image src="/img/asesor-mark.png" alt="" width={471} height={463} />
