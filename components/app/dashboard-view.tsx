@@ -10,9 +10,9 @@ import {
   BellRing, ChevronRight, DollarSign,
 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts"
-import { cn } from "@/lib/utils"
 import { ForbiddenBanner } from "@/components/app/forbidden-banner"
-import { STATUS_CONFIG } from "@/lib/mappers/programari"
+import { StatusBadge } from "@/components/app/status-badge"
+import { KpiStrip } from "@/components/app/kpi-strip"
 import type { AppointmentStatus } from "@/lib/mappers/programari"
 import { formatTimeHM, utcIsoToCivil } from "@/lib/time"
 import type {
@@ -23,7 +23,8 @@ import type {
 
 // Client shell for the /app dashboard. Every number comes from the database
 // (dashboard_summary RPC + plain RLS-scoped queries) — no derived trends, no
-// percentage badges.
+// percentage badges. Look: machetă «Ziua salonului» — KPI strip cu hairline-uri,
+// titlu Bodoni, panouri hârtie.
 
 interface DashboardViewProps {
   summary: DashboardSummary | null
@@ -47,49 +48,33 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
   const todayTotal = Object.values(byStatus).reduce((s, n) => s + n, 0)
   const upcoming = summary?.next_upcoming ?? []
 
-  const kpiCards = [
-    {
-      label: "Programări astăzi",
-      value: todayTotal.toString(),
-      icon: Calendar,
-      href: "/app/programari",
-    },
-    {
-      label: "Venituri astăzi",
-      value: formatRONShort(summary?.revenue_today ?? 0),
-      icon: DollarSign,
-      href: "/app/financiar",
-    },
-    {
-      label: "Clienți noi luna aceasta",
-      value: (summary?.new_clients_this_month ?? 0).toString(),
-      icon: Users,
-      href: "/app/clienti",
-    },
-    {
-      label: "Produse cu stoc scăzut",
-      value: (summary?.low_stock_count ?? 0).toString(),
-      icon: Package,
-      href: "/app/stocuri",
-    },
+  const kpis = [
+    { label: "Programări astăzi", value: todayTotal.toString() },
+    { label: "Venituri astăzi", value: formatRONShort(summary?.revenue_today ?? 0) },
+    { label: "Clienți noi luna aceasta", value: (summary?.new_clients_this_month ?? 0).toString() },
+    { label: "Produse cu stoc scăzut", value: (summary?.low_stock_count ?? 0).toString() },
   ]
 
   const selected = upcoming.find(u => u.id === selectedAppt)
 
   return (
-    <div className="p-4 pt-16 lg:p-8 lg:pt-8 max-w-[1600px]">
+    <div className="p-4 pb-24 lg:p-8 lg:pb-8 max-w-[1600px]">
       <ForbiddenBanner />
-      {/* Header */}
+      {/* Header — titlu Bodoni + dată mono, ca .bar din machetă */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground text-balance">Dashboard</h1>
-          <p className="text-muted-foreground capitalize text-sm">{today}</p>
+          <h1 className="text-[26px] leading-tight tracking-[-0.01em] text-foreground text-balance [font-family:var(--serif)]">
+            Bună, ziua.
+          </h1>
+          <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground tabular-nums">
+            {today}
+          </p>
         </div>
         <div className="flex w-full sm:w-auto gap-2 flex-wrap">
           <Button variant="outline" size="sm" asChild>
             <Link href="/app/clienti"><UserPlus className="mr-1.5 h-3.5 w-3.5" />Client nou</Link>
           </Button>
-          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
+          <Button size="sm" asChild>
             <Link href="/app/programari"><Plus className="mr-1.5 h-3.5 w-3.5" />Programare nouă</Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
@@ -98,24 +83,8 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
         </div>
       </div>
 
-      {/* KPI Row */}
-      <div className="mb-6 grid gap-3 grid-cols-2 lg:grid-cols-4">
-        {kpiCards.map(card => (
-          <Link key={card.label} href={card.href}>
-            <Card className="hover:border-accent/50 transition-colors cursor-pointer">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
-                    <card.icon className="h-4 w-4 text-accent" />
-                  </div>
-                </div>
-                <p className="text-xl font-bold text-foreground tabular-nums break-words">{card.value}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{card.label}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {/* KPI strip — .kpis din machetă */}
+      <KpiStrip items={kpis} className="mb-6" />
 
       {/* Main 60/40 grid */}
       <div className="grid gap-4 lg:grid-cols-5">
@@ -132,7 +101,7 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
             </CardHeader>
             <CardContent>
               {selected && (
-                <div className="mb-4 rounded-xl border border-border bg-card p-4 space-y-3">
+                <div className="mb-4 rounded-lg border border-border bg-card p-4 space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <p className="font-semibold text-foreground">{selected.client_name}</p>
@@ -142,16 +111,13 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-sm">
                     <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span>
+                    <span className="font-mono tabular-nums">
                       {utcIsoToCivil(selected.starts_at).date} · {formatTimeHM(selected.starts_at)}
                     </span>
-                    <span className={cn(
-                      "ml-auto text-xs rounded-full px-2 py-0.5 font-medium",
-                      STATUS_CONFIG[selected.status as AppointmentStatus]?.bg ?? "bg-muted",
-                      STATUS_CONFIG[selected.status as AppointmentStatus]?.color ?? "text-muted-foreground",
-                    )}>
-                      {STATUS_CONFIG[selected.status as AppointmentStatus]?.label ?? selected.status}
-                    </span>
+                    <StatusBadge
+                      status={selected.status as AppointmentStatus}
+                      className="ml-auto"
+                    />
                   </div>
                   <Button size="sm" variant="outline" className="w-full" asChild>
                     <Link href={`/app/programari?tab=day&date=${utcIsoToCivil(selected.starts_at).date}`}>
@@ -162,9 +128,10 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
               )}
               {upcoming.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Calendar className="mb-3 h-10 w-10 text-muted-foreground/40" />
-                  <p className="text-muted-foreground">Nicio programare viitoare</p>
-                  <Button className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90" size="sm" asChild>
+                  <Calendar className="mb-3 h-10 w-10 text-muted-foreground/40" aria-hidden="true" />
+                  <p className="text-lg text-foreground [font-family:var(--serif)]">Nicio programare viitoare</p>
+                  <p className="text-sm text-muted-foreground mt-1">Calendarul așteaptă prima clientă.</p>
+                  <Button className="mt-4" size="sm" asChild>
                     <Link href="/app/programari"><Plus className="mr-1 h-4 w-4" />Adaugă programare</Link>
                   </Button>
                 </div>
@@ -172,29 +139,22 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
                 <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
                   {upcoming.map(u => {
                     const civil = utcIsoToCivil(u.starts_at)
-                    const cfg = STATUS_CONFIG[u.status as AppointmentStatus]
                     return (
                       <button
                         key={u.id}
                         onClick={() => setSelectedAppt(prev => prev === u.id ? null : u.id)}
-                        className="w-full text-left rounded-lg border border-border border-l-4 border-l-accent/60 p-3 transition-colors hover:bg-muted/60"
+                        className="w-full text-left rounded-lg border border-border border-l-2 border-l-primary/60 p-3 transition-colors hover:bg-muted/60"
                       >
                         <div className="flex items-center gap-3">
                           <div className="shrink-0 text-center w-16">
-                            <p className="text-sm font-bold tabular-nums text-foreground">{formatTimeHM(u.starts_at)}</p>
-                            <p className="text-[11px] text-muted-foreground">{civil.date.slice(5)}</p>
+                            <p className="text-sm font-semibold tabular-nums text-foreground font-mono">{formatTimeHM(u.starts_at)}</p>
+                            <p className="text-[11px] text-muted-foreground font-mono tabular-nums">{civil.date.slice(5)}</p>
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm text-foreground truncate">{u.client_name}</p>
                             <p className="text-xs text-muted-foreground truncate">{u.staff_name}</p>
                           </div>
-                          <span className={cn(
-                            "text-xs rounded-full px-2 py-0.5 font-medium shrink-0",
-                            cfg?.bg ?? "bg-muted",
-                            cfg?.color ?? "text-muted-foreground",
-                          )}>
-                            {cfg?.label ?? u.status}
-                          </span>
+                          <StatusBadge status={u.status as AppointmentStatus} />
                         </div>
                       </button>
                     )
@@ -211,47 +171,47 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
-                <BellRing className="h-4 w-4 text-accent" />
+                <BellRing className="h-4 w-4 text-primary" aria-hidden="true" />
                 Alerte
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {(summary?.low_stock_count ?? 0) > 0 && (
                 <Link href="/app/stocuri" className="flex items-start gap-3 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 hover:bg-amber-500/15 transition-colors">
-                  <Package className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
+                  <Package className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                       {summary?.low_stock_count} produse cu stoc scăzut
                     </p>
                   </div>
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                 </Link>
               )}
               {(alerts?.pendingConfirmations ?? 0) > 0 && (
-                <Link href="/app/programari?tab=list" className="flex items-start gap-3 rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 hover:bg-blue-500/15 transition-colors">
-                  <Clock className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                <Link href="/app/programari?tab=list" className="flex items-start gap-3 rounded-lg bg-primary/10 border border-primary/20 p-3 hover:bg-primary/15 transition-colors">
+                  <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                    <p className="text-xs font-semibold text-primary">
                       {alerts?.pendingConfirmations} programări de confirmat
                     </p>
                   </div>
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                 </Link>
               )}
               {(alerts?.noShowsYesterday ?? 0) > 0 && (
-                <Link href="/app/programari?tab=list" className="flex items-start gap-3 rounded-lg bg-red-500/10 border border-red-500/20 p-3 hover:bg-red-500/15 transition-colors">
-                  <AlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <Link href="/app/programari?tab=list" className="flex items-start gap-3 rounded-lg bg-[var(--err)]/10 border border-[var(--err)]/20 p-3 hover:bg-[var(--err)]/15 transition-colors">
+                  <AlertTriangle className="h-4 w-4 text-[var(--err)] shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-red-700 dark:text-red-400">
-                      {alerts?.noShowsYesterday} no-show-uri ieri
+                    <p className="text-xs font-semibold text-[var(--err)]">
+                      {alerts?.noShowsYesterday} neprezentări ieri
                     </p>
                   </div>
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
                 </Link>
               )}
               {(alerts?.upcomingTimeOff.length ?? 0) > 0 && (
                 <div className="rounded-lg border border-border p-3 space-y-1.5">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Concedii în aprovăzare</p>
+                  <p className="mono-label text-[#8a8a8a]">Concedii în aprovăzare</p>
                   {alerts?.upcomingTimeOff.map((t, i) => (
                     <p key={i} className="text-xs text-muted-foreground">
                       <span className="text-foreground font-medium">{t.staffName}</span>
@@ -290,13 +250,13 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
                     <Tooltip
                       formatter={(value) => [`${value} Lei`, "Încasat"]}
                       labelFormatter={(label) => String(label)}
-                      contentStyle={{ borderRadius: 8, fontSize: 12 }}
+                      contentStyle={{ borderRadius: 6, fontSize: 12 }}
                     />
-                    <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="revenue" radius={[3, 3, 0, 0]}>
                       {weekly.map(d => (
                         <Cell
                           key={d.date}
-                          fill={d.isToday ? "var(--accent)" : "var(--muted-foreground)"}
+                          fill={d.isToday ? "var(--primary)" : "var(--muted-foreground)"}
                           fillOpacity={d.isToday ? 1 : 0.35}
                         />
                       ))}
@@ -311,3 +271,4 @@ export function DashboardView({ summary, weekly, alerts }: DashboardViewProps) {
     </div>
   )
 }
+

@@ -5,8 +5,9 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import useSWR from "swr"
 import { toast } from "sonner"
 import { CheckoutDialog } from "@/components/app/programari/checkout-dialog"
+import { StatusBadge } from "@/components/app/status-badge"
+import { KpiStrip } from "@/components/app/kpi-strip"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -92,6 +93,15 @@ function snapTo(minutes: number): number {
   return Math.round(minutes / SNAP_MIN) * SNAP_MIN
 }
 
+function clientInitials(name: string): string {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("")
+}
+
 // ─── Appointment Block (day view, with drag + resize) ───────────────────────
 
 interface DragState {
@@ -108,10 +118,9 @@ interface DragState {
 }
 
 function AppointmentBlock({
-  apt, staffColor, canDrag, onOpen, onDragStart,
+  apt, canDrag, onOpen, onDragStart,
 }: {
   apt: Appointment
-  staffColor: string
   canDrag: boolean
   onOpen: (a: Appointment) => void
   onDragStart: (e: React.PointerEvent, apt: Appointment, mode: "move" | "resize") => void
@@ -124,19 +133,18 @@ function AppointmentBlock({
   return (
     <div
       className={cn(
-        "absolute left-1 right-1 rounded-md select-none overflow-hidden",
+        "absolute left-1 right-1 select-none overflow-hidden rounded-[5px] border-l-[3px] px-2 py-1",
         "transition-shadow hover:z-20 hover:shadow-lg",
         canDrag && "cursor-grab active:cursor-grabbing",
-        cfg.bg, "border border-current", cfg.color,
+        cfg.cls,
       )}
       style={{
         top: `${top}px`,
         height: `${height - 2}px`,
-        borderLeftWidth: 3,
-        borderLeftColor: staffColor,
         zIndex: 10,
         touchAction: "none",
       }}
+      title={`${apt.startTime}–${apt.endTime} · ${apt.clientName}`}
       onPointerDown={(e) => {
         if (!canDrag || e.button !== 0) return
         onDragStart(e, apt, "move")
@@ -146,25 +154,23 @@ function AppointmentBlock({
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && onOpen(apt)}
     >
-      <div className="px-1.5 py-1 h-full flex flex-col justify-start pointer-events-none">
-        <p className={cn("font-semibold leading-tight truncate", isShort ? "text-[10px]" : "text-xs")}>
+      <div className="pointer-events-none flex h-full flex-col justify-start">
+        <p className={cn("font-semibold leading-tight truncate", isShort ? "text-[10px]" : "text-[11.5px]")}>
           {apt.clientHasAllergies && (
             <span
-              className="mr-1 inline-block h-2 w-2 rounded-full bg-red-600 align-middle"
+              className="mr-1 inline-block size-2 rounded-full bg-[var(--err)] align-middle"
               title="Clienta are alergii înregistrate"
               aria-label="Clienta are alergii înregistrate"
             />
           )}
+          {apt.services[0]?.name ?? "Programare"}{apt.services.length > 1 ? ` +${apt.services.length - 1}` : ""}
+        </p>
+        <p className="truncate text-[11px] leading-tight opacity-80">
           {apt.clientName}
+          <span className="opacity-80"> · {apt.source}</span>
         </p>
         {!isShort && (
-          <>
-            <p className="text-[10px] leading-tight truncate opacity-75">{apt.services.map(s => s.name).join(", ")}</p>
-            <div className="mt-auto flex items-center gap-1">
-              <Clock className="h-2.5 w-2.5 opacity-60" />
-              <span className="text-[10px] opacity-70">{apt.startTime}–{apt.endTime}</span>
-            </div>
-          </>
+          <span className="mono-label mt-1 block opacity-90">{cfg.label}</span>
         )}
       </div>
       {canDrag && (
@@ -203,14 +209,17 @@ function AppointmentDetail({
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-start justify-between p-4 border-b border-border">
-        <div>
-          <h3 className="font-semibold text-base text-foreground">{apt.clientName}</h3>
-          <p className="text-sm text-muted-foreground">{apt.clientPhone}</p>
+        <div className="flex items-center gap-3 min-w-0">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#E8E3DD] text-[13px] font-semibold text-ink2 dark:bg-white/10 dark:text-foreground">
+            {clientInitials(apt.clientName)}
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-semibold text-base text-foreground truncate">{apt.clientName}</h3>
+            <p className="text-sm text-muted-foreground font-mono tabular-nums">{apt.clientPhone}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className={cn("text-xs border", cfg.color, cfg.bg, "border-current")}>
-            {cfg.label}
-          </Badge>
+          <StatusBadge status={apt.status} />
           <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Închide">
             <X className="h-4 w-4" />
           </button>
@@ -219,16 +228,16 @@ function AppointmentDetail({
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* Allergy safety warning — boolean flag only; the details live in the
-            client's protected file (owner/manager/staff) */}
+            client's protected file (owner/manager/staff). Tinted block ca în machetă. */}
         {apt.clientHasAllergies && (
-          <div className="flex items-start gap-2 rounded-md border border-red-500/40 bg-red-500/10 p-3" role="alert">
-            <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 rounded-[5px] bg-[#FBF3EA] p-3 dark:bg-[#332613]" role="alert">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-[#7A4510] dark:text-[#D9A05B]" />
             <div>
-              <p className="text-sm font-medium text-red-700 dark:text-red-400">
-                Clienta are alergii înregistrate
+              <p className="text-sm font-medium text-[#7A4510] dark:text-[#D9A05B]">
+                Alergii / Sensibilități
               </p>
-              <p className="text-xs text-red-700/80 dark:text-red-400/80">
-                Verifică fișa protejată a clientei înainte de serviciu.
+              <p className="text-xs text-[#7A4510]/85 dark:text-[#D9A05B]/85">
+                Clienta are alergii înregistrate. Verifică fișa protejată înainte de serviciu.
               </p>
             </div>
           </div>
@@ -239,7 +248,7 @@ function AppointmentDetail({
           <div className="rounded-lg bg-muted/50 p-3">
             <p className="text-xs text-muted-foreground mb-1">Data & Ora</p>
             <p className="text-sm font-medium">{new Date(`${apt.date}T12:00:00`).toLocaleDateString("ro-RO", { day: "numeric", month: "short" })}</p>
-            <p className="text-sm font-medium">{apt.startTime} – {apt.endTime}</p>
+            <p className="text-sm font-medium font-mono tabular-nums">{apt.startTime} – {apt.endTime}</p>
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
             <p className="text-xs text-muted-foreground mb-1">Angajat</p>
@@ -249,26 +258,26 @@ function AppointmentDetail({
 
         {/* Services */}
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Servicii</p>
+          <p className="mono-label text-[#8a8a8a] mb-2">Servicii</p>
           <div className="space-y-1.5">
             {apt.services.map((s, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span>{s.name}</span>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <span>{s.duration}min</span>
-                  <span className="font-medium text-foreground">{s.price} RON</span>
+                  <span className="font-mono tabular-nums text-xs">{s.duration}min</span>
+                  <span className="font-medium text-foreground font-mono tabular-nums">{s.price} RON</span>
                 </div>
               </div>
             ))}
             {apt.discount > 0 && (
-              <div className="flex items-center justify-between text-sm text-emerald-600">
+              <div className="flex items-center justify-between text-sm text-primary">
                 <span>Reducere {apt.discountType === "procent" ? `${apt.discount}%` : ""}</span>
-                <span>-{apt.discountType === "procent" ? Math.round(apt.totalPrice * apt.discount / 100) : apt.discount} RON</span>
+                <span className="font-mono tabular-nums">-{apt.discountType === "procent" ? Math.round(apt.totalPrice * apt.discount / 100) : apt.discount} RON</span>
               </div>
             )}
             <div className="flex items-center justify-between text-sm font-semibold pt-1 border-t border-border">
               <span>Total</span>
-              <span>{Math.round(totalFinal)} RON</span>
+              <span className="font-mono tabular-nums">{Math.round(totalFinal)} RON</span>
             </div>
           </div>
         </div>
@@ -355,7 +364,7 @@ function AppointmentDetail({
             onCheckout ? (
               <Button
                 size="sm"
-                className="w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="w-full text-xs"
                 onClick={() => onCheckout(apt)}
               >
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Încasează
@@ -363,7 +372,7 @@ function AppointmentDetail({
             ) : (
               <Button
                 size="sm"
-                className="w-full text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="w-full text-xs"
                 onClick={() => onStatusChange(apt.id, "finalizat")}
               >
                 <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" /> Marchează finalizat
@@ -373,7 +382,8 @@ function AppointmentDetail({
           {apt.status === "in_asteptare" && (
             <Button
               size="sm"
-              className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
+              variant="outline"
+              className="w-full text-xs text-primary hover:text-primary"
               onClick={() => onStatusChange(apt.id, "confirmat")}
             >
               <Check className="h-3.5 w-3.5 mr-1.5" /> Confirmă programarea
@@ -385,7 +395,7 @@ function AppointmentDetail({
   )
 }
 
-// ─── Day View ──────────────────────────────────────────────────────────────��──
+// ─── Day View ────────────────────────────��─────────────────────────────────��──
 
 function DayView({
   date, appointments, staff, onSelectApt, onNewApt, canEditApt, onReschedule, onResize,
@@ -489,29 +499,33 @@ function DayView({
   return (
     <div className="flex-1 overflow-auto">
       <div className="min-w-[700px]">
-        {/* Staff headers */}
+        {/* Staff headers — nume + rol, ca .cal .hd din machetă */}
         <div className="sticky top-0 z-30 bg-background border-b border-border flex">
-          <div className="w-16 shrink-0 border-r border-border" />
+          <div className="w-14 shrink-0 border-r border-border" />
           {staff.map(s => (
-            <div key={s.id} className="flex-1 flex items-center gap-2 px-3 py-2.5 border-r border-border last:border-r-0">
+            <div key={s.id} className="flex-1 flex items-center gap-2 px-3 py-2 border-r border-border last:border-r-0 min-w-0">
               <div
-                className="h-7 w-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+                className="grid size-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold text-white"
                 style={{ backgroundColor: s.color }}
+                aria-hidden="true"
               >
                 {s.initials}
               </div>
-              <span className="text-sm font-medium truncate">{s.name.split(" ")[0]}</span>
+              <div className="min-w-0">
+                <b className="block text-[11.5px] font-semibold leading-tight text-foreground truncate">{s.name.split(" ")[0]}</b>
+                <small className="block text-[10.5px] leading-tight text-muted-foreground truncate">{s.roleTitle ?? "Specialist"}</small>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Grid */}
         <div className="flex relative" style={{ height: `${totalHeight}px` }}>
-          {/* Time column */}
-          <div className="w-16 shrink-0 border-r border-border relative">
+          {/* Time column — rail mono, ca în machetă */}
+          <div className="w-14 shrink-0 border-r border-border relative">
             {TIME_SLOTS.map(slot => (
               <div key={slot} className="absolute w-full pr-2 flex justify-end" style={{ top: `${getTop(slot) - 8}px` }}>
-                <span className="text-[11px] text-muted-foreground">{slot}</span>
+                <span className="font-mono text-[10.5px] tabular-nums text-muted-foreground">{slot}</span>
               </div>
             ))}
           </div>
@@ -554,11 +568,11 @@ function DayView({
                     return (
                       <div
                         key={time}
-                        className="absolute w-full opacity-0 hover:opacity-100 hover:bg-emerald-500/5 cursor-pointer flex items-center justify-center group"
+                        className="absolute w-full opacity-0 hover:opacity-100 hover:bg-primary/5 cursor-pointer flex items-center justify-center group"
                         style={{ top: `${getTop(time)}px`, height: `${SLOT_HEIGHT / 2}px` }}
                         onClick={() => onNewApt(s.id, time)}
                       >
-                        <span className="text-[10px] text-emerald-600 font-medium group-hover:opacity-100 opacity-0">+ {time}</span>
+                        <span className="text-[10px] text-primary font-medium group-hover:opacity-100 opacity-0">+ {time}</span>
                       </div>
                     )
                   })}
@@ -567,7 +581,6 @@ function DayView({
                     <AppointmentBlock
                       key={apt.id}
                       apt={apt}
-                      staffColor={s.color}
                       canDrag={canEditApt(apt)}
                       onOpen={(a) => {
                         if (justDraggedRef.current) {
@@ -583,28 +596,24 @@ function DayView({
                   {dragPreview && (
                     <div
                       className={cn(
-                        "absolute left-1 right-1 rounded-md pointer-events-none opacity-90 z-30",
-                        STATUS_CONFIG[dragPreview.apt.status].bg,
-                        STATUS_CONFIG[dragPreview.apt.status].color,
-                        "border border-current",
+                        "absolute left-1 right-1 rounded-[5px] border-l-[3px] pointer-events-none opacity-90 z-30",
+                        STATUS_CONFIG[dragPreview.apt.status].cls,
                       )}
                       style={{
                         top: `${((Math.max(SALON_START_MINS, Math.min(SALON_END_MINS, dragPreview.curStartMin)) - SALON_START_MINS) / 60) * SLOT_HEIGHT}px`,
                         height: `${Math.max(getHeight(dragPreview.curDuration), 28) - 2}px`,
-                        borderLeftWidth: 3,
-                        borderLeftColor: s.color,
                       }}
                     >
-                      <div className="px-1.5 py-1">
-                        <p className="text-xs font-semibold truncate">{dragPreview.apt.clientName}</p>
-                        <p className="text-[10px] opacity-75">{minutesToTime(dragPreview.curStartMin)}–{minutesToTime(dragPreview.curStartMin + dragPreview.curDuration)}</p>
+                      <div className="px-2 py-1">
+                        <p className="text-[11.5px] font-semibold truncate">{dragPreview.apt.clientName}</p>
+                        <p className="text-[10px] opacity-75 font-mono tabular-nums">{minutesToTime(dragPreview.curStartMin)}–{minutesToTime(dragPreview.curStartMin + dragPreview.curDuration)}</p>
                       </div>
                     </div>
                   )}
                   {/* Resize preview line */}
                   {resizePreview && (
                     <div
-                      className="absolute left-1 right-1 pointer-events-none z-30 border-b-2 border-emerald-500"
+                      className="absolute left-1 right-1 pointer-events-none z-30 border-b-2 border-primary"
                       style={{ top: `${getTop(resizePreview.apt.startTime) + Math.max(getHeight(resizePreview.curDuration), 28)}px` }}
                     />
                   )}
@@ -613,14 +622,14 @@ function DayView({
             })}
           </div>
 
-          {/* Current time line */}
+          {/* Current time line — smarald, ca .now din machetă */}
           {showNowLine && nowTop > 0 && nowTop < totalHeight && (
             <div
-              className="absolute left-16 right-0 flex items-center pointer-events-none"
+              className="absolute left-14 right-0 flex items-center pointer-events-none"
               style={{ top: `${nowTop}px`, zIndex: 25 }}
             >
-              <div className="h-2.5 w-2.5 rounded-full bg-red-500 -ml-1.5 shrink-0" />
-              <div className="h-px flex-1 bg-red-500" />
+              <div className="size-2 rounded-full bg-primary -ml-1 shrink-0" />
+              <div className="h-px flex-1 bg-primary" />
             </div>
           )}
         </div>
@@ -655,15 +664,15 @@ function WeekView({
                 onClick={() => onDayClick(date)}
                 className={cn(
                   "py-2.5 text-center border-r border-border last:border-r-0 hover:bg-muted/50 transition-colors",
-                  today && "bg-emerald-500/5"
+                  today && "bg-primary/5"
                 )}
               >
-                <p className={cn("text-xs text-muted-foreground capitalize", today && "text-emerald-600 font-medium")}>
+                <p className={cn("text-xs text-muted-foreground capitalize", today && "text-primary font-medium")}>
                   {getDayName(date)}
                 </p>
                 <p className={cn(
                   "text-sm font-semibold mt-0.5 w-7 h-7 rounded-full flex items-center justify-center mx-auto",
-                  today ? "bg-emerald-600 text-white" : "text-foreground"
+                  today ? "bg-primary text-primary-foreground" : "text-foreground"
                 )}>
                   {Number(date.slice(8, 10))}
                 </p>
@@ -689,20 +698,19 @@ function WeekView({
               const dayApts = allAppointments.filter(a => a.date === date)
               const today = isToday(date)
               return (
-                <div key={date} className={cn("relative border-r border-border last:border-r-0", today && "bg-emerald-500/5")}>
+                <div key={date} className={cn("relative border-r border-border last:border-r-0", today && "bg-primary/5")}>
                   {TIME_SLOTS.map(slot => (
                     <div key={slot} className="h-16 border-b border-border/50" />
                   ))}
                   {dayApts.map(apt => {
-                    const s = staff.find(x => x.id === apt.staffId)
                     const top = getTop(apt.startTime)
                     const height = Math.max(getHeight(apt.duration), 20)
                     const cfg = STATUS_CONFIG[apt.status]
                     return (
                       <div
                         key={apt.id}
-                        className={cn("absolute left-0.5 right-0.5 rounded cursor-pointer text-[10px] px-1 py-0.5 overflow-hidden hover:z-10", cfg.bg, cfg.color)}
-                        style={{ top: `${top}px`, height: `${height - 1}px`, borderLeft: `2px solid ${s?.color}` }}
+                        className={cn("absolute left-0.5 right-0.5 rounded-[4px] border-l-2 cursor-pointer text-[10px] px-1 py-0.5 overflow-hidden hover:z-10", cfg.cls)}
+                        style={{ top: `${top}px`, height: `${height - 1}px` }}
                         onClick={() => onSelectApt(apt)}
                         role="button"
                         tabIndex={0}
@@ -718,8 +726,8 @@ function WeekView({
                     if (t <= 0 || t >= (SALON_TOTAL_MINS / 60) * SLOT_HEIGHT) return null
                     return (
                       <div className="absolute left-0 right-0 flex items-center pointer-events-none z-20" style={{ top: `${t}px` }}>
-                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1 shrink-0" />
-                        <div className="h-px flex-1 bg-red-500" />
+                        <div className="size-2 rounded-full bg-primary -ml-1 shrink-0" />
+                        <div className="h-px flex-1 bg-primary" />
                       </div>
                     )
                   })()}
@@ -772,13 +780,13 @@ function MonthView({
                   className={cn(
                     "h-28 p-2 text-left border-r border-border last:border-r-0 hover:bg-muted/50 transition-colors flex flex-col",
                     !isCurrentMonth && "opacity-40",
-                    isToday2 && "bg-emerald-500/5"
+                    isToday2 && "bg-primary/5"
                   )}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className={cn(
                       "text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full",
-                      isToday2 ? "bg-emerald-600 text-white" : "text-foreground"
+                      isToday2 ? "bg-primary text-primary-foreground" : "text-foreground"
                     )}>
                       {Number(date.slice(8, 10))}
                     </span>
@@ -788,12 +796,12 @@ function MonthView({
                   </div>
                   <div className="flex flex-wrap gap-0.5 mt-1">
                     {statusDots.map(status => (
-                      <div key={status} className={cn("h-1.5 w-1.5 rounded-full", STATUS_CONFIG[status].dot)} />
+                      <div key={status} className={cn("size-1.5 rounded-full", STATUS_CONFIG[status].dot)} />
                     ))}
                   </div>
                   {dayApts.slice(0, 2).map(apt => (
-                    <div key={apt.id} className={cn("text-[10px] leading-tight truncate rounded px-1 mt-0.5", STATUS_CONFIG[apt.status].bg, STATUS_CONFIG[apt.status].color)}>
-                      {apt.startTime} {apt.clientName.split(" ")[0]}
+                    <div key={apt.id} className={cn("text-[10px] leading-tight truncate rounded-[3px] border-l-2 px-1 mt-0.5", STATUS_CONFIG[apt.status].cls)}>
+                      <span className="font-mono tabular-nums">{apt.startTime}</span> {apt.clientName.split(" ")[0]}
                     </div>
                   ))}
                   {dayApts.length > 2 && (
@@ -840,42 +848,38 @@ function ListView({
     <div className="flex-1 overflow-auto p-4 space-y-6">
       {sortedDates.map(date => (
         <div key={date}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className={cn("h-2 w-2 rounded-full shrink-0", isToday(date) ? "bg-emerald-500" : "bg-muted-foreground")} />
-            <h3 className={cn("text-sm font-semibold capitalize", isToday(date) ? "text-emerald-600" : "text-foreground")}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className={cn("size-2 rounded-full shrink-0", isToday(date) ? "bg-primary" : "bg-muted-foreground/40")} />
+            <h3 className={cn("text-sm font-semibold capitalize", isToday(date) ? "text-primary" : "text-foreground")}>
               {formatDateRO(date)}
             </h3>
             <div className="flex-1 h-px bg-border" />
             <span className="text-xs text-muted-foreground">{grouped[date].length} programări</span>
           </div>
-          <div className="space-y-2">
+          <div className="divide-y divide-border rounded-lg border border-border bg-card">
             {grouped[date].sort((a, b) => a.startTime.localeCompare(b.startTime)).map(apt => {
-              const cfg = STATUS_CONFIG[apt.status]
               const s = apt.staffName
               return (
                 <button
                   key={apt.id}
                   type="button"
                   onClick={() => onSelectApt(apt)}
-                  className="w-full flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 p-3 rounded-xl border border-border bg-card hover:bg-muted/50 transition-colors text-left"
+                  className="flex w-full flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 px-3 sm:px-4 min-h-12 py-1.5 hover:bg-muted/50 transition-colors text-left"
                 >
-                  <div className="text-center shrink-0 w-12">
-                    <p className="text-sm font-bold text-foreground">{apt.startTime}</p>
-                    <p className="text-[10px] text-muted-foreground">{apt.endTime}</p>
+                  <div className="shrink-0 w-12 text-left">
+                    <p className="text-sm font-semibold text-foreground font-mono tabular-nums leading-tight">{apt.startTime}</p>
+                    <p className="text-[10px] text-muted-foreground font-mono tabular-nums">{apt.endTime}</p>
                   </div>
-                  <div className="h-10 w-0.5 rounded-full shrink-0 bg-muted-foreground/40" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{apt.clientName}</p>
                     <p className="text-xs text-muted-foreground truncate">{apt.services.map(x => x.name).join(", ")} · {s}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
                     <div className="hidden sm:block text-right">
-                      <p className="text-xs text-muted-foreground">{apt.duration}min</p>
-                      <p className="text-xs font-medium text-foreground">{apt.totalPrice} RON</p>
+                      <p className="text-xs text-muted-foreground font-mono tabular-nums">{apt.duration}min</p>
+                      <p className="text-xs font-medium text-foreground font-mono tabular-nums">{apt.totalPrice} RON</p>
                     </div>
-                    <Badge className={cn("text-[10px] border shrink-0", cfg.color, cfg.bg, "border-current")}>
-                      {cfg.label}
-                    </Badge>
+                    <StatusBadge status={apt.status} />
                   </div>
                 </button>
               )
@@ -1126,7 +1130,7 @@ function AppointmentModal({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {isEdit ? <Pencil className="h-5 w-5 text-emerald-600" /> : <Plus className="h-5 w-5 text-emerald-600" />}
+            {isEdit ? <Pencil className="h-5 w-5 text-primary" /> : <Plus className="h-5 w-5 text-primary" />}
             {isEdit ? "Editează programarea" : "Programare nouă"}
           </DialogTitle>
         </DialogHeader>
@@ -1184,7 +1188,7 @@ function AppointmentModal({
                   {!searching && (
                     <button
                       type="button"
-                      className="w-full flex items-center gap-2 px-3 py-3 text-sm text-emerald-600 hover:bg-muted transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-3 text-sm text-primary hover:bg-muted transition-colors"
                       onClick={() => { setShowNewClient(true); setShowClientDropdown(false) }}
                     >
                       <UserPlus className="h-4 w-4" />
@@ -1321,7 +1325,7 @@ function AppointmentModal({
           </div>
 
           {totalDuration > 0 && (
-            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-500/10 text-sm text-emerald-700 dark:text-emerald-400">
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-primary/10 text-sm text-primary">
               <Clock className="h-4 w-4 shrink-0" />
               <span>Se termină la {endTime} ({totalDuration} minute total)</span>
             </div>
@@ -1365,7 +1369,7 @@ function AppointmentModal({
                 </Select>
               </div>
               {discount > 0 && (
-                <p className="text-xs text-emerald-600">Total final: {Math.round(discountedTotal)} RON</p>
+                <p className="text-xs text-primary font-mono tabular-nums">Total final: {Math.round(discountedTotal)} RON</p>
               )}
             </div>
           )}
@@ -1451,7 +1455,6 @@ function AppointmentModal({
           <Button
             onClick={() => handleSave(false)}
             disabled={!selectedClient || selectedServices.length === 0 || saving}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             {saving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Check className="h-4 w-4 mr-1.5" />}
             {isEdit ? "Salvează modificările" : "Salvează programarea"}
@@ -1497,7 +1500,7 @@ function CancelReasonDialog({
   )
 }
 
-// ─── Main View ────────────────────────────────────────────────────────────────
+// ─── Main View ─────────��──────────────────────────────────────────────────────
 
 export function ProgramariView({
   salonId, role, staffId, staff, services, staffServices, initialAppointments, initialDate,
@@ -1632,6 +1635,8 @@ export function ProgramariView({
     .reduce((s, a) => s + a.totalPrice, 0)
   const confirmedToday = appointments
     .filter(a => a.date === today && (a.status === "confirmat" || a.status === "in_desfasurare")).length
+  const pendingToday = appointments
+    .filter(a => a.date === today && a.status === "in_asteptare").length
 
   const navigatePrev = () => {
     if (view === "day") shiftDate(-1)
@@ -1793,6 +1798,20 @@ export function ProgramariView({
     setModalOpen(true)
   }
 
+  // Deep link din bara de tab-uri mobile: /app/programari?nou=1 deschide
+  // dialogul de programare nouă, apoi curăță parametrul.
+  const nouParam = searchParams.get("nou")
+  useEffect(() => {
+    if (nouParam === "1" && canCreate) {
+      openNewApt()
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete("nou")
+      const qs = params.toString()
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nouParam, canCreate])
+
   const openEditApt = (apt: Appointment) => {
     setSelectedApt(null)
     setEditingApt(apt)
@@ -1826,65 +1845,54 @@ export function ProgramariView({
       : new Date(`${currentDate.slice(0, 7)}-15T12:00:00`).toLocaleDateString("ro-RO", { month: "long", year: "numeric" })
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden pt-16 lg:pt-0">
-      {/* ── Header ── */}
+    <div className="flex flex-col overflow-hidden h-[calc(100dvh-3.5rem)] lg:h-dvh">
+      {/* ── Header — .bar din machetă: titlu + dată mono, segmente, buton primar ── */}
       <div className="shrink-0 border-b border-border bg-background px-4 py-3 lg:px-6">
         <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-          {/* Left: title + nav */}
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-foreground text-balance">Programări</h1>
-            <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
-              <button type="button" onClick={navigatePrev} className="p-1.5 rounded hover:bg-muted" aria-label="Perioada anterioară">
+          {/* Left: title + mono date + nav */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="min-w-0">
+              <h1 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground text-balance">Programări</h1>
+              <p className="mt-0.5 truncate font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground tabular-nums">
+                {dateLabel}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 rounded-md border border-border p-0.5">
+              <button type="button" onClick={navigatePrev} className="rounded-[3px] p-1.5 hover:bg-muted" aria-label="Perioada anterioară">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <button type="button" onClick={() => setCurrentDate(todayBucharest())} className="px-2 py-1 text-xs font-medium rounded hover:bg-muted">
+              <button type="button" onClick={() => setCurrentDate(todayBucharest())} className="rounded-[3px] px-2 py-1 text-xs font-medium hover:bg-muted">
                 Astăzi
               </button>
-              <button type="button" onClick={navigateNext} className="p-1.5 rounded hover:bg-muted" aria-label="Perioada următoare">
+              <button type="button" onClick={navigateNext} className="rounded-[3px] p-1.5 hover:bg-muted" aria-label="Perioada următoare">
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
-            <span className="text-sm font-medium text-muted-foreground capitalize hidden md:block">{dateLabel}</span>
           </div>
 
-          {/* Right: stats + view toggle + new btn */}
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Quick stats */}
-            <div className="hidden lg:flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-muted-foreground">Azi:</span>
-                <span className="font-semibold">{todayCount} apt.</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span className="font-semibold">{confirmedToday} confirm.</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-muted-foreground">Încasat:</span>
-                <span className="font-semibold text-emerald-600">{todayRevenue} RON</span>
-              </div>
-            </div>
-
-            {/* View toggle */}
-            <div className="flex items-center gap-0.5 rounded-lg border border-border p-0.5">
+          {/* Right: view toggle + new btn */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Segmented control — segmentul activ în ink, ca .seg din machetă */}
+            <div className="flex items-center rounded-md border border-border overflow-hidden">
               {([
-                { id: "day",   label: "Zi",          icon: CalendarDays },
-                { id: "week",  label: "Săptămână",   icon: LayoutGrid },
-                { id: "month", label: "Lună",         icon: CalendarDays },
-                { id: "list",  label: "Listă",        icon: List },
-              ] as const).map(({ id, label, icon: Icon }) => (
+                { id: "day",   label: "Zi" },
+                { id: "week",  label: "Săptămână" },
+                { id: "month", label: "Lună" },
+                { id: "list",  label: "Listă" },
+              ] as const).map(({ id, label }) => (
                 <button
                   key={id}
                   type="button"
                   onClick={() => setView(id)}
+                  aria-pressed={view === id}
                   className={cn(
-                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors",
-                    view === id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "px-2.5 py-1.5 text-[11.5px] font-medium transition-colors",
+                    view === id
+                      ? "bg-foreground text-background"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="hidden sm:block">{label}</span>
+                  {label}
                 </button>
               ))}
             </div>
@@ -1893,7 +1901,6 @@ export function ProgramariView({
               <Button
                 size="sm"
                 onClick={() => openNewApt()}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 <Plus className="h-4 w-4 sm:mr-1.5" />
                 <span className="hidden sm:inline">Programare nouă</span>
@@ -1902,6 +1909,18 @@ export function ProgramariView({
             )}
           </div>
         </div>
+      </div>
+
+      {/* ── KPI strip — .kpis din machetă ── */}
+      <div className="shrink-0 px-4 pt-3 lg:px-6">
+        <KpiStrip
+          items={[
+            { label: "Programări astăzi", value: String(todayCount) },
+            { label: "Confirmate azi", value: String(confirmedToday) },
+            { label: "Necesită confirmare", value: String(pendingToday) },
+            { label: "Încasat azi", value: `${todayRevenue.toLocaleString("ro-RO")} RON` },
+          ]}
+        />
       </div>
 
       {/* ── Main content ── */}

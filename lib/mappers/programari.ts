@@ -43,16 +43,19 @@ export interface Appointment {
   createdAt: string
 }
 
+// Statusurile folosesc clasele .stx-*/.std-* din globals.css — stilurile din
+// reconstrucția machetei (confirmat = hârtie cu bordură smarald, în
+// desfășurare = umplutură ink, în așteptare = contur punctat, finalizat = estompat).
 export const STATUS_CONFIG: Record<
   AppointmentStatus,
-  { label: string; color: string; bg: string; border: string; dot: string }
+  { label: string; cls: string; dot: string }
 > = {
-  confirmat: { label: "Confirmat", color: "text-emerald-700 dark:text-emerald-400", bg: "bg-emerald-500/15", border: "border-emerald-500", dot: "bg-emerald-500" },
-  in_asteptare: { label: "În așteptare", color: "text-amber-700 dark:text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500", dot: "bg-amber-500" },
-  in_desfasurare: { label: "În desfășurare", color: "text-blue-700 dark:text-blue-400", bg: "bg-blue-500/15", border: "border-blue-500", dot: "bg-blue-500" },
-  finalizat: { label: "Finalizat", color: "text-zinc-500", bg: "bg-zinc-500/15", border: "border-zinc-400", dot: "bg-zinc-400" },
-  anulat: { label: "Anulat", color: "text-red-600 dark:text-red-400", bg: "bg-red-500/15", border: "border-red-500", dot: "bg-red-500" },
-  no_show: { label: "No-show", color: "text-red-900 dark:text-red-300", bg: "bg-red-900/15", border: "border-red-900", dot: "bg-red-900" },
+  confirmat: { label: "Confirmat", cls: "stx-confirmat", dot: "std-confirmat" },
+  in_asteptare: { label: "În așteptare", cls: "stx-asteptare", dot: "std-asteptare" },
+  in_desfasurare: { label: "În desfășurare", cls: "stx-desfasurare", dot: "std-desfasurare" },
+  finalizat: { label: "Finalizat", cls: "stx-finalizat", dot: "std-finalizat" },
+  anulat: { label: "Anulat", cls: "stx-anulat", dot: "std-anulat" },
+  no_show: { label: "Neprezentare", cls: "stx-noshow", dot: "std-noshow" },
 }
 
 export const RECURRENCE_LABELS: Record<RecurrenceType, string> = {
@@ -131,6 +134,7 @@ export function mapAppointmentJoin(join: AppointmentJoin, clientHasAllergies = f
 export interface CalendarStaff {
   id: string
   name: string
+  roleTitle: string | null
   color: string
   initials: string
   active: boolean
@@ -164,7 +168,8 @@ export function mapCalendarStaff(row: StaffDbRow): CalendarStaff {
   return {
     id: row.id,
     name,
-    color: row.color || "#10b981",
+    roleTitle: row.role_title,
+    color: row.color || "#00704F",
     initials: initials || "?",
     active: row.status === "activ" && row.deleted_at === null,
   }
