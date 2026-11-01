@@ -2,7 +2,9 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import crypto from "node:crypto"
 import { createSupabaseAdminClient, isSupabaseAdminConfigured } from "@/lib/supabase/admin"
+import { SalonShell } from "@/components/booking/salon-shell"
 import { ManageCancel } from "@/components/booking/manage-cancel"
+import "../../booking.css"
 
 export const dynamic = "force-dynamic"
 
@@ -47,7 +49,7 @@ export default async function ManageBookingPage({
   const [{ data: salonRow }, { data: staffRow }, { data: servicesRows }] = await Promise.all([
     supabase
       .from("salons")
-      .select("name, phone, address, cancellation_window_hours")
+      .select("name, phone, address, cancellation_window_hours, branding")
       .eq("id", apt.salon_id)
       .maybeSingle(),
     supabase.from("staff").select("first_name").eq("id", apt.staff_id).maybeSingle(),
@@ -62,6 +64,7 @@ export default async function ManageBookingPage({
     phone: string
     address: string | null
     cancellation_window_hours: number | null
+    branding: { primary_color?: string; logo_url?: string } | null
   } | null
 
   if (!salon) notFound()
@@ -94,41 +97,31 @@ export default async function ManageBookingPage({
   }).format(endsAt)
 
   const cancelled = apt.status === "anulat"
+  const ron = new Intl.NumberFormat("ro-RO", {
+    style: "currency",
+    currency: "RON",
+    maximumFractionDigits: 0,
+  })
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-lg font-semibold text-white">
-            {salon.name
-              .split(" ")
-              .map((w) => w[0])
-              .slice(0, 2)
-              .join("")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-semibold text-zinc-900 md:text-lg">
-              {salon.name}
-            </div>
-            <div className="truncate text-xs text-zinc-500 md:text-sm">{salon.address}</div>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:py-12">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
-          Programarea ta
-        </h1>
-        <p className="mt-2 text-base text-zinc-600">
+    <SalonShell
+      name={salon.name}
+      address={salon.address}
+      logoUrl={salon.branding?.logo_url ?? null}
+      accentColor={salon.branding?.primary_color ?? null}
+    >
+      <main className="bk-main" style={{ paddingBottom: 40 }}>
+        <h1 className="bk-title">Programarea ta</h1>
+        <p className="bk-lede">
           {cancelled
             ? "Această programare a fost anulată."
             : "Detaliile programării tale sunt mai jos."}
         </p>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <dl className="divide-y divide-zinc-100">
+        <div className="bk-card" style={{ marginTop: 20 }}>
+          <dl>
             <Row label="Data">
-              <span className="capitalize">{fmtDate}</span>
+              <span style={{ textTransform: "capitalize" }}>{fmtDate}</span>
             </Row>
             <Row label="Ora">
               {fmtTime}–{fmtEndTime}
@@ -137,45 +130,33 @@ export default async function ManageBookingPage({
               {(staffRow as { first_name: string } | null)?.first_name ?? "—"}
             </Row>
             <Row label="Servicii">
-              <ul className="space-y-1">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                 {services.map((s, i) => (
-                  <li key={i} className="flex items-center justify-between gap-3">
-                    <span className="text-zinc-700">{s.name_snapshot}</span>
-                    <span className="shrink-0 font-medium text-zinc-900">
-                      {new Intl.NumberFormat("ro-RO", {
-                        style: "currency",
-                        currency: "RON",
-                        maximumFractionDigits: 0,
-                      }).format(Number(s.price))}
-                    </span>
+                  <li key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <span style={{ color: "var(--ink-2)" }}>{s.name_snapshot}</span>
+                    <span style={{ flex: "none", fontWeight: 500 }}>{ron.format(Number(s.price))}</span>
                   </li>
                 ))}
               </ul>
             </Row>
             {apt.confirmation_code && (
               <Row label="Cod confirmare">
-                <span className="font-mono">{apt.confirmation_code}</span>
+                <span style={{ fontFamily: "var(--mono)" }}>{apt.confirmation_code}</span>
               </Row>
             )}
           </dl>
-          <div className="flex items-center justify-between border-t border-zinc-100 bg-emerald-50 px-5 py-4">
-            <div className="text-sm font-medium text-emerald-900">Total</div>
-            <div className="text-2xl font-bold text-emerald-700">
-              {new Intl.NumberFormat("ro-RO", {
-                style: "currency",
-                currency: "RON",
-                maximumFractionDigits: 0,
-              }).format(Number(apt.total_price))}
-            </div>
+          <div className="bk-total">
+            <span className="bk-rlabel" style={{ fontSize: 12.5 }}>Total</span>
+            <b>{ron.format(Number(apt.total_price))}</b>
           </div>
         </div>
 
         {!cancelled && (
-          <div className="mt-6">
+          <div style={{ marginTop: 20 }}>
             {cancellable ? (
               <ManageCancel token={token} salonPhone={salon.phone} />
             ) : (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              <div className="bk-alert">
                 <p>
                   Anularea online nu mai este posibilă (mai puțin de {windowHours}{" "}
                   {windowHours === 1 ? "oră" : "ore"} până la programare). Pentru modificări sau
@@ -183,7 +164,8 @@ export default async function ManageBookingPage({
                 </p>
                 <a
                   href={`tel:${salon.phone.replace(/\s/g, "")}`}
-                  className="mt-2 inline-flex h-11 items-center rounded-lg bg-amber-600 px-4 text-sm font-medium text-white hover:bg-amber-700"
+                  className="bk-btn"
+                  style={{ marginTop: 12, minHeight: 46, textDecoration: "none", display: "inline-flex" }}
                 >
                   Sună la {salon.phone}
                 </a>
@@ -192,20 +174,16 @@ export default async function ManageBookingPage({
           </div>
         )}
       </main>
-
-      <footer className="border-t border-zinc-200 px-4 py-4 text-center text-xs text-zinc-500">
-        Programare gestionată prin <span className="font-semibold text-zinc-700">ASESOR</span>
-      </footer>
-    </div>
+    </SalonShell>
   )
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3 px-5 py-3.5">
-      <div className="min-w-0 flex-1">
-        <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</div>
-        <div className="mt-0.5 text-sm text-zinc-900">{children}</div>
+    <div className="bk-row">
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div className="bk-rlabel">{label}</div>
+        <div className="bk-rval">{children}</div>
       </div>
     </div>
   )

@@ -16,7 +16,7 @@ import { bookingDetailsSchema, type BookingDetailsInput } from "@/lib/validation
 export type AvailabilitySlot = { staffId: string; time: string }
 
 export type AvailabilityResult =
-  | { ok: true; slots: AvailabilitySlot[] }
+  | { ok: true; slots: AvailabilitySlot[]; takenSlots: string[] }
   | { ok: false; error: string }
 
 export type BookingSummary = {
@@ -69,15 +69,29 @@ export async function getAvailabilityAction(
     minute: "2-digit",
     hour12: false,
   })
+  // `slots` stays free-only (P9 contract — the "prima dată disponibilă" probe
+  // relies on it). Taken candidate slots (script 020, additive) surface as
+  // `takenSlots` so the UI can strike them through; absent flag → empty list.
+  const free: AvailabilitySlot[] = []
+  const freeTimes = new Set<string>()
+  const takenTimes = new Set<string>()
+  for (const s of slots as unknown[]) {
+    const rec = s as { staff_id?: string; starts_at?: string; taken?: boolean }
+    if (!rec.staff_id || !rec.starts_at) continue
+    const time = fmt.format(new Date(rec.starts_at))
+    if (rec.taken === true) {
+      takenTimes.add(time)
+    } else {
+      free.push({ staffId: rec.staff_id, time })
+      freeTimes.add(time)
+    }
+  }
   return {
     ok: true,
-    slots: (slots as unknown[])
-      .map((s) => {
-        const rec = s as { staff_id?: string; starts_at?: string }
-        if (!rec.staff_id || !rec.starts_at) return null
-        return { staffId: rec.staff_id, time: fmt.format(new Date(rec.starts_at)) }
-      })
-      .filter((s): s is AvailabilitySlot => s !== null),
+    slots: free,
+    takenSlots: Array.from(takenTimes)
+      .filter((t) => !freeTimes.has(t))
+      .sort(),
   }
 }
 

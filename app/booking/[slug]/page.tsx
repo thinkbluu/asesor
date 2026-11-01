@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { createClient } from "@supabase/supabase-js"
 import { loadBillingStateBySlug } from "@/lib/billing/state"
 import { BookingFlow } from "@/components/booking/booking-flow"
+import { SalonShell } from "@/components/booking/salon-shell"
 import type { SalonInfo, BookingService } from "@/lib/booking-logic"
 import { getDayNameRO } from "@/lib/booking-logic"
 import { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from "@/lib/supabase/config"
@@ -19,6 +20,7 @@ type ProfileJson = {
   description: string | null
   cancellation_policy: string | null
   cancellation_window_hours: number | null
+  branding: { primary_color?: string; logo_url?: string } | null
   salon_hours: { weekday: number; opens: string | null; closes: string | null; is_open: boolean }[]
 }
 
@@ -54,6 +56,10 @@ const loadPublicSalon = cache(
           "Programările pot fi anulate gratuit cu minim 4 ore înainte de ora stabilită.",
         cancellationWindowHours: p.cancellation_window_hours ?? 4,
         hoursText,
+        // Salon identity for the public pages (P17): accent + logo from the
+        // same branding jsonb the emails and Setări use.
+        accentColor: p.branding?.primary_color ?? null,
+        logoUrl: p.branding?.logo_url ?? null,
       },
       services: ((services ?? []) as unknown[]).map((s) => {
         const rec = s as {
@@ -103,13 +109,20 @@ export default async function BookingPage({
   const billing = await loadBillingStateBySlug(slug)
   if (billing?.readOnly) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 p-6 text-center">
-        <h1 className="text-balance text-2xl font-bold">{data.salon.name}</h1>
-        <p role="status" className="text-pretty text-muted-foreground">
-          Programarea online este temporar indisponibilă.
-          {data.salon.phone ? ` Sună la salon: ${data.salon.phone}` : ""}
-        </p>
-      </main>
+      <SalonShell
+        name={data.salon.name}
+        address={data.salon.address}
+        logoUrl={data.salon.logoUrl}
+        accentColor={data.salon.accentColor}
+      >
+        <main className="bk-main" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+          <h1 className="bk-title" style={{ textAlign: "center" }}>{data.salon.name}</h1>
+          <p role="status" className="bk-lede" style={{ textAlign: "center" }}>
+            Programarea online este temporar indisponibilă.
+            {data.salon.phone ? ` Sună la salon: ${data.salon.phone}` : ""}
+          </p>
+        </main>
+      </SalonShell>
     )
   }
 

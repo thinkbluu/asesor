@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { cancelBookingByToken } from "@/app/booking/manage/[token]/actions"
 
 export function ManageCancel({
@@ -32,47 +31,54 @@ export function ManageCancel({
 
   if (!confirming) {
     return (
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-        <p className="text-sm text-zinc-600">
+      <div className="bk-card" style={{ padding: "14px 16px" }}>
+        <p className="bk-fine" style={{ color: "var(--ink-2)" }}>
           Nu mai poți veni? Anulează programarea ca să eliberezi ora pentru altcineva.
         </p>
-        {error && <p className="mt-2 text-sm font-medium text-red-600">{error}</p>}
-        <Button
-          variant="outline"
+        {error && (
+          <p role="alert" className="bk-ferr" style={{ marginTop: 8 }}>
+            {error}
+          </p>
+        )}
+        <button
+          type="button"
           onClick={() => setConfirming(true)}
-          className="mt-3 h-11 border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100"
+          className="bk-btn2"
+          style={{ marginTop: 12 }}
         >
           Anulează programarea
-        </Button>
+        </button>
       </div>
     )
   }
 
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-      <p className="text-sm font-medium text-red-900">
+    <div className="bk-alert err" style={{ padding: 14 }}>
+      <p style={{ fontWeight: 500 }}>
         Sigur vrei să anulezi programarea? Ora va fi eliberată definitiv.
       </p>
-      {error && <p className="mt-2 text-sm font-medium text-red-600">{error}</p>}
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button
-          onClick={cancel}
-          disabled={pending}
-          className="h-11 bg-red-600 text-sm font-medium text-white hover:bg-red-700 disabled:bg-red-300"
-        >
+      {error && (
+        <p role="alert" className="bk-ferr" style={{ marginTop: 8 }}>
+          {error}
+        </p>
+      )}
+      <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 10 }}>
+        <button type="button" onClick={cancel} disabled={pending} className="bk-btn" style={{ minHeight: 46 }}>
           {pending ? "Se anulează..." : "Da, anulează"}
-        </Button>
-        <Button
-          variant="outline"
+        </button>
+        <button
+          type="button"
           onClick={() => setConfirming(false)}
           disabled={pending}
-          className="h-11 border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100"
+          className="bk-btn2"
+          style={{ minHeight: 46 }}
         >
           Renunță
-        </Button>
+        </button>
         <a
           href={`tel:${salonPhone.replace(/\s/g, "")}`}
-          className="flex h-11 items-center rounded-lg px-4 text-sm font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
+          className="bk-link"
+          style={{ display: "inline-flex", alignItems: "center", minHeight: 46, textDecoration: "underline" }}
         >
           sau sună la {salonPhone}
         </a>

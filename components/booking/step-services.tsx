@@ -8,9 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Input } from "@/components/ui/input"
 import { formatPriceRON, formatDurationMin, type BookingService } from "@/lib/booking-logic"
-import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
 
 export function StepServices({
@@ -72,93 +70,77 @@ export function StepServices({
   }, [state.serviceIds, services])
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-zinc-600 md:text-base">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <p className="bk-lede" style={{ marginTop: 0 }}>
         Selectează unul sau mai multe servicii. Totalul și durata se actualizează pe măsură ce alegi.
       </p>
 
       {/* Search */}
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-        <Input
+      <div className="bk-search">
+        <Search aria-hidden="true" />
+        <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Caută un serviciu..."
-          className="h-12 border-zinc-200 bg-white pl-10 text-base text-zinc-900 placeholder:text-zinc-400 focus-visible:border-emerald-600 focus-visible:ring-emerald-600/20"
+          aria-label="Caută un serviciu"
+          className="bk-input"
         />
       </div>
 
       {/* Categories accordion */}
       {filteredCategories.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center text-sm text-zinc-500">
-          Niciun serviciu găsit pentru „{search}".
-        </div>
+        <div className="bk-empty">Niciun serviciu găsit pentru „{search}”.</div>
       ) : (
-        <Accordion
-          type="multiple"
-          defaultValue={categories.map((c) => c.name)}
-          className="space-y-2"
-        >
+        <Accordion type="multiple" defaultValue={categories.map((c) => c.name)} className="bk-acc">
           {filteredCategories.map((cat) => {
             const selectedInCat = cat.services.filter((s) => state.serviceIds.includes(s.id)).length
             return (
-              <AccordionItem
-                key={cat.name}
-                value={cat.name}
-                className="overflow-hidden rounded-xl border border-zinc-200 bg-white"
-              >
-                <AccordionTrigger className="px-4 py-3.5 text-left text-base font-semibold text-zinc-900 hover:no-underline">
-                  <div className="flex items-center gap-3">
-                    <span>{cat.name}</span>
+              <AccordionItem key={cat.name} value={cat.name} className="bk-acc-item">
+                <AccordionTrigger className="bk-acc-trigger hover:no-underline">
+                  <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {cat.name}
                     {selectedInCat > 0 && (
-                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                      <span className="bk-acc-count">
                         {selectedInCat} ales{selectedInCat > 1 ? "e" : ""}
                       </span>
                     )}
-                  </div>
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-0">
-                  <ul className="divide-y divide-zinc-100 border-t border-zinc-100">
-                    {cat.services.map((svc) => {
-                      const selected = state.serviceIds.includes(svc.id)
-                      return (
-                        <li key={svc.id}>
-                          <button
-                            type="button"
-                            onClick={() => toggleService(svc.id)}
-                            className={cn(
-                              "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-zinc-50",
-                              selected && "bg-emerald-50/60",
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
-                                selected
-                                  ? "border-emerald-600 bg-emerald-600 text-white"
-                                  : "border-zinc-300 bg-white",
-                              )}
+                <AccordionContent className="p-0">
+                  <div className="bk-acc-content">
+                    <ul>
+                      {cat.services.map((svc) => {
+                        const selected = state.serviceIds.includes(svc.id)
+                        return (
+                          <li key={svc.id}>
+                            <button
+                              type="button"
+                              onClick={() => toggleService(svc.id)}
+                              aria-pressed={selected}
+                              className={`bk-svc${selected ? " on" : ""}`}
                             >
-                              {selected && <Check className="h-3 w-3" strokeWidth={3} />}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="text-sm font-medium text-zinc-900">{svc.name}</div>
-                              <div className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
-                                <Clock className="h-3 w-3" />
-                                {formatDurationMin(svc.durationMin)}
-                              </div>
-                            </div>
-                            <div className="shrink-0 text-sm font-semibold text-zinc-900">
-                              {formatPriceRON(svc.price)}
-                              {svc.priceFrom && (
-                                <span className="ml-1 text-xs font-normal text-zinc-400">de la</span>
-                              )}
-                            </div>
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
+                              <span className="bk-cbx" aria-hidden="true">
+                                {selected && <Check style={{ width: 12, height: 12 }} strokeWidth={3} />}
+                              </span>
+                              <span style={{ minWidth: 0, flex: 1 }}>
+                                <span className="bk-svc-name" style={{ display: "block" }}>
+                                  {svc.name}
+                                </span>
+                                <span className="bk-svc-meta">
+                                  <Clock aria-hidden="true" />
+                                  {formatDurationMin(svc.durationMin)}
+                                </span>
+                              </span>
+                              <span className="bk-svc-price">
+                                {formatPriceRON(svc.price)}
+                                {svc.priceFrom && <small>de la</small>}
+                              </span>
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             )
@@ -167,11 +149,9 @@ export function StepServices({
       )}
 
       {totals.duration > 0 && (
-        <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-          <div className="text-sm font-medium text-emerald-900">
-            Total selectat · {formatDurationMin(totals.duration)}
-          </div>
-          <div className="text-lg font-bold text-emerald-700">{formatPriceRON(totals.price)}</div>
+        <div className="bk-sumline">
+          <span className="lab">Total selectat · {formatDurationMin(totals.duration)}</span>
+          <b>{formatPriceRON(totals.price)}</b>
         </div>
       )}
     </div>

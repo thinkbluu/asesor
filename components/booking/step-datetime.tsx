@@ -7,8 +7,10 @@ import { ro } from "date-fns/locale"
 import { getAvailabilityAction, type AvailabilitySlot } from "@/app/booking/[slug]/actions"
 import type { BookingService, BookingSlot } from "@/lib/booking-logic"
 import { toISODate, groupSlotsByPeriod, formatDateLong, formatDurationMin } from "@/lib/booking-logic"
-import { cn } from "@/lib/utils"
 import type { BookingState } from "./booking-flow"
+
+// Display model after merging free slots with taken-only times (script 020).
+type SlotPill = { time: string; taken: boolean; staffId: string | null }
 
 export function StepDatetime({
   state,
@@ -36,6 +38,7 @@ export function StepDatetime({
 
   const [displayMonth, setDisplayMonth] = useState<Date>(() => selectedDate ?? new Date())
   const [slots, setSlots] = useState<AvailabilitySlot[] | null>(null)
+  const [takenSlots, setTakenSlots] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [nextAvailable, setNextAvailable] = useState<string | null>(null)
@@ -44,6 +47,7 @@ export function StepDatetime({
   useEffect(() => {
     if (!state.date) {
       setSlots(null)
+      setTakenSlots([])
       return
     }
     let cancelled = false
@@ -53,8 +57,12 @@ export function StepDatetime({
       const res = await getAvailabilityAction(salonSlug, state.serviceIds, state.staffId, state.date!)
       if (cancelled) return
       setLoading(false)
-      if (res.ok) setSlots(res.slots)
-      else setLoadError(res.error)
+      if (res.ok) {
+        setSlots(res.slots)
+        setTakenSlots(res.takenSlots)
+      } else {
+        setLoadError(res.error)
+      }
     })()
     return () => {
       cancelled = true
@@ -86,26 +94,49 @@ export function StepDatetime({
     }
   }, [salonSlug, state.serviceIds, state.staffId, state.date, slotNonce])
 
-  const groups = useMemo(() => groupSlotsByPeriod(slots ?? []), [slots])
+  // Merge free + taken-only times, deduped by time (several staff can share a
+  // free slot — one pill per time). Taken-only times render struck-through.
+  const groups = useMemo(() => {
+    const byTime = new Map<string, SlotPill>()
+    for (const s of slots ?? []) {
+      const existing = byTime.get(s.time)
+      if (!existing || existing.taken) {
+        byTime.set(s.time, { time: s.time, taken: false, staffId: s.staffId })
+      }
+    }
+    for (const t of takenSlots) {
+      if (!byTime.has(t)) byTime.set(t, { time: t, taken: true, staffId: null })
+    }
+    const pills = Array.from(byTime.values()).sort((a, b) => a.time.localeCompare(b.time))
+    const asSlots = pills.map((p): BookingSlot => ({ staffId: p.staffId ?? "", time: p.time }))
+    const grouped = groupSlotsByPeriod(asSlots)
+    const takenByTime = new Map(pills.map((p) => [p.time, p.taken]))
+    const mark = (list: BookingSlot[]): SlotPill[] =>
+      list.map((s) => ({ time: s.time, taken: takenByTime.get(s.time) ?? false, staffId: null }))
+    return {
+      morning: mark(grouped.morning),
+      afternoon: mark(grouped.afternoon),
+      evening: mark(grouped.evening),
+    }
+  }, [slots, takenSlots])
 
-  const pickSlot = (slot: BookingSlot) => {
-    update({ time: slot.time, ...(state.staffId ? {} : { staffId: slot.staffId }) })
+  const pickSlot = (pill: SlotPill) => {
+    if (pill.taken) return
+    // The free slot's staff wins when "oricine" is selected.
+    const free = (slots ?? []).find((s) => s.time === pill.time)
+    update({ time: pill.time, ...(state.staffId ? {} : { staffId: free?.staffId ?? null }) })
   }
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-zinc-600 md:text-base">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <p className="bk-lede" style={{ marginTop: 0 }}>
         Alege data programării, apoi un interval orar disponibil.
       </p>
 
-      {slotError && (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">
-          {slotError}
-        </div>
-      )}
+      {slotError && <div className="bk-alert err">{slotError}</div>}
 
       {nextAvailable && !state.date && (
         <button
@@ -114,22 +145,22 @@ export function StepDatetime({
             update({ date: nextAvailable, time: null })
             setDisplayMonth(new Date(nextAvailable + "T12:00:00"))
           }}
-          className="flex w-full items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left transition-colors hover:bg-emerald-100"
+          className="bk-next"
         >
-          <div>
-            <div className="text-xs font-medium uppercase tracking-wide text-emerald-700">
+          <span>
+            <span className="k" style={{ display: "block" }}>
               Prima dată disponibilă
-            </div>
-            <div className="mt-0.5 text-base font-semibold capitalize text-emerald-900">
+            </span>
+            <span className="v" style={{ display: "block" }}>
               {formatDateLong(nextAvailable)}
-            </div>
-          </div>
-          <ArrowRight className="h-5 w-5 text-emerald-700" />
+            </span>
+          </span>
+          <ArrowRight style={{ width: 18, height: 18, flex: "none" }} aria-hidden="true" />
         </button>
       )}
 
-      <div className="grid gap-6 md:grid-cols-[auto_1fr]">
-        <div className="rounded-xl border border-zinc-200 bg-white p-3 md:p-4">
+      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="bk-card bk-cal">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -150,57 +181,33 @@ export function StepDatetime({
           />
         </div>
 
-        <div className="min-h-[200px]">
+        <div style={{ minHeight: 180 }}>
           {!state.date ? (
-            <div className="flex h-full min-h-[200px] items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-6 text-center text-sm text-zinc-500">
-              Selectează o dată pentru a vedea intervalele disponibile.
-            </div>
+            <div className="bk-empty">Selectează o dată pentru a vedea intervalele disponibile.</div>
           ) : loading ? (
-            <div className="flex h-full min-h-[200px] items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-sm text-zinc-500">
-              Se încarcă intervalele...
-            </div>
+            <div className="bk-empty">Se încarcă intervalele...</div>
           ) : loadError ? (
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
-              {loadError}
-            </div>
-          ) : (slots ?? []).length === 0 ? (
+            <div className="bk-alert err">{loadError}</div>
+          ) : (slots ?? []).length === 0 && takenSlots.length === 0 ? (
             <NoSlotsMessage date={state.date} />
           ) : (
-            <div className="space-y-5">
-              <div className="text-sm font-medium capitalize text-zinc-700">
+            <div className="bk-slots">
+              <div className="bk-rlabel" style={{ textTransform: "none", letterSpacing: 0, fontSize: 13.5, color: "var(--ink)" }}>
                 {formatDateLong(state.date)}
               </div>
-              <SlotGroup
-                icon={Sun}
-                title="Dimineața"
-                slots={groups.morning}
-                selected={state.time}
-                onPick={pickSlot}
-              />
-              <SlotGroup
-                icon={Cloud}
-                title="După-amiază"
-                slots={groups.afternoon}
-                selected={state.time}
-                onPick={pickSlot}
-              />
-              <SlotGroup
-                icon={Moon}
-                title="Seara"
-                slots={groups.evening}
-                selected={state.time}
-                onPick={pickSlot}
-              />
+              <SlotGroup icon={Sun} title="Dimineața" pills={groups.morning} selected={state.time} onPick={pickSlot} />
+              <SlotGroup icon={Cloud} title="După-amiază" pills={groups.afternoon} selected={state.time} onPick={pickSlot} />
+              <SlotGroup icon={Moon} title="Seara" pills={groups.evening} selected={state.time} onPick={pickSlot} />
             </div>
           )}
         </div>
       </div>
 
       {totalDuration > 0 && (
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
-          <Clock className="h-3.5 w-3.5" />
+        <p className="bk-fine" style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <Clock style={{ width: 13, height: 13 }} aria-hidden="true" />
           Durata totală a serviciilor alese: {formatDurationMin(totalDuration)}.
-        </div>
+        </p>
       )}
     </div>
   )
@@ -208,9 +215,9 @@ export function StepDatetime({
 
 function NoSlotsMessage({ date }: { date: string }) {
   return (
-    <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-6 text-center">
-      <p className="text-sm font-medium text-zinc-700">Nicio oră disponibilă</p>
-      <p className="mt-1 text-sm text-zinc-500">
+    <div className="bk-empty" style={{ flexDirection: "column", gap: 4 }}>
+      <p style={{ fontWeight: 500, color: "var(--ink)" }}>Nicio oră disponibilă</p>
+      <p>
         Nu există intervale libere pe {formatDateLong(date)}. Încearcă o altă zi.
       </p>
     </div>
@@ -220,39 +227,42 @@ function NoSlotsMessage({ date }: { date: string }) {
 function SlotGroup({
   icon: Icon,
   title,
-  slots,
+  pills,
   selected,
   onPick,
 }: {
   icon: typeof Sun
   title: string
-  slots: BookingSlot[]
+  pills: SlotPill[]
   selected: string | null
-  onPick: (slot: BookingSlot) => void
+  onPick: (pill: SlotPill) => void
 }) {
-  if (slots.length === 0) return null
+  if (pills.length === 0) return null
   return (
     <div>
-      <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        <Icon className="h-3.5 w-3.5" />
+      <div className="bk-sg-label">
+        <Icon aria-hidden="true" />
         {title}
       </div>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-        {slots.map((slot) => {
-          const isSelected = selected === slot.time
+      <div className="bk-slotgrid">
+        {pills.map((pill) => {
+          const isSelected = selected === pill.time && !pill.taken
+          if (pill.taken) {
+            return (
+              <span key={pill.time} className="bk-slot taken" aria-disabled="true">
+                {pill.time}
+              </span>
+            )
+          }
           return (
             <button
-              key={`${slot.staffId}-${slot.time}`}
+              key={pill.time}
               type="button"
-              onClick={() => onPick(slot)}
-              className={cn(
-                "h-11 rounded-lg border text-sm font-medium transition-colors",
-                isSelected
-                  ? "border-emerald-600 bg-emerald-600 text-white"
-                  : "border-zinc-200 bg-white text-zinc-900 hover:border-emerald-400 hover:bg-emerald-50",
-              )}
+              onClick={() => onPick(pill)}
+              aria-pressed={isSelected}
+              className={`bk-slot${isSelected ? " on" : ""}`}
             >
-              {slot.time}
+              {pill.time}
             </button>
           )
         })}

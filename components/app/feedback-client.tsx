@@ -2,13 +2,17 @@
 
 import { useState } from "react"
 import { Star, ExternalLink, Check, Heart, Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { SalonShell } from "@/components/booking/salon-shell"
 import { cn } from "@/lib/utils"
 import { submitFeedbackAction, type FeedbackSubmitResult } from "@/app/feedback/[token]/actions"
 import type { FeedbackTokenState } from "@/lib/data/feedback"
 
 type Phase = "rating" | "google" | "internal" | "submitted"
+
+// Indexed access inline in props kept tripping the parser — alias it (see
+// project gotcha on `T["K"]` indexed access).
+type OpenFeedbackData = Extract<FeedbackTokenState, { status: "open" }>["data"]
 
 export function FeedbackClient({
   state,
@@ -26,14 +30,14 @@ export function FeedbackClient({
 
 function ClosedState({ text }: { text: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md text-center">
-        <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-          <Heart className="h-6 w-6 text-muted-foreground" />
+    <SalonShell name="ASESOR" header={false}>
+      <main className="bk-main" style={{ display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+        <div>
+          <Heart style={{ width: 22, height: 22, color: "var(--acc)", margin: "0 auto 10px" }} aria-hidden="true" />
+          <p className="bk-lede">{text}</p>
         </div>
-        <p className="text-sm text-muted-foreground">{text}</p>
-      </div>
-    </main>
+      </main>
+    </SalonShell>
   )
 }
 
@@ -41,7 +45,7 @@ function OpenFeedback({
   data,
   token,
 }: {
-  data: Extract<FeedbackTokenState, { status: "open" }>["data"]
+  data: OpenFeedbackData
   token: string
 }) {
   const [phase, setPhase] = useState<Phase>("rating")
@@ -89,27 +93,16 @@ function OpenFeedback({
     : null
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        {/* Header — salon branding */}
-        <header className="mb-8 text-center">
-          {data.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={data.logoUrl}
-              alt={data.salonName}
-              className="mx-auto mb-3 h-12 w-12 rounded-xl object-cover"
-            />
-          ) : (
-            <div
-              className="mx-auto mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl"
-              style={{ backgroundColor: data.accentColor ?? "var(--accent)" }}
-            >
-              <Heart className="h-6 w-6 text-white" />
-            </div>
-          )}
-          <h1 className="text-2xl font-semibold tracking-tight">{data.salonName}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+    <SalonShell
+      name={data.salonName}
+      logoUrl={data.logoUrl}
+      accentColor={data.accentColor}
+    >
+      <main className="bk-main" style={{ paddingBottom: 40 }}>
+        {/* Header — salon branding is in the shell; here: the personal note */}
+        <header style={{ textAlign: "center", marginBottom: 24 }}>
+          <h1 className="bk-title">Cum a fost experiența ta?</h1>
+          <p className="bk-lede">
             {data.clientFirstName ? `Mulțumim, ${data.clientFirstName}!` : "Mulțumim că ne-ai vizitat"}
             {dateLabel ? ` — ${dateLabel}` : ""}
           </p>
@@ -117,27 +110,28 @@ function OpenFeedback({
 
         {phase === "rating" && (
           <section aria-label="Alege o notă">
-            <p className="mb-4 text-center text-sm text-muted-foreground">
-              Cum a fost experiența ta?
+            <p className="bk-lede" style={{ textAlign: "center", marginBottom: 14 }}>
+              Alege o notă de la 1 la 5.
             </p>
-            <div className="flex justify-center gap-2">
+            <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
               {[1, 2, 3, 4, 5].map((r) => (
                 <button
                   key={r}
                   type="button"
                   aria-label={`${r} din 5 stele`}
+                  aria-pressed={(hovered ?? rating ?? 0) >= r}
                   onMouseEnter={() => setHovered(r)}
                   onMouseLeave={() => setHovered(null)}
                   onClick={() => handleRate(r)}
-                  className="rounded-lg p-1 transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-accent"
+                  className="bk-star"
                 >
                   <Star
                     className={cn(
-                      "h-9 w-9 transition-colors",
                       (hovered ?? rating ?? 0) >= r
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-muted-foreground/40",
+                        ? "fill-[color:var(--acc)] text-[color:var(--acc)]"
+                        : "text-[color:var(--satin)]",
                     )}
+                    aria-hidden="true"
                   />
                 </button>
               ))}
@@ -146,18 +140,16 @@ function OpenFeedback({
         )}
 
         {phase === "google" && (
-          <section className="space-y-4 text-center">
-            <p className="text-sm text-muted-foreground">
+          <section style={{ display: "flex", flexDirection: "column", gap: 16, textAlign: "center" }}>
+            <p className="bk-lede">
               Ne bucurăm că ai fost mulțumit(ă)! Ne poți ajuta cu o recenzie publică:
             </p>
-            <Button asChild className="w-full">
-              <a href={googleUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Lasă o recenzie pe Google
-              </a>
-            </Button>
-            <div className="space-y-2 pt-2 text-left">
-              <label htmlFor="fb-text" className="text-sm font-medium">
+            <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="bk-btn" style={{ textDecoration: "none" }}>
+              <ExternalLink style={{ width: 15, height: 15 }} aria-hidden="true" />
+              Lasă o recenzie pe Google
+            </a>
+            <div className="bk-field" style={{ textAlign: "left", marginTop: 6 }}>
+              <label htmlFor="fb-text" className="bk-label">
                 Ai și ceva de transmis direct salonului? (opțional)
               </label>
               <Textarea
@@ -167,27 +159,28 @@ function OpenFeedback({
                 placeholder="Scrie aici…"
                 maxLength={1000}
                 rows={3}
+                className="bk-input"
               />
-              <Button
-                variant="outline"
-                className="w-full"
+              <button
+                type="button"
+                className="bk-btn2"
                 disabled={submitting}
                 onClick={() => handleSubmit(true)}
               >
                 {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 Trimite salonului
-              </Button>
+              </button>
             </div>
           </section>
         )}
 
         {phase === "internal" && (
-          <section className="space-y-4">
-            <p className="text-center text-sm text-muted-foreground">
+          <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <p className="bk-lede" style={{ textAlign: "center" }}>
               Spune-ne ce am putea face mai bine. Mesajul ajunge direct la salon.
             </p>
-            <div className="space-y-2">
-              <label htmlFor="fb-text" className="text-sm font-medium">
+            <div className="bk-field">
+              <label htmlFor="fb-text" className="bk-label">
                 Mesajul tău
               </label>
               <Textarea
@@ -197,37 +190,43 @@ function OpenFeedback({
                 placeholder="Ce ar fi trebuit să facem diferit?"
                 maxLength={1000}
                 rows={4}
+                className="bk-input"
               />
             </div>
-            <Button
-              className="w-full"
+            <button
+              type="button"
+              className="bk-btn"
               disabled={submitting || feedbackText.trim().length < 5}
               onClick={() => handleSubmit(false)}
             >
               {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Trimite feedbackul
-            </Button>
+            </button>
           </section>
         )}
 
         {phase === "submitted" && (
-          <section className="space-y-3 text-center">
-            <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15">
-              <Check className="h-6 w-6 text-emerald-600" />
-            </div>
-            <p className="font-medium">Mulțumim pentru feedback!</p>
-            <p className="text-sm text-muted-foreground">
-              Mesajul tău a ajuns la {data.salonName}.
-            </p>
+          <section style={{ display: "flex", flexDirection: "column", gap: 10, textAlign: "center" }}>
+            <span
+              style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: 48, height: 48, borderRadius: "50%", margin: "0 auto",
+                background: "var(--acc)", color: "var(--acc-ink)",
+              }}
+            >
+              <Check style={{ width: 22, height: 22 }} aria-hidden="true" />
+            </span>
+            <p style={{ fontWeight: 500 }}>Mulțumim pentru feedback!</p>
+            <p className="bk-lede">Mesajul tău a ajuns la {data.salonName}.</p>
           </section>
         )}
 
         {error && (
-          <p className="mt-4 flex items-center justify-center gap-1.5 text-sm text-red-500" role="alert">
-            <AlertCircle className="h-4 w-4" /> {error}
+          <p role="alert" className="bk-ferr" style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <AlertCircle style={{ width: 14, height: 14 }} aria-hidden="true" /> {error}
           </p>
         )}
-      </div>
-    </main>
+      </main>
+    </SalonShell>
   )
 }

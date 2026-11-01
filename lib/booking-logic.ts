@@ -12,6 +12,9 @@ export interface SalonInfo {
   cancellationPolicy: string
   cancellationWindowHours: number
   hoursText: string
+  /** salons.branding — optional salon identity for the public pages (P17). */
+  logoUrl?: string | null
+  accentColor?: string | null
 }
 
 export interface BookingService {
@@ -131,3 +134,37 @@ function escapeICS(value: string): string {
 }
 
 export { normalizePhoneRo as normalizePhone } from "@/lib/validation/programari"
+
+// ─── Salon accent (P17) ──────────────────────────────────────────────────────
+// The accent comes from salons.branding.primary_color (fallback: smarald ASESOR).
+// Text on top of it must stay readable even when the salon picks a pale colour,
+// so we pick whichever of white / ink has the higher WCAG contrast.
+
+function normalizeHex(color?: string | null): string | null {
+  if (!color) return null
+  let s = color.trim().toLowerCase()
+  if (s.startsWith("#")) s = s.slice(1)
+  if (/^[0-9a-f]{3}$/.test(s)) s = s.split("").map((ch) => ch + ch).join("")
+  if (!/^[0-9a-f]{6}$/.test(s)) return null
+  return `#${s}`
+}
+
+function srgbChannel(value: number): number {
+  const v = value / 255
+  return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+}
+
+function relativeLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return 0.2126 * srgbChannel(r) + 0.7152 * srgbChannel(g) + 0.0722 * srgbChannel(b)
+}
+
+export function accentPair(color: string | null | undefined): { acc: string; ink: string } {
+  const acc = normalizeHex(color) ?? "#00704F"
+  const lum = relativeLuminance(acc)
+  const vsWhite = 1.05 / (lum + 0.05)
+  const vsInk = (lum + 0.05) / (relativeLuminance("#131516") + 0.05)
+  return { acc, ink: vsWhite >= vsInk ? "#FFFFFF" : "#131516" }
+}
