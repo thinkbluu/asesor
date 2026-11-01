@@ -1,23 +1,33 @@
 import { z } from "zod"
 
-export const CONTACT_SUBJECTS = ["demo", "pilot", "premium", "altceva"] as const
+export const CONTACT_SUBJECTS = [
+  "general",
+  "demo",
+  "pilot",
+  "premium",
+  "suport",
+  "facturare",
+] as const
 export type ContactSubject = (typeof CONTACT_SUBJECTS)[number]
 
 export const CONTACT_SUBJECT_LABELS: Record<ContactSubject, string> = {
-  demo: "Demo",
-  pilot: "Program pilot",
-  premium: "Pachet premium",
-  altceva: "Altceva",
+  general: "Întrebare generală",
+  demo: "Vreau o prezentare",
+  pilot: "Programul pilot",
+  premium: "Pachetul Premium",
+  suport: "Suport",
+  facturare: "Facturare",
 }
 
 export const contactSchema = z.object({
-  firstName: z.string().trim().min(1, "Prenumele este obligatoriu.").max(80),
-  lastName: z.string().trim().min(1, "Numele este obligatoriu.").max(80),
+  name: z.string().trim().min(1, "Numele este obligatoriu.").max(120),
   email: z.string().trim().email("Adresa de email nu este validă.").max(200),
   phone: z
     .string()
     .trim()
-    .regex(/^[\d\s()+-]{6,20}$/, "Numărul de telefon nu este valid."),
+    .regex(/^$|^[\d\s()+-]{6,20}$/, "Numărul de telefon nu este valid.")
+    .optional()
+    .or(z.literal("")),
   salonName: z.string().trim().max(120).optional().or(z.literal("")),
   subject: z.enum(CONTACT_SUBJECTS, {
     error: "Alege un subiect.",

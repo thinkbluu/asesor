@@ -90,10 +90,9 @@ async function sendContactEmail(input: {
 export async function submitContactAction(formData: FormData): Promise<ContactResult> {
   // 1. zod validation
   const parsed = contactSchema.safeParse({
-    firstName: formData.get("firstName"),
-    lastName: formData.get("lastName"),
+    name: formData.get("name"),
     email: formData.get("email"),
-    phone: formData.get("phone"),
+    phone: formData.get("phone") ?? "",
     salonName: formData.get("salonName") ?? "",
     subject: formData.get("subject"),
     message: formData.get("message"),
@@ -138,11 +137,11 @@ export async function submitContactAction(formData: FormData): Promise<ContactRe
   }
 
   // 5. insert (service role — the table has no RLS policies by design)
-  const name = `${parsed.data.firstName} ${parsed.data.lastName}`.trim()
+  const name = parsed.data.name
   const { error: insertError } = await admin.from("contact_requests").insert({
     name,
     email: parsed.data.email,
-    phone: parsed.data.phone,
+    phone: parsed.data.phone || null,
     salon_name: parsed.data.salonName || null,
     subject: parsed.data.subject,
     message: parsed.data.message,
@@ -157,7 +156,7 @@ export async function submitContactAction(formData: FormData): Promise<ContactRe
   await sendContactEmail({
     name,
     email: parsed.data.email,
-    phone: parsed.data.phone,
+    phone: parsed.data.phone || "",
     salonName: parsed.data.salonName || "",
     subject: parsed.data.subject,
     message: parsed.data.message,
