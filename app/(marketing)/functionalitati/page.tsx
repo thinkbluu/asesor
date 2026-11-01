@@ -1,211 +1,166 @@
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Calendar, Users, UserCog, Package, PieChart, Megaphone, ArrowRight, Check } from "lucide-react"
+import type { Metadata } from "next"
+import Image from "next/image"
+import { OBJECTS } from "@/components/marketing/module-board"
+import { FinalCta } from "@/components/marketing/final-cta"
+import { MarketingMotion } from "@/components/marketing/marketing-motion"
 
-const modules = [
+const MODULES = [
   {
     id: "programari",
-    icon: Calendar,
-    title: "Programări inteligente",
-    description: "Nucleul platformei. Aici se organizează întreaga activitate zilnică.",
-    features: [
-      "Calendar vizual (zi / săptămână / lună)",
-      "Programări online — clienții se programează singuri, 24/7",
-      "Confirmări și reamintiri pe email",
-      "Reguli personalizate: timp buffer între programări, politică de anulare",
-      "Atribuire automată sau manuală pe membrii echipei",
+    num: "i.",
+    title: "Programări",
+    items: [
+      "Vizualizare pe zi, săptămână și lună",
+      "Muti o programare trăgând-o",
+      "Aplicația nu te lasă să suprapui doi clienți la același om",
+      "Programări recurente",
+      "Șase statusuri și sursa fiecărei programări",
+      "Recepția și specialiștii văd schimbările în timp real",
+      "Pagina publică de programare, cu logo și culoare proprii",
+      "Confirmare și reamintire pe email",
     ],
-    result: "Mai puține apeluri. Mai puține anulări. Mai mult timp pentru ceea ce contează.",
   },
   {
     id: "clienti",
-    icon: Users,
-    title: "Clienți — CRM Beauty",
-    description: "Fiecare client are o poveste. ASESOR o ține minte pentru tine.",
-    features: [
-      "Fișă completă: date contact, istoric servicii, produse cumpărate",
-      "Note și preferințe (ex: „nu vrea vopsea cu amoniac”)",
-      "Segmentare: clienți noi, fideli, inactivi",
-      "Istoric valoare: cât a cheltuit, cât de des revine",
-      "Etichete personalizate pentru organizare",
+    num: "ii.",
+    title: "Clienți",
+    items: [
+      "Istoric de vizite și servicii",
+      "Alergii și formule de culoare, vizibile doar specialiștilor",
+      "Galerie înainte și după, cu acordul clientei",
+      "Etichete și note",
+      "Import din Excel sau CSV",
+      "Export și ștergere la cerere",
     ],
-    result: "Relații mai bune. Clienți care se simt cunoscuți și apreciați.",
   },
   {
     id: "echipa",
-    icon: UserCog,
-    title: "Echipă & Performanță",
-    description: "O echipă bună are nevoie de claritate, nu de micromanagement.",
-    features: [
-      "Profil individual: servicii oferite, program de lucru, zile libere",
-      "Calendar personal pentru fiecare membru",
-      "Performanță vizibilă: programări, venituri generate, rată de retenție",
-      "Setări de comision (fix sau procentual)",
-      "Permisiuni diferențiate (admin, angajat, colaborator)",
+    num: "iii.",
+    title: "Echipă",
+    items: [
+      "Program săptămânal pe om",
+      "Cereri de concediu aprobate de tine",
+      "Servicii și prețuri diferite pe specialist",
+      "Comision procentual, fix sau salariu",
+      "Fiecare își vede propriile cifre",
+      "Roluri: proprietar, manager, specialist, recepție",
     ],
-    result: "Fiecare știe ce are de făcut. Tu ai imaginea de ansamblu.",
   },
   {
     id: "stocuri",
-    icon: Package,
-    title: "Stocuri & Produse",
-    description: "Nu mai numeri pe degete. Nu mai rămâi fără vopsea vineri seara.",
-    features: [
-      "Catalog produse cu categorii și branduri",
-      "Nivel stoc în timp real",
-      "Alertă automată pentru stoc scăzut",
-      "Consum legat de servicii (ex: 1 tuns = X ml șampon)",
-      "Istoric ajustări și comenzi",
+    num: "iv.",
+    title: "Stocuri",
+    items: [
+      "Stoc minim pe produs",
+      "Consum automat la fiecare serviciu finalizat",
+      "Recepție de marfă pe factură",
+      "Inventar cu diferențe",
+      "Listă de comandat pe furnizor",
     ],
-    result: "Stocuri optimizate. Costuri controlate. Zero surprize.",
   },
   {
     id: "financiar",
-    icon: PieChart,
-    title: "Financiar & Rapoarte",
-    description: "Cifrele nu mint. Dar trebuie să le vezi ca să le înțelegi.",
-    features: [
-      "Venituri totale: pe zi, săptămână, lună, perioadă personalizată",
-      "Comparație perioade (luna asta vs. luna trecută)",
-      "Defalcare: servicii vs. vânzări retail",
-      "Top servicii și top clienți",
-      "Performanță pe membru de echipă",
-      "Export PDF și CSV",
+    num: "v.",
+    title: "Financiar",
+    items: [
+      "Încasare la final de programare: numerar, card sau transfer, cu reduceri și baciș",
+      "Cheltuieli cu poză după bon",
+      "Închiderea zilei cu diferența de numerar",
+      "Rapoarte pe zi, specialist și serviciu",
+      "Export CSV pentru contabil",
     ],
-    result: "Știi exact unde ești. Poți decide unde vrei să ajungi.",
   },
   {
-    id: "marketing",
-    icon: Megaphone,
-    title: "Marketing automat",
-    description: "Clienții care nu revin nu te-au uitat. Pur și simplu nu le-ai reamintit.",
-    features: [
-      "Reminder programare (cu 24h/48h înainte)",
-      "Mesaj post-vizită (mulțumire + cerere recenzie)",
-      "Campanii de reactivare pentru clienți inactivi (30/60/90 zile)",
-      "Mesaje de aniversare sau ocazii speciale",
-      "Statistici: rate de deschidere, conversii",
+    id: "loialitate",
+    num: "vi.",
+    title: "Loialitate & recenzii",
+    items: [
+      "Puncte la fiecare vizită, niveluri și recompense",
+      "Cerere de părere după vizită",
+      "Clienții mulțumiți sunt trimiși spre Google, ceilalți îți scriu ție direct",
     ],
-    result: "Clienți care revin. Recenzii care vin. Fără efort manual.",
   },
 ]
 
+export const metadata: Metadata = {
+  title: "Funcționalități — ASESOR · programări, clienți, echipă, stocuri, financiar, loialitate",
+  description:
+    "Fiecare modul înlocuiește un obiect de pe biroul de la recepție: programări, fișe de client, echipă, stocuri, încasări și loialitate. Le folosești pe toate sau doar pe cele de care ai nevoie.",
+}
+
 export default function FunctionalitatiPage() {
   return (
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="border-b border-border bg-muted/30 py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl text-balance">
-                Șase module. O singură platformă.
-              </h1>
-              <p className="mt-6 text-lg leading-relaxed text-muted-foreground text-pretty">
-                ASESOR nu e doar un calendar de programări. E un sistem complet de management pentru salonul tău.
-              </p>
-            </div>
-          </div>
-        </section>
+    <main>
+      <section className="phero pow">
+        <div className="wrap in">
+          <p className="eyebrow">Funcționalități</p>
+          <h1 className="display">
+            <span className="l">
+              <span>Tot ce face ASESOR,</span>
+            </span>
+            <span className="l">
+              <span>
+                <em>pe module.</em>
+              </span>
+            </span>
+          </h1>
+          <p className="lede">
+            Fiecare modul înlocuiește un obiect de pe biroul de la recepție. Le folosești pe toate sau doar pe cele de
+            care ai nevoie.
+          </p>
+        </div>
+      </section>
 
-        {/* Modules */}
-        <section className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="space-y-24">
-              {modules.map((module, index) => (
-                <div
-                  key={module.id}
-                  id={module.id}
-                  className={`grid gap-12 lg:grid-cols-2 lg:gap-16 ${
-                    index % 2 === 1 ? "lg:grid-flow-dense" : ""
-                  }`}
-                >
-                  <div className={index % 2 === 1 ? "lg:col-start-2" : ""}>
-                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10">
-                      <module.icon className="h-7 w-7 text-accent" />
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                      {module.title}
-                    </h2>
-                    <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                      {module.description}
-                    </p>
-                    <div className="mt-8 space-y-3">
-                      {module.features.map((feature, i) => (
-                        <div key={i} className="flex items-start gap-3">
-                          <Check className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
-                          <span className="text-sm leading-relaxed text-foreground">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-8 rounded-lg bg-muted/50 p-4">
-                      <p className="font-semibold text-foreground">Rezultat:</p>
-                      <p className="mt-1 text-sm text-muted-foreground">{module.result}</p>
-                    </div>
-                  </div>
-                  <div
-                    className={`rounded-xl border border-border bg-muted/30 ${
-                      module.id === "programari" || module.id === "clienti" || module.id === "echipa" || module.id === "stocuri"
-                        ? "group overflow-hidden"
-                        : ""
-                    } ${index % 2 === 1 ? "lg:col-start-1 lg:row-start-1" : ""}`}
-                  >
-                    {module.id === "programari" ? (
-                      <img
-                        src="/asesor-programari.webp"
-                        alt="ASESOR — Calendar programări salon"
-                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : module.id === "clienti" ? (
-                      <img
-                        src="/asesor-clienti.webp"
-                        alt="ASESOR — Gestionare clienți salon"
-                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : module.id === "echipa" ? (
-                      <img
-                        src="/asesor-echipa.webp"
-                        alt="ASESOR — Management echipă salon"
-                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : module.id === "stocuri" ? (
-                      <img
-                        src="/asesor-stocuri.webp"
-                        alt="ASESOR — Gestiune stocuri produse salon"
-                        className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex aspect-video items-center justify-center p-8">
-                        <module.icon className="h-24 w-24 text-accent/20" />
-                      </div>
-                    )}
-                  </div>
+      {MODULES.map((mod, i) => {
+        const obj = OBJECTS[i]
+        return (
+          <section className={`sec mod ${i % 2 === 1 ? "f-pow rev" : "f-porc"}`} id={mod.id} key={mod.id}>
+            <div className="wrap">
+              <div className="grid">
+                <div>
+                  <p className="num rv">{mod.num}</p>
+                  <h2 className="rv">{mod.title}</h2>
+                  <ul className="rv">
+                    {mod.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="border-t border-border bg-muted/30 py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl text-balance">
-                Vrei să vezi cum funcționează?
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground text-pretty">
-                Programează o prezentare de 15 minute. Fără obligații. Îți arătăm exact ce poate face ASESOR pentru salonul tău.
-              </p>
-              <div className="mt-8">
-                <Button size="lg" asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                  <Link href="/contact">
-                    Solicită prezentare
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                <div className="mcol">
+                  <figure className="mobj rv">
+                    <Image
+                      src={obj.src}
+                      alt={obj.alt}
+                      width={1024}
+                      height={1024}
+                      sizes="(min-width: 1101px) 40vw, (min-width: 761px) 50vw, 100vw"
+                    />
+                    <figcaption>
+                      <i>{obj.num}</i>
+                      {obj.caption}
+                    </figcaption>
+                    <div className="twin">{obj.twin}</div>
+                  </figure>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+        )
+      })}
+
+      <section className="sec f-pow">
+        <div className="wrap soon">
+          <h3 className="rv">În curând</h3>
+          <ul className="rv">
+            <li>Mesaje SMS și WhatsApp</li>
+            <li>Campanii de reactivare și zile de naștere</li>
+            <li>Mai multe locații sub același cont</li>
+          </ul>
+        </div>
+      </section>
+
+      <FinalCta />
+      <MarketingMotion />
+    </main>
   )
 }

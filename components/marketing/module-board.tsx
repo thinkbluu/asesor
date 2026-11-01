@@ -1,6 +1,8 @@
 import Image from "next/image"
 
-const OBJECTS = [
+// Exported for /functionalitati, which reuses the same still-life objects
+// and digital-twin cards one per module section.
+export const OBJECTS = [
   {
     cls: "o1",
     src: "/img/obj-programari.webp",
