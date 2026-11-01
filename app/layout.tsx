@@ -6,8 +6,9 @@ import { CookieBanner } from "@/components/cookie-banner"
 import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+// latin-ext for the Romanian diacritics (ș/ț cu virgulă subscrisă)
+const _geist = Geist({ subsets: ["latin", "latin-ext"] });
+const _geistMono = Geist_Mono({ subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://asesor.ro'),
