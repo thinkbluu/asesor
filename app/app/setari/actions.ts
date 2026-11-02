@@ -211,7 +211,7 @@ export async function deleteSetariServiceAction(input: unknown): Promise<ActionR
   return { ok: true }
 }
 
-// ��── Reordonare ──────────────────────────────────────────────────────────────
+// ââ── Reordonare ──────────────────────────────────────────────────────────────
 
 export async function reorderSetariServicesAction(input: unknown): Promise<ActionResult> {
   const blocked = await billingGuard({ write: true })

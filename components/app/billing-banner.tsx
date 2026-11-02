@@ -13,7 +13,7 @@ export function BillingBanner({ banner, isOwner }: { banner: Banner | null; isOw
       role={urgent ? "alert" : "status"}
       className={cn(
         "flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2.5 text-sm",
-        urgent ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-accent/30 bg-accent/10 text-foreground",
+        urgent ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-primary/30 bg-primary/10 text-foreground",
       )}
     >
       <Icon className="h-4 w-4 shrink-0" aria-hidden />

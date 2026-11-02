@@ -395,7 +395,7 @@ function AppointmentDetail({
   )
 }
 
-// ─── Day View ────────────────────────────��─────────────────────────────────��──
+// ─── Day View ────────────────────────────ââ─────────────────────────────────ââ──
 
 function DayView({
   date, appointments, staff, onSelectApt, onNewApt, canEditApt, onReschedule, onResize,
@@ -638,7 +638,7 @@ function DayView({
   )
 }
 
-// ─── Week View ───────────────────────────────────────────────────────��────────
+// ─── Week View ───────────────────────────────────────────────────────ââ────────
 
 function WeekView({
   weekDates, allAppointments, staff, onSelectApt, onDayClick,
@@ -741,7 +741,7 @@ function WeekView({
   )
 }
 
-// ─── Month View ────────────────────────────���──────────────────────────────────
+// ─── Month View ────────────────────────────âââ──────────────────────────────────
 
 function MonthView({
   year, month, allAppointments, onDayClick,
@@ -817,7 +817,7 @@ function MonthView({
   )
 }
 
-// ─── List View ────────────────────────────────────────────────────────────��───
+// ─── List View ────────────────────────────────────────────────────────────ââ───
 
 function ListView({
   appointments, onSelectApt,
@@ -1176,7 +1176,7 @@ function AppointmentModal({
                         setShowClientDropdown(false)
                       }}
                     >
-                      <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center text-xs font-bold text-accent shrink-0">
+                      <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                         {c.firstName[0]}{c.lastName[0]}
                       </div>
                       <div>
@@ -1465,7 +1465,7 @@ function AppointmentModal({
   )
 }
 
-// ─── Cancel reason dialog ─────────────────────────────────��──────────────────
+// ─── Cancel reason dialog ─────────────────────────────────ââ──────────────────
 
 function CancelReasonDialog({
   open, aptName, onClose, onConfirm,
@@ -1500,7 +1500,7 @@ function CancelReasonDialog({
   )
 }
 
-// ─── Main View ─────────��──────────────────────────────────────────────────────
+// ─── Main View ─────────ââ──────────────────────────────────────────────────────
 
 export function ProgramariView({
   salonId, role, staffId, staff, services, staffServices, initialAppointments, initialDate,

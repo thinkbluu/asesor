@@ -66,7 +66,7 @@ export function LegalAcceptanceModal({ pending }: { pending: LegalDocKey[] }) {
                 href={DOC_LABELS[doc].href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-foreground underline underline-offset-4 hover:text-accent"
+                className="font-medium text-foreground underline underline-offset-4 hover:text-primary"
               >
                 {DOC_LABELS[doc].label}
               </a>

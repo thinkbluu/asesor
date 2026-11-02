@@ -24,7 +24,7 @@ export function BookingTabs() {
           className={cn(
             "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap",
             currentTab === t.id
-              ? "border-accent text-accent"
+              ? "border-primary text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >

@@ -373,7 +373,7 @@ export async function reorderSetariCategories(salonId: string, input: SetariReor
   return { ok: true }
 }
 
-// ���── Produse (pentru consumul pe servicii) ───────────────────────────────────
+// âââ── Produse (pentru consumul pe servicii) ───────────────────────────────────
 
 export async function loadSetariProducts(salonId: string): Promise<{ id: string; name: string }[]> {
   const supabase = await createSupabaseServerClient()

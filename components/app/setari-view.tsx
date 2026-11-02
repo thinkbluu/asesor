@@ -278,10 +278,10 @@ export function SetariView({
     <div className="flex min-h-screen flex-col">
       <Toaster position="top-center" richColors />
       {/* Page header */}
-      <div className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur">
+      <div className="sticky top-0 z-10 flex min-h-14 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-border bg-background/95 px-4 py-2 backdrop-blur sm:px-6">
         <div>
           <h1 className="text-lg font-semibold">Setări</h1>
-          <p className="text-xs text-muted-foreground">Configurează salonul tău</p>
+          <p className="hidden text-xs text-muted-foreground sm:block">Configurează salonul tău</p>
         </div>
         <div className="flex items-center gap-3">
           {unsaved && (
@@ -291,7 +291,7 @@ export function SetariView({
             </div>
           )}
           {saved && (
-            <div className="flex items-center gap-1.5 text-xs text-accent">
+            <div className="flex items-center gap-1.5 text-xs text-primary">
               <Check className="h-3.5 w-3.5" />
               Salvat
             </div>
@@ -300,11 +300,31 @@ export function SetariView({
             size="sm"
             onClick={handleSave}
             disabled={!unsaved || saving}
-            className="bg-accent text-accent-foreground hover:bg-accent/90 disabled:opacity-40"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
             {saving ? "Se salvează…" : "Salvează modificările"}
           </Button>
         </div>
+      </div>
+
+      {/* Mobile tab bar — outside the flex row so the tall form can't stretch it */}
+      <div className="flex overflow-x-auto border-b border-border px-4 lg:hidden">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors",
+              activeTab === tab.id
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="flex flex-1 pt-4">
@@ -319,7 +339,7 @@ export function SetariView({
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors text-left",
                   activeTab === tab.id
-                    ? "bg-accent/10 text-accent"
+                    ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
@@ -331,30 +351,10 @@ export function SetariView({
           </nav>
         </aside>
 
-        {/* Mobile tab bar */}
-        <div className="flex overflow-x-auto border-b border-border px-4 pb-0 lg:hidden">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors",
-                activeTab === tab.id
-                  ? "border-accent text-accent"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
         {/* Content */}
-        <main className="flex-1 overflow-auto px-4 py-6 lg:px-8">
+        <main className="min-w-0 flex-1 px-4 py-6 lg:px-8">
 
-          {/* ─��� PROFIL SALON ── */}
+          {/* ─âââ PROFIL SALON ── */}
           {activeTab === "profil" && (
             <div className="max-w-3xl space-y-6">
               <Card>

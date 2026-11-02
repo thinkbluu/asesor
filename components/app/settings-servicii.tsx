@@ -332,7 +332,7 @@ export function SettingsServicii({ categories: initialCategories, services: init
           <Button variant="outline" size="sm" onClick={openNewCat} className="gap-1.5 text-xs">
             <Plus className="h-3.5 w-3.5" /> Categorie nouă
           </Button>
-          <Button size="sm" onClick={openNewService} className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90 text-xs">
+          <Button size="sm" onClick={openNewService} className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-xs">
             <Plus className="h-3.5 w-3.5" /> Serviciu nou
           </Button>
         </div>
@@ -435,7 +435,7 @@ export function SettingsServicii({ categories: initialCategories, services: init
                             </div>
                           </td>
                           <td className="px-4 py-3 text-muted-foreground">{svc.duration} min</td>
-                          <td className="px-4 py-3 font-medium text-accent">{svc.price} RON</td>
+                          <td className="px-4 py-3 font-medium text-primary">{svc.price} RON</td>
                           <td className="px-4 py-3 text-muted-foreground">
                             {svc.staff.length > 0 ? (
                               <span>{svc.staff.length} pers.</span>
@@ -445,7 +445,7 @@ export function SettingsServicii({ categories: initialCategories, services: init
                           </td>
                           <td className="px-4 py-3">
                             {svc.onlineBooking ? (
-                              <Globe className="h-4 w-4 text-accent" />
+                              <Globe className="h-4 w-4 text-primary" />
                             ) : (
                               <Globe className="h-4 w-4 text-muted-foreground/30" />
                             )}
@@ -528,8 +528,8 @@ export function SettingsServicii({ categories: initialCategories, services: init
                       className={cn(
                         "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
                         editingService.duration === d
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border bg-muted/30 text-muted-foreground hover:border-accent/50"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-muted/30 text-muted-foreground hover:border-primary/50"
                       )}
                     >
                       {d}
@@ -599,8 +599,8 @@ export function SettingsServicii({ categories: initialCategories, services: init
                       className={cn(
                         "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
                         editingService.staff.includes(member.id)
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border text-muted-foreground hover:border-accent/50"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary/50"
                       )}
                     >
                       {member.name}
@@ -682,7 +682,7 @@ export function SettingsServicii({ categories: initialCategories, services: init
             <Button
               onClick={saveService}
               disabled={!editingService.name.trim() || editingService.price <= 0 || saving}
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {saving ? "Se salvează…" : isNewService ? "Adaugă serviciu" : "Salvează modificările"}
             </Button>
@@ -720,8 +720,8 @@ export function SettingsServicii({ categories: initialCategories, services: init
                       className={cn(
                         "flex h-9 w-9 items-center justify-center rounded-lg border transition-colors",
                         editingCat.icon === iconKey
-                          ? "border-accent bg-accent/10 text-accent"
-                          : "border-border text-muted-foreground hover:border-accent/50"
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary/50"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -758,7 +758,7 @@ export function SettingsServicii({ categories: initialCategories, services: init
             <Button
               onClick={saveCat}
               disabled={!editingCat.name.trim() || saving}
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {saving ? "Se salvează…" : isNewCat ? "Adaugă" : "Salvează"}
             </Button>

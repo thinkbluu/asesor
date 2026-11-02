@@ -70,7 +70,7 @@ function PlanPicker({
             aria-pressed={interval === v}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm transition-colors",
-              interval === v ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground",
+              interval === v ? "bg-primary text-accent-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {v === "month" ? "Lunar" : "Anual (preț redus)"}
@@ -88,7 +88,7 @@ function PlanPicker({
               aria-pressed={active}
               className={cn(
                 "rounded-lg border p-4 text-left transition-colors",
-                active ? "border-accent bg-accent/5 ring-1 ring-accent" : "border-border hover:border-accent/50",
+                active ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:border-primary/50",
               )}
             >
               <div className="flex items-center justify-between gap-2">
@@ -155,8 +155,8 @@ export function SettingsAbonament({ billing, usage, isOwner }: Props) {
   return (
     <div className="max-w-3xl space-y-6">
       {returned === "ok" && (
-        <div role="status" className="flex items-start gap-2 rounded-lg border border-accent/40 bg-accent/5 p-4 text-sm">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+        <div role="status" className="flex items-start gap-2 rounded-lg border border-primary/40 bg-primary/5 p-4 text-sm">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p>Mulțumim! Abonamentul se activează în câteva secunde. Dacă statusul nu apare, reîncarcă pagina.</p>
         </div>
       )}
@@ -167,7 +167,7 @@ export function SettingsAbonament({ billing, usage, isOwner }: Props) {
       )}
 
       {billing.source === "pilot" && (
-        <Card className="border-accent/40 bg-accent/5">
+        <Card className="border-primary/40 bg-primary/5">
           <CardContent className="pt-6">
             <p className="text-lg font-bold">Perioadă pilot</p>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -178,13 +178,13 @@ export function SettingsAbonament({ billing, usage, isOwner }: Props) {
       )}
 
       {billing.hasSubscription && status && (
-        <Card className="border-accent/40 bg-accent/5">
+        <Card className="border-primary/40 bg-primary/5">
           <CardContent className="pt-6">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-lg font-bold">Plan {plan.name}</p>
               <Badge
                 className={cn(
-                  status.tone === "ok" && "bg-accent text-accent-foreground",
+                  status.tone === "ok" && "bg-primary text-accent-foreground",
                   status.tone === "warn" && "bg-secondary text-secondary-foreground",
                   status.tone === "bad" && "bg-destructive text-white",
                 )}

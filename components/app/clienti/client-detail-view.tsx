@@ -382,7 +382,7 @@ function HistoryTab({ history }: { history: ClientHistoryItem[] }) {
   )
 }
 
-// ─── Date protejate ───────────────���────────────────────���─────────────────────
+// ─── Date protejate ───────────────âââ────────────────────âââ─────────────────────
 
 function SensitiveTab({
   clientId,

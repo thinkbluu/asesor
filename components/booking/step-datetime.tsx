@@ -136,7 +136,7 @@ export function StepDatetime({
         Alege data programării, apoi un interval orar disponibil.
       </p>
 
-      {slotError && <div className="bk-alert err">{slotError}</div>}
+      {slotError && <div role="alert" className="bk-alert err">{slotError}</div>}
 
       {nextAvailable && !state.date && (
         <button

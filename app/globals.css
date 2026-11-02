@@ -238,3 +238,17 @@
 }
 /* p18 kick */
 /* p18 kick 2 */
+
+/* P19 a11y: visible keyboard focus everywhere — the scoped CSS systems
+   (marketing/auth/booking) set outline:none on inputs, and bare links
+   otherwise rely on UA defaults. Unlayered rules beat the scoped ones. */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.mkt .cform .ctl:focus-visible,
+.bk-input:focus-visible,
+.au-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

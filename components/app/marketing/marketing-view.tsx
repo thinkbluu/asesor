@@ -146,8 +146,8 @@ function CampaignWizard({
             <div key={s} className="flex items-center gap-2 flex-1">
               <div className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold border",
-                i < step ? "bg-accent text-accent-foreground border-accent" :
-                i === step ? "border-accent text-accent" :
+                i < step ? "bg-primary text-accent-foreground border-primary" :
+                i === step ? "border-primary text-primary" :
                 "border-border text-muted-foreground"
               )}>
                 {i < step ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
@@ -170,12 +170,12 @@ function CampaignWizard({
                     onClick={() => setType(t)}
                     className={cn(
                       "flex flex-col items-center gap-3 rounded-xl border-2 p-6 transition-all",
-                      type === t ? "border-accent bg-accent/5" : "border-border hover:border-accent/50"
+                      type === t ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
                     )}
                   >
                     {t === "SMS"
-                      ? <MessageSquare className="h-8 w-8 text-accent" />
-                      : <Mail className="h-8 w-8 text-accent" />}
+                      ? <MessageSquare className="h-8 w-8 text-primary" />
+                      : <Mail className="h-8 w-8 text-primary" />}
                     <span className="font-semibold">{t}</span>
                     <span className="text-xs text-muted-foreground text-center">
                       {t === "SMS" ? "Mesaj direct pe telefon. Rată deschidere 90%+" : "Template bogat cu imagini. Ideal pentru newsletter."}
@@ -197,7 +197,7 @@ function CampaignWizard({
                     onClick={() => { setAudience(seg.id); setCustomFilters(seg.id === "custom") }}
                     className={cn(
                       "w-full flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition-all",
-                      audience === seg.id ? "border-accent bg-accent/5" : "border-border hover:border-accent/40"
+                      audience === seg.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                     )}
                   >
                     <span>{seg.label}</span>
@@ -255,9 +255,9 @@ function CampaignWizard({
                 </div>
               )}
               {audienceObj && segmentCount(audienceObj.id) !== null && (
-                <div className="flex items-center gap-2 rounded-lg bg-accent/10 px-4 py-2 text-sm">
-                  <Users className="h-4 w-4 text-accent" />
-                  <span className="font-medium text-accent">Audiență estimată: {segmentCount(audienceObj.id)} clienți</span>
+                <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="font-medium text-primary">Audiență estimată: {segmentCount(audienceObj.id)} clienți</span>
                 </div>
               )}
             </div>
@@ -271,7 +271,7 @@ function CampaignWizard({
                   <div className="flex gap-1 flex-wrap">
                     {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
-                        className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
+                        className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-primary/10 hover:border-primary transition-colors">
                         {v}
                       </button>
                     ))}
@@ -308,7 +308,7 @@ function CampaignWizard({
                       {EMAIL_TEMPLATES.map(t => (
                         <button key={t.id} onClick={() => setTemplate(t.id)}
                           className={cn("rounded-lg border px-3 py-2 text-sm transition-all",
-                            template === t.id ? "border-accent bg-accent/5 text-accent" : "border-border hover:border-accent/40"
+                            template === t.id ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/40"
                           )}>
                           {t.label}
                         </button>
@@ -322,7 +322,7 @@ function CampaignWizard({
                   <div className="flex gap-1 flex-wrap">
                     {["{{nume_client}}", "{{salon}}", "{{link_programare}}", "{{data}}", "{{serviciu}}", "{{puncte_loialitate}}"].map(v => (
                       <button key={v} onClick={() => insertVar(v)}
-                        className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
+                        className="rounded border bg-muted px-2 py-1 text-xs font-mono hover:bg-primary/10 hover:border-primary transition-colors">
                         {v}
                       </button>
                     ))}
@@ -345,7 +345,7 @@ function CampaignWizard({
                 {(["now", "later"] as const).map(m => (
                   <button key={m} onClick={() => setScheduleMode(m)}
                     className={cn("rounded-xl border-2 p-4 text-sm transition-all text-center",
-                      scheduleMode === m ? "border-accent bg-accent/5" : "border-border hover:border-accent/40"
+                      scheduleMode === m ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
                     )}>
                     <div className="font-semibold">{m === "now" ? "Trimite acum" : "Programează"}</div>
                     <div className="text-xs text-muted-foreground mt-1">{m === "now" ? "Mesajele pleacă imediat" : "Alegi data și ora"}</div>
@@ -395,13 +395,13 @@ function CampaignWizard({
             <Button
               onClick={() => setStep(s => s + 1)}
               disabled={step === 0 && !type}
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Continuă <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <Button
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
               disabled
               title="Trimiterea campaniilor vine în curând."
             >
@@ -447,7 +447,7 @@ function AutomationModal({
             <div className="flex gap-1 flex-wrap mb-2">
               {["{{nume_client}}", "{{salon}}", "{{data}}", "{{ora}}", "{{serviciu}}", "{{link_programare}}", "{{link_review}}", "{{puncte_loialitate}}"].map(v => (
                 <button key={v} onClick={() => setTemplate(t => t + v)}
-                  className="rounded border bg-muted px-2 py-0.5 text-xs font-mono hover:bg-accent/10 hover:border-accent transition-colors">
+                  className="rounded border bg-muted px-2 py-0.5 text-xs font-mono hover:bg-primary/10 hover:border-primary transition-colors">
                   {v}
                 </button>
               ))}
@@ -465,7 +465,7 @@ function AutomationModal({
               <p className="text-xs text-muted-foreground">Trimise</p>
             </div>
             <div className="text-center rounded-lg border p-3">
-              <p className="text-lg font-bold text-accent">{automation.openRate}%</p>
+              <p className="text-lg font-bold text-primary">{automation.openRate}%</p>
               <p className="text-xs text-muted-foreground">Deschidere</p>
             </div>
             <div className="text-center rounded-lg border p-3">
@@ -476,7 +476,7 @@ function AutomationModal({
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Anulează</Button>
-          <Button className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={onClose}>Salvează</Button>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={onClose}>Salvează</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -541,7 +541,7 @@ function PromotionModal({ open, onClose }: { open: boolean; onClose: () => void 
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>Anulează</Button>
-          <Button className="bg-accent text-accent-foreground hover:bg-accent/90" onClick={onClose}>
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={onClose}>
             <Tag className="mr-2 h-4 w-4" />Creează codul
           </Button>
         </div>
@@ -550,7 +550,7 @@ function PromotionModal({ open, onClose }: { open: boolean; onClose: () => void 
   )
 }
 
-// ── Main Page ───────────────────���───────────────────────────────────────────────
+// ── Main Page ───────────────────âââ───────────────────────────────────────────────
 
 export default function MarketingView({
   segments,
@@ -584,7 +584,7 @@ export default function MarketingView({
           <h1 className="text-xl font-semibold sm:text-2xl">Marketing</h1>
           <p className="text-muted-foreground text-sm">Campanii, automatizări, promoții</p>
         </div>
-        <Button className="bg-accent text-accent-foreground hover:bg-accent/90 w-full sm:w-auto" onClick={() => setWizardOpen(true)}>
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto" onClick={() => setWizardOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />Campanie nouă
         </Button>
       </div>
@@ -702,7 +702,7 @@ export default function MarketingView({
                         </div>
                       ) : <span className="text-muted-foreground">—</span>}
                     </td>
-                    <td className="px-4 py-3 hidden lg:table-cell font-medium text-accent">{c.conversions > 0 ? c.conversions : "—"}</td>
+                    <td className="px-4 py-3 hidden lg:table-cell font-medium text-primary">{c.conversions > 0 ? c.conversions : "—"}</td>
                     <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground text-xs">{c.revenue > 0 ? formatRON(c.revenue) : "—"}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
@@ -740,9 +740,9 @@ export default function MarketingView({
                   <div className="flex items-start gap-3 flex-1 min-w-0">
                     <div className={cn(
                       "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                      a.enabled ? "bg-accent/10" : "bg-muted"
+                      a.enabled ? "bg-primary/10" : "bg-muted"
                     )}>
-                      <Zap className={cn("h-4 w-4", a.enabled ? "text-accent" : "text-muted-foreground")} />
+                      <Zap className={cn("h-4 w-4", a.enabled ? "text-primary" : "text-muted-foreground")} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -772,7 +772,7 @@ export default function MarketingView({
                       <p className="text-xs text-muted-foreground">Trimise</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm font-bold text-accent">{a.openRate}%</p>
+                      <p className="text-sm font-bold text-primary">{a.openRate}%</p>
                       <p className="text-xs text-muted-foreground">Deschidere</p>
                     </div>
                     <div className="text-center">
@@ -790,7 +790,7 @@ export default function MarketingView({
         <TabsContent value="promotii" className="space-y-4">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm text-muted-foreground">{PROMOTIONS.filter(p => p.active).length} coduri active</p>
-            <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 shrink-0" onClick={() => setPromoOpen(true)}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0" onClick={() => setPromoOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />Cod nou
             </Button>
           </div>
@@ -824,7 +824,7 @@ export default function MarketingView({
                         <Progress value={(p.usedCount / p.maxUses) * 100} className="h-1 w-20" />
                       </div>
                     </td>
-                    <td className="px-4 py-3 hidden lg:table-cell text-accent font-medium">
+                    <td className="px-4 py-3 hidden lg:table-cell text-primary font-medium">
                       {p.revenue > 0 ? formatRON(p.revenue) : "—"}
                     </td>
                     <td className="px-4 py-3">
