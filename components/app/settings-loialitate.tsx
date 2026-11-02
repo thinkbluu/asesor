@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,25 +16,25 @@ import {
   type RedemptionTier,
   type LoyaltyReward,
 } from "@/lib/loyalty"
+import { saveSetariLoyaltyAction } from "@/app/app/setari/actions"
 
 interface Props {
-  onDirty: () => void
+  initialConfig: LoyaltyConfig
 }
 
 let tierCounter = 100
 let rewardCounter = 100
 
-export function SettingsLoialitate({ onDirty }: Props) {
-  const [cfg, setCfg] = useState<LoyaltyConfig>(DEFAULT_LOYALTY_CONFIG)
+export function SettingsLoialitate({ initialConfig }: Props) {
+  const [cfg, setCfg] = useState<LoyaltyConfig>(initialConfig)
+  const [saving, setSaving] = useState(false)
 
   function patch<K extends keyof LoyaltyConfig>(key: K, value: LoyaltyConfig[K]) {
     setCfg(prev => ({ ...prev, [key]: value }))
-    onDirty()
   }
 
   function patchBonus<K extends keyof LoyaltyConfig["bonus"]>(key: K, value: LoyaltyConfig["bonus"][K]) {
     setCfg(prev => ({ ...prev, bonus: { ...prev.bonus, [key]: value } }))
-    onDirty()
   }
 
   function patchTier(id: string, patch: Partial<RedemptionTier>) {
@@ -41,7 +42,6 @@ export function SettingsLoialitate({ onDirty }: Props) {
       ...prev,
       tiers: prev.tiers.map(t => (t.id === id ? { ...t, ...patch } : t)),
     }))
-    onDirty()
   }
 
   function addTier() {
@@ -52,12 +52,10 @@ export function SettingsLoialitate({ onDirty }: Props) {
       label: "Nou tier",
     }
     setCfg(prev => ({ ...prev, tiers: [...prev.tiers, next] }))
-    onDirty()
   }
 
   function removeTier(id: string) {
     setCfg(prev => ({ ...prev, tiers: prev.tiers.filter(t => t.id !== id) }))
-    onDirty()
   }
 
   function patchReward(id: string, patch: Partial<LoyaltyReward>) {
@@ -65,7 +63,6 @@ export function SettingsLoialitate({ onDirty }: Props) {
       ...prev,
       rewards: prev.rewards.map(r => (r.id === id ? { ...r, ...patch } : r)),
     }))
-    onDirty()
   }
 
   function addReward() {
@@ -77,12 +74,27 @@ export function SettingsLoialitate({ onDirty }: Props) {
       active: true,
     }
     setCfg(prev => ({ ...prev, rewards: [...prev.rewards, next] }))
-    onDirty()
   }
 
   function removeReward(id: string) {
     setCfg(prev => ({ ...prev, rewards: prev.rewards.filter(r => r.id !== id) }))
-    onDirty()
+  }
+
+  async function handleSave() {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await saveSetariLoyaltyAction(cfg)
+      if (res.ok) {
+        toast.success("Configurația de loialitate a fost salvată.")
+      } else {
+        toast.error(res.error)
+      }
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -91,9 +103,9 @@ export function SettingsLoialitate({ onDirty }: Props) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Award className="h-4 w-4 text-emerald-600" />
+            <Award className="h-4 w-4 text-primary" />
             Program de loialitate
-            {cfg.enabled && <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30">Activ</Badge>}
+            {cfg.enabled && <Badge className="bg-primary/10 text-primary border-primary/30">Activ</Badge>}
           </CardTitle>
           <CardDescription>
             Acordă puncte automat clienților pentru fiecare vizită și oferă-le recompense pentru fidelitate.
@@ -164,8 +176,8 @@ export function SettingsLoialitate({ onDirty }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Cake className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Cake className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Aniversare client</p>
@@ -212,8 +224,8 @@ export function SettingsLoialitate({ onDirty }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Users className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Users className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Bonus recomandare</p>
@@ -246,8 +258,8 @@ export function SettingsLoialitate({ onDirty }: Props) {
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
-                  <Sparkles className="h-4 w-4 text-emerald-600" />
+                <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                  <Sparkles className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Bonus primă vizită</p>
@@ -332,7 +344,7 @@ export function SettingsLoialitate({ onDirty }: Props) {
                 variant="ghost"
                 onClick={() => removeTier(tier.id)}
                 disabled={!cfg.enabled || cfg.tiers.length <= 1}
-                className="text-muted-foreground hover:text-red-500"
+                className="text-muted-foreground hover:text-[var(--err)]"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -401,7 +413,7 @@ export function SettingsLoialitate({ onDirty }: Props) {
                   variant="ghost"
                   onClick={() => removeReward(r.id)}
                   disabled={!cfg.enabled}
-                  className="text-muted-foreground hover:text-red-500"
+                  className="text-muted-foreground hover:text-[var(--err)]"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -417,6 +429,17 @@ export function SettingsLoialitate({ onDirty }: Props) {
           ))}
         </CardContent>
       </Card>
+
+      {/* Save */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          {saving ? "Se salvează…" : "Salvează configurația"}
+        </Button>
+      </div>
     </div>
   )
 }

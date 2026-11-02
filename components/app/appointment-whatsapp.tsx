@@ -51,7 +51,7 @@ function formatRelative(iso: string): string {
 }
 
 function DeliveryIcon({ status }: { status: WhatsAppMessage["status"] }) {
-  if (status === "failed") return <AlertCircle className="h-3 w-3 text-red-500" />
+  if (status === "failed") return <AlertCircle className="h-3 w-3 text-[var(--err)]" />
   if (status === "sent") return <Check className="h-3 w-3 text-muted-foreground" />
   if (status === "delivered") return <CheckCheck className="h-3 w-3 text-muted-foreground" />
   if (status === "read" || status === "replied") return <CheckCheck className="h-3 w-3 text-[#34B7F1]" />
@@ -123,13 +123,13 @@ export function AppointmentWhatsApp({
 
   return (
     <div className="space-y-3">
-      {/* Send button */}
+      {/* Send button — WhatsApp sending is not wired yet (P8+) */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             size="sm"
             className="w-full gap-2 bg-[#25D366] text-white hover:bg-[#1fb355]"
-            disabled={!e164}
+            disabled
           >
             <MessageCircle className="h-3.5 w-3.5" />
             Trimite pe WhatsApp
@@ -149,11 +149,16 @@ export function AppointmentWhatsApp({
       </DropdownMenu>
 
       {!e164 && (
-        <p className="flex items-center gap-1.5 text-xs text-amber-600">
+        <p className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
           <AlertCircle className="h-3.5 w-3.5" />
           Număr WhatsApp invalid — verifică profilul clientului
         </p>
       )}
+
+      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <AlertCircle className="h-3.5 w-3.5" />
+        Trimiterea WhatsApp — În curând
+      </p>
 
       {/* Message history preview */}
       <div>
@@ -218,8 +223,8 @@ export function AppointmentWhatsApp({
                   className={cn(
                     "flex items-center gap-2 rounded-lg border p-2.5 text-xs",
                     feedback.ok
-                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
-                      : "border-red-500/30 bg-red-500/10 text-red-600"
+                      ? "border-primary/30 bg-primary/10 text-primary"
+                      : "border-red-500/30 bg-red-500/10 text-[var(--err)]"
                   )}
                 >
                   {feedback.ok ? <Check className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}

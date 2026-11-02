@@ -34,13 +34,13 @@ export function OverviewTab() {
               <div
                 className={cn(
                   "h-10 w-10 rounded-full flex items-center justify-center",
-                  enabled ? "bg-emerald-500/15" : "bg-muted",
+                  enabled ? "bg-primary/10" : "bg-muted",
                 )}
               >
                 <div
                   className={cn(
                     "h-2.5 w-2.5 rounded-full",
-                    enabled ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground",
+                    enabled ? "bg-primary animate-pulse" : "bg-muted-foreground",
                   )}
                 />
               </div>
@@ -73,7 +73,7 @@ export function OverviewTab() {
                 variant={copied ? "default" : "outline"}
                 size="sm"
                 onClick={handleCopy}
-                className={cn("gap-1.5 shrink-0", copied && "bg-emerald-600 hover:bg-emerald-700")}
+                className={cn("gap-1.5 shrink-0", copied && "bg-primary hover:bg-primary-hover")}
               >
                 {copied ? (
                   <>

@@ -29,9 +29,9 @@ import {
 
 const STATUS_CONFIG: Record<WhatsAppChannelStatus, { label: string; cls: string }> = {
   disconnected: { label: "Neconectat", cls: "bg-muted text-muted-foreground border-border" },
-  pending: { label: "În verificare", cls: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
-  connected: { label: "Conectat", cls: "bg-emerald-500/15 text-emerald-600 border-emerald-500/30" },
-  error: { label: "Eroare", cls: "bg-red-500/15 text-red-500 border-red-500/30" },
+  pending: { label: "În verificare", cls: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30" },
+  connected: { label: "Conectat", cls: "bg-primary/10 text-primary border-primary/30" },
+  error: { label: "Eroare", cls: "bg-red-500/15 text-[var(--err)] border-red-500/30" },
 }
 
 const SAMPLE_VARS: Record<string, string> = {
@@ -50,6 +50,10 @@ const SAMPLE_VARS: Record<string, string> = {
 interface Props {
   onDirty?: () => void
 }
+
+// Integrarea WhatsApp Business API nu este activă încă — tabul rămâne
+// consultativ (note „în curând”, conectare dezactivată) până la P5+.
+const COMING_SOON = true
 
 export function SettingsWhatsApp({ onDirty }: Props) {
   // Connection state
@@ -147,12 +151,23 @@ export function SettingsWhatsApp({ onDirty }: Props) {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
+          {COMING_SOON && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-800 dark:text-amber-400">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                <strong className="font-medium">În curând.</strong> Integrarea WhatsApp Business
+                nu este încă activă — poți consulta șabloanele, dar conectarea rămâne dezactivată.
+              </span>
+            </div>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Număr WhatsApp Business</Label>
               <Input
                 placeholder="+40 722 123 456"
                 value={phoneNumber}
+                disabled={COMING_SOON}
                 onChange={(e) => { setPhoneNumber(e.target.value); markDirty() }}
               />
               <p className="text-xs text-muted-foreground">
@@ -164,6 +179,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
               <Input
                 placeholder="1234567890"
                 value={phoneNumberId}
+                disabled={COMING_SOON}
                 onChange={(e) => { setPhoneNumberId(e.target.value); markDirty() }}
               />
               <p className="text-xs text-muted-foreground">Din Meta → WhatsApp → API Setup</p>
@@ -175,12 +191,13 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             <Input
               placeholder="987654321"
               value={wabaId}
+              disabled={COMING_SOON}
               onChange={(e) => { setWabaId(e.target.value); markDirty() }}
             />
           </div>
 
           {verifyError && (
-            <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-sm text-red-600">
+            <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 p-3 text-sm text-[var(--err)]">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{verifyError}</span>
             </div>
@@ -190,7 +207,7 @@ export function SettingsWhatsApp({ onDirty }: Props) {
             {status !== "connected" ? (
               <Button
                 onClick={handleVerify}
-                disabled={verifying || !phoneNumberId}
+                disabled={COMING_SOON || verifying || !phoneNumberId}
                 className="bg-[#25D366] text-white hover:bg-[#1fb355]"
               >
                 {verifying ? (
@@ -280,8 +297,8 @@ export function SettingsWhatsApp({ onDirty }: Props) {
                     variant="outline"
                     className={cn(
                       "text-xs",
-                      t.status === "approved" && "bg-emerald-500/10 text-emerald-600 border-emerald-500/30",
-                      t.status === "pending" && "bg-amber-500/10 text-amber-600 border-amber-500/30",
+                      t.status === "approved" && "bg-primary/10 text-primary border-primary/30",
+                      t.status === "pending" && "bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-500/30",
                       t.status === "draft" && "bg-muted text-muted-foreground"
                     )}
                   >

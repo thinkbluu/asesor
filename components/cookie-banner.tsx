@@ -53,6 +53,11 @@ export function CookieBanner() {
     } catch {
       // If localStorage is inaccessible, do not show banner (graceful degradation)
     }
+
+    // "Setări cookie-uri" footer link reopens the banner.
+    const onOpenSettings = () => setVisible(true)
+    window.addEventListener("asesor:open-cookie-settings", onOpenSettings)
+    return () => window.removeEventListener("asesor:open-cookie-settings", onOpenSettings)
   }, [])
 
   if (!visible) return null
@@ -82,13 +87,13 @@ export function CookieBanner() {
       >
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:py-5 lg:px-8">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-              <Cookie className="h-5 w-5 text-accent" aria-hidden="true" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Cookie className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">
               Folosim cookies pentru autentificare (strict necesare) și pentru a înțelege cum e folosit ASESOR
               (analytics). Poți alege ce accepți. Vezi{" "}
-              <Link href="/cookies" className="font-medium text-foreground underline underline-offset-4 hover:text-accent">
+              <Link href="/cookies" className="font-medium text-foreground underline underline-offset-4 hover:text-primary">
                 Politica Cookies
               </Link>
               .
@@ -114,7 +119,7 @@ export function CookieBanner() {
             <Button
               size="sm"
               onClick={handleAcceptAll}
-              className="bg-accent text-accent-foreground hover:bg-accent/90 sm:order-3"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 sm:order-3"
             >
               Acceptă tot
             </Button>
@@ -191,7 +196,7 @@ export function CookieBanner() {
             </Button>
             <Button
               onClick={handleSaveSettings}
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Salvează preferințele
             </Button>

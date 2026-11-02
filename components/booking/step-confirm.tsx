@@ -2,166 +2,144 @@
 
 import { useMemo, useState } from "react"
 import {
-  Calendar,
-  Clock,
-  User,
-  Scissors,
-  FileText,
   AlertCircle,
   CheckCircle2,
   CalendarPlus,
   Copy,
-  Phone,
-  MapPin,
   Check,
+  Link2,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { getFullName, type StaffMember } from "@/lib/echipa-data"
+import type { SalonInfo, BookingService } from "@/lib/booking-logic"
 import {
-  getServiceByName,
   formatPriceRON,
   formatDurationMin,
   formatDateLong,
-  generateConfirmationNumber,
   generateICS,
-  type SalonInfo,
 } from "@/lib/booking-logic"
 import type { BookingState } from "./booking-flow"
 
-const STAFF_DATA: StaffMember[] = []
+type SubmitResult =
+  | { ok: false; code: string; message: string }
+  | null
 
 function Review({
   salon,
   state,
-  update,
+  services,
+  staffName,
+  onSubmit,
 }: {
   salon: SalonInfo
   state: BookingState
-  update: (patch: Partial<BookingState>) => void
+  services: BookingService[]
+  staffName: string | null
+  onSubmit: () => Promise<SubmitResult>
 }) {
   const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const services = useMemo(
+  const selectedServices = useMemo(
     () =>
-      state.serviceNames
-        .map((name) => getServiceByName(name))
-        .filter((s): s is NonNullable<ReturnType<typeof getServiceByName>> => !!s),
-    [state.serviceNames],
+      state.serviceIds
+        .map((id) => services.find((s) => s.id === id))
+        .filter((s): s is BookingService => !!s),
+    [state.serviceIds, services],
   )
 
   const totals = useMemo(() => {
     let d = 0
     let p = 0
-    for (const s of services) {
-      d += s.duration
+    for (const s of selectedServices) {
+      d += s.durationMin
       p += s.price
     }
     return { duration: d, price: p }
-  }, [services])
-
-  const staff = useMemo(() => {
-    if (!state.staffId) return null
-    return STAFF_DATA.find((s) => s.id === state.staffId) ?? null
-  }, [state.staffId])
+  }, [selectedServices])
 
   const confirmBooking = async () => {
     setSubmitting(true)
-    // Simulated persistence — in a real app, POST to /api/bookings
-    await new Promise((r) => setTimeout(r, 600))
-    update({ confirmationNumber: generateConfirmationNumber() })
-    setSubmitting(false)
+    setError(null)
+    const res = await onSubmit()
+    if (res && !res.ok) {
+      setError(res.message)
+      setSubmitting(false)
+      return
+    }
+    // On success the flow swaps to the Success screen; keep submitting state
+    // until then to avoid a double submit.
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-zinc-600 md:text-base">
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <p className="bk-lede" style={{ marginTop: 0 }}>
         Verifică detaliile programării înainte de a confirma.
       </p>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-        <div className="border-b border-zinc-100 bg-zinc-50 px-5 py-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Sumar programare
+      {error && (
+        <div role="alert" className="bk-alert err">
+          {error}
+        </div>
+      )}
+
+      <div className="bk-card">
+        <div className="bk-row">
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <CheckCircle2 style={{ width: 14, height: 14, color: "var(--ink-2)" }} aria-hidden="true" />
+            <span className="bk-rlabel">Sumar programare</span>
           </div>
         </div>
 
-        <dl className="divide-y divide-zinc-100">
-          <SummaryRow icon={Calendar} label="Data">
-            <span className="capitalize">{state.date ? formatDateLong(state.date) : "—"}</span>
+        <dl>
+          <SummaryRow label="Data">
+            <span style={{ textTransform: "capitalize" }}>
+              {state.date ? formatDateLong(state.date) : "—"}
+            </span>
           </SummaryRow>
-          <SummaryRow icon={Clock} label="Ora">
+          <SummaryRow label="Ora">
             {state.time ?? "—"} · {formatDurationMin(totals.duration)}
           </SummaryRow>
-          <SummaryRow icon={User} label="Specialist">
-            {staff ? getFullName(staff) : "Fără preferință (alegem noi)"}
+          <SummaryRow label="Specialist">
+            {staffName ?? "Oricine e disponibil (alegem noi)"}
           </SummaryRow>
-          <SummaryRow icon={Scissors} label="Servicii">
-            <ul className="space-y-1.5">
-              {services.map((s) => (
-                <li key={s.name} className="flex items-center justify-between gap-3">
-                  <span className="text-zinc-700">{s.name}</span>
-                  <span className="shrink-0 font-medium text-zinc-900">
-                    {formatPriceRON(s.price)}
-                  </span>
+
+          <SummaryRow label="Servicii">
+            <ul style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {selectedServices.map((s) => (
+                <li key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                  <span style={{ color: "var(--ink-2)" }}>{s.name}</span>
+                  <span style={{ flex: "none", fontWeight: 500 }}>{formatPriceRON(s.price)}</span>
                 </li>
               ))}
             </ul>
           </SummaryRow>
           {state.client.notes.trim() && (
-            <SummaryRow icon={FileText} label="Mențiuni">
-              <span className="whitespace-pre-line text-zinc-700">{state.client.notes}</span>
+            <SummaryRow label="Mențiuni">
+              <span style={{ whiteSpace: "pre-line" }}>{state.client.notes}</span>
             </SummaryRow>
           )}
         </dl>
 
-        <div className="flex items-center justify-between border-t border-zinc-100 bg-emerald-50 px-5 py-4">
-          <div className="text-sm font-medium text-emerald-900">Total de plată</div>
-          <div className="text-2xl font-bold text-emerald-700">{formatPriceRON(totals.price)}</div>
+        <div className="bk-total">
+          <span className="bk-rlabel" style={{ fontSize: 12.5 }}>Total de plată</span>
+          <b>{formatPriceRON(totals.price)}</b>
         </div>
       </div>
 
       {/* Cancellation policy */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <div className="flex items-start gap-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
-          <div className="flex-1">
-            <div className="text-sm font-semibold text-amber-900">Politică de anulare</div>
-            <p className="mt-1 text-sm text-amber-900/90">{salon.cancellationPolicy}</p>
-          </div>
-        </div>
+      <div className="bk-alert" style={{ display: "flex", gap: 9 }}>
+        <AlertCircle style={{ width: 15, height: 15, flex: "none", marginTop: 2 }} aria-hidden="true" />
+        <span>{salon.cancellationPolicy}</span>
       </div>
 
-      <Button
-        size="lg"
+      <button
+        type="button"
         disabled={submitting}
         onClick={confirmBooking}
-        className="h-14 w-full bg-emerald-600 text-base font-semibold text-white hover:bg-emerald-700 disabled:bg-emerald-600/60"
+        className="bk-btn"
+        style={{ width: "100%" }}
       >
-        {submitting ? "Se procesează..." : "Confirmă programarea"}
-      </Button>
-    </div>
-  )
-}
-
-function SummaryRow({
-  icon: Icon,
-  label,
-  children,
-}: {
-  icon: typeof Calendar
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex items-start gap-4 px-5 py-4">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
-        <Icon className="h-4 w-4" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</dt>
-        <dd className="mt-1 text-sm text-zinc-900">{children}</dd>
-      </div>
+        {submitting ? "Se trimite..." : "Confirmă programarea"}
+      </button>
     </div>
   )
 }
@@ -176,177 +154,163 @@ function Success({
   onReset: () => void
 }) {
   const [copied, setCopied] = useState(false)
-  const services = state.serviceNames
-    .map((name) => getServiceByName(name))
-    .filter((s): s is NonNullable<ReturnType<typeof getServiceByName>> => !!s)
-  const totalDuration = services.reduce((sum, s) => sum + s.duration, 0)
-  const totalPrice = services.reduce((sum, s) => sum + s.price, 0)
-  const staff = state.staffId ? STAFF_DATA.find((s) => s.id === state.staffId) : null
+  const result = state.result!
+  const date = result.startsAt.slice(0, 10)
+  const time = result.startsAt.slice(11, 16)
 
   const icsHref = useMemo(() => {
-    if (!state.date || !state.time) return "#"
     const ics = generateICS({
-      title: `Programare ${salon.name}`,
-      description: `Servicii: ${services.map((s) => s.name).join(", ")}\nSpecialist: ${staff ? getFullName(staff) : "Fără preferință"}\nCod confirmare: ${state.confirmationNumber}`,
-      location: salon.address,
-      date: state.date,
-      time: state.time,
-      durationMin: totalDuration,
+      title: `${salon.name} — programare`,
+      description: `Cod confirmare: ${result.code}. Servicii: ${result.services.map((s) => s.name).join(", ")}.`,
+      location: `${salon.name}, ${salon.address}`,
+      date,
+      time,
+      durationMin: result.durationMin,
     })
     return `data:text/calendar;charset=utf-8,${encodeURIComponent(ics)}`
-  }, [state, salon, services, staff, totalDuration])
+  }, [salon, result, date, time])
 
   const copyConfirmation = async () => {
-    if (!state.confirmationNumber) return
     try {
-      await navigator.clipboard.writeText(state.confirmationNumber)
+      await navigator.clipboard.writeText(result.code)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch {}
+    } catch {
+      // clipboard unavailable — non-critical
+    }
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-lg font-semibold text-white">
-            {salon.name
-              .split(" ")
-              .map((w) => w[0])
-              .slice(0, 2)
-              .join("")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-base font-semibold text-zinc-900 md:text-lg">
-              {salon.name}
-            </div>
-            <div className="truncate text-xs text-zinc-500 md:text-sm">{salon.address}</div>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 md:py-12">
+    <main className="bk-main" style={{ paddingBottom: 40 }}>
         {/* Hero confirmation */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <CheckCircle2 className="h-8 w-8 text-emerald-600" strokeWidth={2.5} />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
-            Programare confirmată!
+        <div style={{ textAlign: "center", marginBottom: 26 }}>
+          <span
+            style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              width: 56, height: 56, borderRadius: "50%", marginBottom: 14,
+              background: "var(--acc)", color: "var(--acc-ink)",
+            }}
+          >
+            <CheckCircle2 style={{ width: 26, height: 26 }} strokeWidth={2.5} aria-hidden="true" />
+          </span>
+          <h1 className="bk-title">
+            {result.status === "in_asteptare"
+              ? "Programare trimisă spre confirmare!"
+              : "Programare confirmată!"}
           </h1>
-          <p className="mt-2 text-base text-zinc-600">
-            Te așteptăm la {salon.name}. Toate detaliile sunt mai jos.
+          <p className="bk-lede">
+            {result.status === "in_asteptare"
+              ? `${salon.name} va confirma programarea în cel mai scurt timp.`
+              : `Te așteptăm la ${salon.name}. Toate detaliile sunt mai jos.`}
           </p>
         </div>
 
         {/* Confirmation code */}
-        <div className="mb-6 flex flex-col items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 sm:flex-row sm:justify-between">
+        <div className="bk-card" style={{ display: "flex", flexDirection: "column", gap: 10, padding: "14px 16px", marginBottom: 14 }}>
           <div>
-            <div className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-              Cod confirmare
-            </div>
-            <div className="mt-0.5 font-mono text-lg font-semibold text-zinc-900">
-              {state.confirmationNumber}
+            <div className="bk-rlabel">Cod confirmare</div>
+            <div className="bk-rval" style={{ fontFamily: "var(--mono)", fontSize: 17, fontWeight: 500 }}>
+              {result.code}
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyConfirmation}
-            className="border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-100"
-          >
+          <button type="button" onClick={copyConfirmation} className="bk-btn2" style={{ alignSelf: "flex-start" }}>
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5" />
+                <Check style={{ width: 14, height: 14 }} aria-hidden="true" />
                 Copiat
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" />
+                <Copy style={{ width: 14, height: 14 }} aria-hidden="true" />
                 Copiază
               </>
             )}
-          </Button>
+          </button>
         </div>
 
         {/* Summary */}
-        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <dl className="divide-y divide-zinc-100">
-            <SummaryRow icon={Calendar} label="Data">
-              <span className="capitalize">{state.date ? formatDateLong(state.date) : "—"}</span>
+        <div className="bk-card">
+          <dl>
+            <SummaryRow label="Data">
+              <span style={{ textTransform: "capitalize" }}>{formatDateLong(date)}</span>
             </SummaryRow>
-            <SummaryRow icon={Clock} label="Ora">
-              {state.time} · {formatDurationMin(totalDuration)}
+            <SummaryRow label="Ora">
+              {time} · {formatDurationMin(result.durationMin)}
             </SummaryRow>
-            <SummaryRow icon={User} label="Specialist">
-              {staff ? getFullName(staff) : "Fără preferință"}
+            <SummaryRow label="Specialist">
+              {result.staffFirstName || "Oricine e disponibil"}
             </SummaryRow>
-            <SummaryRow icon={Scissors} label="Servicii">
-              <ul className="space-y-1">
-                {services.map((s) => (
-                  <li key={s.name} className="flex items-center justify-between gap-3">
-                    <span className="text-zinc-700">{s.name}</span>
-                    <span className="shrink-0 font-medium text-zinc-900">
-                      {formatPriceRON(s.price)}
-                    </span>
+            <SummaryRow label="Servicii">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {result.services.map((s) => (
+                  <li key={s.name} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                    <span style={{ color: "var(--ink-2)" }}>{s.name}</span>
+                    <span style={{ flex: "none", fontWeight: 500 }}>{formatPriceRON(s.price)}</span>
                   </li>
                 ))}
               </ul>
             </SummaryRow>
-            <SummaryRow icon={MapPin} label="Locație">
+            <SummaryRow label="Locație">
               {salon.address}
             </SummaryRow>
-            <SummaryRow icon={Phone} label="Contact salon">
-              <a
-                href={`tel:${salon.phone.replace(/\s/g, "")}`}
-                className="font-medium text-emerald-700 hover:text-emerald-800"
-              >
+            <SummaryRow label="Contact salon">
+              <a href={`tel:${salon.phone.replace(/\s/g, "")}`} className="bk-link">
                 {salon.phone}
               </a>
             </SummaryRow>
           </dl>
 
-          <div className="flex items-center justify-between border-t border-zinc-100 bg-emerald-50 px-5 py-4">
-            <div className="text-sm font-medium text-emerald-900">Total</div>
-            <div className="text-2xl font-bold text-emerald-700">{formatPriceRON(totalPrice)}</div>
+          <div className="bk-total">
+            <span className="bk-rlabel" style={{ fontSize: 12.5 }}>Total</span>
+            <b>{formatPriceRON(result.totalPrice)}</b>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
           <a
             href={icsHref}
-            download={`programare-${state.confirmationNumber}.ics`}
-            className="flex h-12 items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-50"
+            download={`programare-${result.code}.ics`}
+            className="bk-btn2"
+            style={{ textDecoration: "none" }}
           >
-            <CalendarPlus className="h-4 w-4" />
+            <CalendarPlus style={{ width: 15, height: 15 }} aria-hidden="true" />
             Adaugă în calendar
           </a>
-          <Button
-            onClick={onReset}
-            className="h-12 bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
-          >
-            Programează din nou
-          </Button>
+          <a href={result.managePath} className="bk-btn" style={{ textDecoration: "none" }}>
+            <Link2 style={{ width: 15, height: 15 }} aria-hidden="true" />
+            Gestionează programarea
+          </a>
         </div>
 
-        <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-          <p>
-            Vrei să modifici sau să anulezi programarea? Sună la{" "}
-            <a
-              href={`tel:${salon.phone.replace(/\s/g, "")}`}
-              className="font-medium text-emerald-700 hover:text-emerald-800"
-            >
-              {salon.phone}
-            </a>{" "}
-            cu minim 4 ore înainte de ora programată.
-          </p>
+        <div className="bk-alert" style={{ marginTop: 18 }}>
+          Vrei să modifici sau să anulezi programarea? Folosește linkul de mai sus sau sună la{" "}
+          <a href={`tel:${salon.phone.replace(/\s/g, "")}`} className="bk-link">
+            {salon.phone}
+          </a>
+          .
         </div>
-      </main>
 
-      <footer className="border-t border-zinc-200 px-4 py-4 text-center text-xs text-zinc-500">
-        Programare gestionată prin <span className="font-semibold text-zinc-700">ASESOR</span>
-      </footer>
+        <button type="button" onClick={onReset} className="bk-back" style={{ marginTop: 18 }}>
+          Programează-te din nou
+        </button>
+    </main>
+  )
+}
+
+function SummaryRow({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="bk-row">
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div className="bk-rlabel">{label}</div>
+        <div className="bk-rval">{children}</div>
+      </div>
     </div>
   )
 }

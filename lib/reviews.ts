@@ -1,3 +1,6 @@
+// Pure reviews/feedback helpers. No I/O — the real numbers come from
+// feedback_requests via lib/data/feedback.ts.
+
 export interface ReviewsConfig {
   enabled: boolean
   googleBusinessUrl: string
@@ -9,54 +12,46 @@ export interface ReviewsConfig {
 
 export const DEFAULT_REVIEWS_CONFIG: ReviewsConfig = {
   enabled: true,
-  googleBusinessUrl: "https://g.page/r/CXxxxxxxxxxxxx/review",
+  googleBusinessUrl: "",
   googlePlaceId: "",
   hoursAfterAppointment: 24,
   minStarsForGoogle: 4,
   channel: "whatsapp",
 }
 
-export interface GoogleReview {
-  id: string
-  author: string
-  rating: 1 | 2 | 3 | 4 | 5
-  text: string
-  date: string
-  responded: boolean
-}
-
-export interface InternalFeedback {
-  id: string
-  clientId: string
-  appointmentId: string
-  rating: 1 | 2 | 3
-  text: string
-  date: string
-  resolved: boolean
-}
-
 export interface ReviewsStats {
   total: number
   averageRating: number
   distribution: Record<1 | 2 | 3 | 4 | 5, number>
-  unresponded: number
+  recentComments: { rating: number; text: string; date: string }[]
 }
 
-export function getReviewsStats(reviews: GoogleReview[] = []): ReviewsStats {
-  const total = reviews.length
+export interface FeedbackStatRow {
+  rating: number
+  comment: string | null
+  answered_at: string | null
+  created_at: string
+}
+
+export function computeReviewsStats(rows: FeedbackStatRow[]): ReviewsStats {
+  const answered = rows.filter((r) => r.answered_at !== null && r.rating !== null)
   const distribution: ReviewsStats["distribution"] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
   let sum = 0
-  let unresponded = 0
-  for (const review of reviews) {
-    distribution[review.rating]++
-    sum += review.rating
-    if (!review.responded) unresponded++
+  for (const row of answered) {
+    const rating = row.rating as 1 | 2 | 3 | 4 | 5
+    distribution[rating]++
+    sum += rating
   }
+  const recentComments = answered
+    .filter((r) => r.comment !== null && r.comment.trim() !== "")
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .slice(0, 5)
+    .map((r) => ({ rating: r.rating, text: r.comment as string, date: r.created_at }))
   return {
-    total,
-    averageRating: total === 0 ? 0 : sum / total,
+    total: answered.length,
+    averageRating: answered.length === 0 ? 0 : sum / answered.length,
     distribution,
-    unresponded,
+    recentComments,
   }
 }
 
@@ -65,29 +60,4 @@ export function shouldRouteToGoogle(
   config: ReviewsConfig = DEFAULT_REVIEWS_CONFIG,
 ): boolean {
   return rating >= config.minStarsForGoogle
-}
-
-export async function recordSatisfactionRating(params: {
-  appointmentId: string
-  rating: number
-}): Promise<{ ok: true }> {
-  void params
-  return { ok: true }
-}
-
-export async function submitInternalFeedback(params: {
-  appointmentId: string
-  clientId: string
-  rating: 1 | 2 | 3
-  text: string
-}): Promise<InternalFeedback> {
-  return {
-    id: `if_${Date.now()}`,
-    clientId: params.clientId,
-    appointmentId: params.appointmentId,
-    rating: params.rating,
-    text: params.text,
-    date: new Date().toISOString().slice(0, 10),
-    resolved: false,
-  }
 }

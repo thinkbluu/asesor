@@ -1,35 +1,100 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Star, ExternalLink, Clock, Shield, MessageSquare } from "lucide-react"
-import { DEFAULT_REVIEWS_CONFIG, type ReviewsConfig } from "@/lib/reviews"
+import { DEFAULT_REVIEWS_CONFIG, type ReviewsConfig, type ReviewsStats } from "@/lib/reviews"
 import { cn } from "@/lib/utils"
+import { saveSetariReviewsAction } from "@/app/app/setari/actions"
 
-export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
-  const [cfg, setCfg] = useState<ReviewsConfig>(DEFAULT_REVIEWS_CONFIG)
+export function SettingsReviews({
+  initialConfig,
+  stats,
+}: {
+  initialConfig: ReviewsConfig
+  stats: ReviewsStats
+}) {
+  const [cfg, setCfg] = useState<ReviewsConfig>(initialConfig)
+  const [saving, setSaving] = useState(false)
 
   function patch<K extends keyof ReviewsConfig>(key: K, value: ReviewsConfig[K]) {
     setCfg(prev => ({ ...prev, [key]: value }))
-    onDirty()
+  }
+
+  async function handleSave() {
+    if (saving) return
+    setSaving(true)
+    try {
+      const res = await saveSetariReviewsAction(cfg)
+      if (res.ok) {
+        toast.success("Configurația de recenzii a fost salvată.")
+      } else {
+        toast.error(res.error)
+      }
+    } catch {
+      toast.error("Conexiune eșuată. Încearcă din nou.")
+    } finally {
+      setSaving(false)
+    }
   }
 
   const isUrlValid = /^https?:\/\/.+/.test(cfg.googleBusinessUrl)
 
   return (
     <div className="max-w-3xl space-y-6">
+      {/* Real feedback received so far */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MessageSquare className="h-4 w-4 text-primary" />
+            Feedback primit
+          </CardTitle>
+          <CardDescription>
+            Răspunsurile reale din sondajele trimise clienților după programările finalizate.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {stats.total === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Încă nu ai primit feedback. Sondajele pleacă automat după fiecare programare încasată.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-bold">{stats.averageRating.toFixed(1)}</span>
+                <span className="text-sm text-muted-foreground">
+                  din {stats.total} {stats.total === 1 ? "răspuns" : "răspunsuri"}
+                </span>
+              </div>
+              {stats.recentComments.length > 0 && (
+                <ul className="space-y-2">
+                  {stats.recentComments.slice(0, 3).map((c, i) => (
+                    <li key={i} className="rounded-lg border bg-muted/30 p-3 text-xs">
+                      <span className="font-medium">{c.rating}★</span>{" "}
+                      <span className="text-muted-foreground">{c.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Master toggle */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Star className="h-4 w-4 text-emerald-600" />
+            <Star className="h-4 w-4 text-primary" />
             Automatizare recenzii Google
-            {cfg.enabled && <Badge className="bg-emerald-500/15 text-emerald-600 border-emerald-500/30">Activ</Badge>}
+            {cfg.enabled && <Badge className="bg-primary/10 text-primary border-primary/30">Activ</Badge>}
           </CardTitle>
           <CardDescription>
             Trimite automat clienților un sondaj de satisfacție după programare și direcționează
@@ -64,7 +129,7 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
             <p className="text-xs text-muted-foreground">
               Link-ul direct către pagina de recenzii. Îl găsești în Google Business Profile &rsaquo; Distribuie &rsaquo; Obține mai multe recenzii.
               {cfg.googleBusinessUrl && !isUrlValid && (
-                <span className="text-red-500 ml-1">URL invalid</span>
+                <span className="text-[var(--err)] ml-1">URL invalid</span>
               )}
             </p>
           </div>
@@ -126,8 +191,8 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
                 className={cn(
                   "rounded-full border px-3 py-1 text-xs transition-colors disabled:opacity-50",
                   cfg.hoursAfterAppointment === h
-                    ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                    : "border-border bg-background hover:border-emerald-500/40"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background hover:border-primary/40"
                 )}
               >
                 {h}h
@@ -191,7 +256,7 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
               <span className="text-muted-foreground">Client primește sondaj · 1-5 stele</span>
             </div>
             <div className="grid sm:grid-cols-2 gap-2">
-              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
                 <div className="flex items-center gap-1 mb-1">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -199,12 +264,12 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
                       className={cn(
                         "h-3 w-3",
                         i >= cfg.minStarsForGoogle - 1
-                          ? "fill-emerald-500 text-emerald-500"
+                          ? "fill-primary text-primary"
                           : "text-muted-foreground/40"
                       )}
                     />
                   ))}
-                  <span className="ml-1 text-[10px] font-semibold text-emerald-600">
+                  <span className="ml-1 text-[10px] font-semibold text-primary">
                     {cfg.minStarsForGoogle}+
                   </span>
                 </div>
@@ -218,7 +283,7 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
                   {Array.from({ length: cfg.minStarsForGoogle - 1 }).map((_, i) => (
                     <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
                   ))}
-                  <span className="ml-1 text-[10px] font-semibold text-amber-600">
+                  <span className="ml-1 text-[10px] font-semibold text-amber-700 dark:text-amber-400">
                     sub {cfg.minStarsForGoogle}
                   </span>
                 </div>
@@ -239,6 +304,17 @@ export function SettingsReviews({ onDirty }: { onDirty: () => void }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Save */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-accent text-accent-foreground hover:bg-accent/90"
+        >
+          {saving ? "Se salvează…" : "Salvează configurația"}
+        </Button>
+      </div>
     </div>
   )
 }

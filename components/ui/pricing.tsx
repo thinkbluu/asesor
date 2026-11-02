@@ -73,7 +73,7 @@ function Star({
   containerRef,
 }: {
   mousePosition: { x: number | null; y: number | null };
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [initialPos] = useState({
     top: `${Math.random() * 100}%`,
@@ -148,7 +148,7 @@ function InteractiveStarfield({
   containerRef,
 }: {
   mousePosition: { x: number | null; y: number | null };
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">

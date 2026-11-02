@@ -50,30 +50,30 @@ export function AppointmentLoyalty({
   if (!cfg.enabled) return null
 
   return (
-    <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3 space-y-3">
+    <div className="rounded-xl border border-primary/25 bg-primary/5 p-3 space-y-3">
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded bg-emerald-500/15">
-          <Award className="h-3.5 w-3.5 text-emerald-600" />
+        <div className="flex h-6 w-6 items-center justify-center rounded bg-primary/10">
+          <Award className="h-3.5 w-3.5 text-primary" />
         </div>
-        <span className="text-xs font-medium text-emerald-700 dark:text-emerald-500">
+        <span className="text-xs font-medium text-primary">
           Loialitate
         </span>
-        <Badge variant="outline" className="ml-auto text-[10px] px-1.5 py-0 h-4 border-emerald-500/40 text-emerald-600">
+        <Badge variant="outline" className="ml-auto text-[10px] px-1.5 py-0 h-4 border-primary/40 text-primary">
           {clientBalance} pct disponibile
         </Badge>
       </div>
 
       {/* Award preview */}
       {!isCompleted && (
-        <div className="rounded-lg bg-background/60 border border-emerald-500/20 p-2.5">
+        <div className="rounded-lg bg-background/60 border border-primary/20 p-2.5">
           <div className="flex items-center justify-between gap-2 text-xs">
             <span className="text-muted-foreground">La finalizare se vor acorda:</span>
-            <span className="font-semibold text-emerald-600 tabular-nums">
+            <span className="font-semibold text-primary tabular-nums">
               +{calc.total} pct
             </span>
           </div>
           {calc.reasons.length > 0 && (
-            <p className="text-[10px] text-emerald-700/80 mt-1">
+            <p className="text-[10px] text-primary/80 mt-1">
               Include: {calc.reasons.join(" · ")}
             </p>
           )}
@@ -99,8 +99,8 @@ export function AppointmentLoyalty({
                   onClick={() => setSelectedTierId(isSelected ? null : tier.id)}
                   className={cn(
                     "w-full flex items-center justify-between gap-2 rounded-lg border p-2 text-left transition-colors",
-                    isSelected && "border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/30",
-                    !isSelected && canAfford && "border-border bg-background hover:border-emerald-500/40 hover:bg-emerald-500/5",
+                    isSelected && "border-primary bg-primary/10 ring-1 ring-primary/30",
+                    !isSelected && canAfford && "border-border bg-background hover:border-primary/40 hover:bg-primary/5",
                     !canAfford && "border-border bg-muted/40 opacity-60 cursor-not-allowed"
                   )}
                 >
@@ -110,19 +110,19 @@ export function AppointmentLoyalty({
                       {tier.points} pct · -{tier.discountPercent}%
                     </p>
                   </div>
-                  {isSelected && <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />}
+                  {isSelected && <Check className="h-3.5 w-3.5 text-primary shrink-0" />}
                 </button>
               )
             })}
           </div>
 
           {selectedTier && (
-            <div className="rounded-lg bg-background border border-emerald-500/30 p-2.5 space-y-1 text-xs">
+            <div className="rounded-lg bg-background border border-primary/30 p-2.5 space-y-1 text-xs">
               <div className="flex justify-between text-muted-foreground">
                 <span>Total servicii</span>
                 <span className="tabular-nums">{totalPrice} Lei</span>
               </div>
-              <div className="flex justify-between text-emerald-600">
+              <div className="flex justify-between text-primary">
                 <span>Reducere ({selectedTier.discountPercent}%)</span>
                 <span className="tabular-nums">-{discountAmount} Lei</span>
               </div>
@@ -139,8 +139,8 @@ export function AppointmentLoyalty({
       )}
 
       {isCompleted && (
-        <div className="rounded-lg bg-background/60 border border-emerald-500/20 p-2.5 flex items-center gap-2">
-          <Check className="h-3.5 w-3.5 text-emerald-600" />
+        <div className="rounded-lg bg-background/60 border border-primary/20 p-2.5 flex items-center gap-2">
+          <Check className="h-3.5 w-3.5 text-primary" />
           <span className="text-xs">
             Programare finalizată — puncte acordate automat.
           </span>
