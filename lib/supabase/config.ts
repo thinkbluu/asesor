@@ -17,7 +17,22 @@ export function supabaseUrl(): string | null {
 
 export function supabaseAnonKey(): string | null {
   const raw = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  return raw && raw.trim().length > 0 ? raw : null
+  if (!raw || raw.trim().length === 0) return null
+  // Fail closed: a service-role secret must never act as the public anon key.
+  // A misconfigured env would otherwise ship service-role power to browsers.
+  if (raw.startsWith("sb_secret_")) return null
+  if (raw.startsWith("eyJ")) {
+    try {
+      const payload = JSON.parse(
+        atob(raw.split(".")[1].replace(/-/g, "+").replace(/_/g, "-"))
+      ) as { role?: string }
+      if (payload.role === "service_role") return null
+    } catch {
+      // Malformed JWT — surface it as unconfigured rather than half-working.
+      return null
+    }
+  }
+  return raw
 }
 
 export function isSupabaseConfigured(): boolean {
